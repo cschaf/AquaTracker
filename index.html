@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaTrack - Water Intake Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#10b981',
+                        accent: '#8b5cf6',
+                        light: '#f0f9ff',
+                        dark: '#0f172a',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+            min-height: 100vh;
+        }
+        
+        .water-progress {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+        
+        .water-progress::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to right, #3b82f6, #60a5fa);
+            opacity: 0.8;
+            z-index: 1;
+        }
+        
+        .water-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0L100 100M100 0L0 100' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.1'/%3E%3C/svg%3E");
+            z-index: 2;
+        }
+        
+        .water-level {
+            position: relative;
+            z-index: 3;
+            background: linear-gradient(to top, #3b82f6, #60a5fa);
+            transition: height 1s ease-in-out;
+        }
+        
+        .water-bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .water-bubble:nth-child(1) {
+            width: 20px;
+            height: 20px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .water-bubble:nth-child(2) {
+            width: 15px;
+            height: 15px;
+            top: 60%;
+            left: 70%;
+            animation-delay: 1s;
+        }
+        
+        .water-bubble:nth-child(3) {
+            width: 10px;
+            height: 10px;
+            top: 40%;
+            left: 40%;
+            animation-delay: 2s;
+        }
+        
+        .water-bubble:nth-child(4) {
+            width: 25px;
+            height: 25px;
+            top: 80%;
+            left: 20%;
+            animation-delay: 3s;
+        }
+        
+        .water-bubble:nth-child(5) {
+            width: 12px;
+            height: 12px;
+            top: 30%;
+            left: 80%;
+            animation-delay: 4s;
+        }
+        
+        .drop-shadow {
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+        }
+        
+        .entry-item {
+            transition: all 0.3s ease;
+        }
+        
+        .entry-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .goal-input {
+            background: rgba(255, 255, 255, 0.7);
+            border: 2px solid #e0f2fe;
+            transition: all 0.3s ease;
+        }
+        
+        .goal-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        
+        .water-icon {
+            animation: pulse-slow 2s infinite;
+        }
+        
+        .achievement-badge {
+            animation: float 4s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-cyan-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <div class="flex justify-center mb-4">
+                <div class="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center water-icon">
+                    <i class="fas fa-tint text-white text-2xl"></i>
+                </div>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-2">AquaTrack</h1>
+            <p class="text-lg text-gray-600">Stay hydrated, stay healthy</p>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Left Column - Daily Tracker -->
+            <div class="space-y-8">
+                <!-- Daily Intake Card -->
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden drop-shadow">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-bold text-gray-800">Today's Intake</h2>
+                            <div class="relative">
+                                <div class="flex items-center bg-blue-50 rounded-full px-4 py-2">
+                                    <i class="fas fa-calendar-alt text-blue-500 mr-2"></i>
+                                    <span id="current-date" class="font-medium text-gray-700"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Water Progress Visualization -->
+                        <div class="mb-8">
+                            <div class="flex justify-between items-center mb-3">
+                                <div class="flex items-baseline">
+                                    <span id="daily-total" class="text-4xl font-bold text-blue-600">0</span>
+                                    <span class="text-xl text-gray-500 ml-1">ml</span>
+                                </div>
+                                <div class="flex items-baseline">
+                                    <span class="text-xl text-gray-500 mr-1">/</span>
+                                    <input id="daily-goal" type="number" class="goal-input w-24 text-xl font-bold text-gray-700 text-center rounded-lg py-1 px-2 focus:outline-none" value="2000">
+                                    <span class="text-xl text-gray-500 ml-1">ml</span>
+                                </div>
+                            </div>
+                            
+                            <div class="water-progress h-8 rounded-full overflow-hidden relative">
+                                <div id="water-level" class="water-level h-full w-0"></div>
+                                <div class="water-bubble"></div>
+                                <div class="water-bubble"></div>
+                                <div class="water-bubble"></div>
+                                <div class="water-bubble"></div>
+                                <div class="water-bubble"></div>
+                            </div>
+                            
+                            <div class="mt-3 flex justify-between text-sm text-gray-500">
+                                <span>0%</span>
+                                <span id="progress-percentage">0%</span>
+                                <span>100%</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Add Buttons -->
+                        <div class="mb-8">
+                            <p class="text-lg font-semibold text-gray-700 mb-4">Quick Add</p>
+                            <div class="grid grid-cols-3 gap-3">
+                                <button data-amount="250" class="quick-add bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold py-4 rounded-xl transition-all duration-300 transform hover:scale-105">
+                                    <i class="fas fa-glass-whiskey text-xl mb-1"></i>
+                                    <span>250 ml</span>
+                                </button>
+                                <button data-amount="500" class="quick-add bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold py-4 rounded-xl transition-all duration-300 transform hover:scale-105">
+                                    <i class="fas fa-wine-bottle text-xl mb-1"></i>
+                                    <span>500 ml</span>
+                                </button>
+                                <button data-amount="1000" class="quick-add bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold py-4 rounded-xl transition-all duration-300 transform hover:scale-105">
+                                    <i class="fas fa-prescription-bottle text-xl mb-1"></i>
+                                    <span>1L</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Custom Add -->
+                        <div class="mb-6">
+                            <p class="text-lg font-semibold text-gray-700 mb-3">Custom Amount</p>
+                            <div class="flex gap-3">
+                                <input type="number" id="custom-amount" placeholder="Enter amount in ml" class="flex-1 p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition">
+                                <button id="add-custom" class="bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105">
+                                    <i class="fas fa-plus mr-2"></i>Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Today's Entries -->
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden drop-shadow">
+                    <div class="p-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4">Today's Entries</h2>
+                        <div id="entries-container" class="space-y-3 max-h-96 overflow-y-auto pr-2">
+                            <div class="text-center py-8 text-gray-500">
+                                <i class="fas fa-glass-water text-4xl mb-3 text-blue-300"></i>
+                                <p>No entries yet. Add your first water intake!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Achievements -->
+                <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl shadow-xl overflow-hidden text-white">
+                    <div class="p-6">
+                        <h2 class="text-2xl font-bold mb-4">Your Achievements</h2>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="achievement-badge bg-white bg-opacity-20 rounded-xl p-4 text-center">
+                                <i class="fas fa-medal text-2xl mb-2"></i>
+                                <p class="font-semibold">First Day</p>
+                                <p class="text-sm opacity-80">Track your first day</p>
+                            </div>
+                            <div class="achievement-badge bg-white bg-opacity-20 rounded-xl p-4 text-center">
+                                <i class="fas fa-fire text-2xl mb-2"></i>
+                                <p class="font-semibold">Streak</p>
+                                <p class="text-sm opacity-80">5 days in a row</p>
+                            </div>
+                            <div class="achievement-badge bg-white bg-opacity-20 rounded-xl p-4 text-center">
+                                <i class="fas fa-trophy text-2xl mb-2"></i>
+                                <p class="font-semibold">Goal Master</p>
+                                <p class="text-sm opacity-80">100% for 3 days</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column - Charts and Stats -->
+            <div class="space-y-8">
+                <!-- Weekly Chart -->
+                <div class="chart-container">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Weekly Consumption</h2>
+                    <div class="h-64 flex items-end justify-between px-4">
+                        <div class="flex flex-col items-center">
+                            <div class="w-10 bg-blue-400 rounded-t-lg mb-2" style="height: 40%"></div>
+                            <span class="text-sm text-gray-600">Mon</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="w-10 bg-blue-500 rounded-t-lg mb-2" style="height: 60%"></div>
+                            <span class="text-sm text-gray-600">Tue</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="w-10 bg-blue-600 rounded-t-lg mb-2" style="height: 80%"></div>
+                            <span class="text-sm text-gray-600">Wed</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="w-10 bg-blue-700 rounded-t-lg mb-2" style="height: 90%"></div>
+                            <span class="text-sm text-gray-600">Thu</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="w-10 bg-blue-600 rounded-t-lg mb-2" style="height: 70%"></div>
+                            <span class="text-sm text-gray-600">Fri</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="w-10 bg-blue-500 rounded-t-lg mb-2" style="height: 50%"></div>
+                            <span class="text-sm text-gray-600">Sat</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="w-10 bg-blue-400 rounded-t-lg mb-2" style="height: 30%"></div>
+                            <span class="text-sm text-gray-600">Sun</span>
+                        </div>
+                    </div>
+                    <div class="mt-6 text-center">
+                        <p class="text-gray-600">Average: <span class="font-bold text-blue-600">1.8L</span> per day</p>
+                    </div>
+                </div>
+                
+                <!-- Stats Overview -->
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="bg-gradient-to-br from-cyan-500 to-blue-500 rounded-2xl shadow-xl p-6 text-white">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-lg opacity-90">This Week</p>
+                                <p class="text-3xl font-bold mt-1">12.6L</p>
+                            </div>
+                            <i class="fas fa-calendar-week text-3xl opacity-80"></i>
+                        </div>
+                        <div class="mt-4">
+                            <p class="text-sm opacity-90">Goal: 14L</p>
+                            <div class="w-full bg-white bg-opacity-30 h-2 rounded-full mt-1">
+                                <div class="bg-white h-2 rounded-full" style="width: 90%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl shadow-xl p-6 text-white">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-lg opacity-90">Best Streak</p>
+                                <p class="text-3xl font-bold mt-1">7 days</p>
+                            </div>
+                            <i class="fas fa-fire text-3xl opacity-80"></i>
+                        </div>
+                        <div class="mt-4">
+                            <p class="text-sm opacity-90">Current: 3 days</p>
+                            <div class="w-full bg-white bg-opacity-30 h-2 rounded-full mt-1">
+                                <div class="bg-white h-2 rounded-full" style="width: 43%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Export Data -->
+                <div class="bg-white rounded-2xl shadow-xl p-6 text-center">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Export Your Data</h2>
+                    <p class="text-gray-600 mb-6">Download your water intake history for backup or analysis</p>
+                    <button id="export-data" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-xl transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-file-export mr-2"></i>Export as JSON
+                    </button>
+                </div>
+                
+                <!-- Tips -->
+                <div class="bg-gradient-to-r from-amber-100 to-orange-100 rounded-2xl shadow-xl p-6 border border-amber-200">
+                    <h2 class="text-xl font-bold text-amber-800 mb-3 flex items-center">
+                        <i class="fas fa-lightbulb mr-2"></i>Hydration Tips
+                    </h2>
+                    <ul class="space-y-2 text-amber-700">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle mt-1 mr-2 text-amber-500"></i>
+                            <span>Drink a glass of water first thing in the morning</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle mt-1 mr-2 text-amber-500"></i>
+                            <span>Carry a reusable water bottle with you</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle mt-1 mr-2 text-amber-500"></i>
+                            <span>Set reminders to drink water throughout the day</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="mt-12 text-center text-gray-600">
+            <p>&copy; 2023 AquaTrack. Stay hydrated, stay healthy.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current date
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', options);
+            
+            // Load data from localStorage
+            let logs = JSON.parse(localStorage.getItem('waterTrackerData')) || [];
+            let dailyGoal = parseInt(localStorage.getItem('waterTrackerGoal')) || 2000;
+            document.getElementById('daily-goal').value = dailyGoal;
+            
+            // Get today's date string
+            const todayStr = now.toISOString().split('T')[0];
+            
+            // Get today's log
+            let todayLog = logs.find(log => log.date === todayStr);
+            if (!todayLog) {
+                todayLog = { date: todayStr, entries: [] };
+                logs.push(todayLog);
+            }
+            
+            // Update UI with today's data
+            updateUI();
+            
+            // Quick add buttons
+            document.querySelectorAll('.quick-add').forEach(button => {
+                button.addEventListener('click', function() {
+                    const amount = parseInt(this.getAttribute('data-amount'));
+                    addWaterEntry(amount);
+                });
+            });
+            
+            // Custom add button
+            document.getElementById('add-custom').addEventListener('click', function() {
+                const amount = parseInt(document.getElementById('custom-amount').value);
+                if (amount && amount > 0) {
+                    addWaterEntry(amount);
+                    document.getElementById('custom-amount').value = '';
+                }
+            });
+            
+            // Custom amount input on Enter key
+            document.getElementById('custom-amount').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('add-custom').click();
+                }
+            });
+            
+            // Daily goal input change
+            document.getElementById('daily-goal').addEventListener('change', function() {
+                dailyGoal = parseInt(this.value) || 2000;
+                localStorage.setItem('waterTrackerGoal', dailyGoal);
+                updateUI();
+            });
+            
+            // Export data button
+            document.getElementById('export-data').addEventListener('click', function() {
+                exportDataToJson(logs);
+            });
+            
+            // Function to add water entry
+            function addWaterEntry(amount) {
+                const timestamp = Date.now();
+                const entry = { amount, timestamp };
+                
+                // Add to today's log
+                todayLog.entries.push(entry);
+                
+                // Update logs array
+                const index = logs.findIndex(log => log.date === todayStr);
+                if (index > -1) {
+                    logs[index] = todayLog;
+                } else {
+                    logs.push(todayLog);
+                }
+                
+                // Save to localStorage
+                localStorage.setItem('waterTrackerData', JSON.stringify(logs));
+                
+                // Update UI
+                updateUI();
+            }
+            
+            // Function to update UI
+            function updateUI() {
+                // Calculate daily total
+                const dailyTotal = todayLog.entries.reduce((sum, entry) => sum + entry.amount, 0);
+                document.getElementById('daily-total').textContent = dailyTotal;
+                
+                // Update progress bar
+                const percentage = Math.min((dailyTotal / dailyGoal) * 100, 100);
+                document.getElementById('water-level').style.width = `${percentage}%`;
+                document.getElementById('progress-percentage').textContent = `${Math.round(percentage)}%`;
+                
+                // Update entries list
+                const entriesContainer = document.getElementById('entries-container');
+                if (todayLog.entries.length === 0) {
+                    entriesContainer.innerHTML = `
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-glass-water text-4xl mb-3 text-blue-300"></i>
+                            <p>No entries yet. Add your first water intake!</p>
+                        </div>
+                    `;
+                } else {
+                    // Sort entries by timestamp (newest first)
+                    const sortedEntries = [...todayLog.entries].sort((a, b) => b.timestamp - a.timestamp);
+                    
+                    entriesContainer.innerHTML = sortedEntries.map(entry => {
+                        const entryDate = new Date(entry.timestamp);
+                        const timeString = entryDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        
+                        return `
+                            <div class="entry-item bg-blue-50 p-4 rounded-xl flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center mr-3">
+                                        <i class="fas fa-tint text-white"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-800">${entry.amount} ml</p>
+                                        <p class="text-sm text-gray-500">${timeString}</p>
+                                    </div>
+                                </div>
+                                <button class="delete-entry text-red-500 hover:text-red-700" data-timestamp="${entry.timestamp}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    // Add event listeners to delete buttons
+                    document.querySelectorAll('.delete-entry').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const timestamp = parseInt(this.getAttribute('data-timestamp'));
+                            deleteEntry(timestamp);
+                        });
+                    });
+                }
+            }
+            
+            // Function to delete entry
+            function deleteEntry(timestamp) {
+                // Remove entry from today's log
+                todayLog.entries = todayLog.entries.filter(entry => entry.timestamp !== timestamp);
+                
+                // Update logs array
+                const index = logs.findIndex(log => log.date === todayStr);
+                if (index > -1) {
+                    logs[index] = todayLog;
+                }
+                
+                // Remove log if no entries left
+                if (todayLog.entries.length === 0) {
+                    logs = logs.filter(log => log.date !== todayStr);
+                }
+                
+                // Save to localStorage
+                localStorage.setItem('waterTrackerData', JSON.stringify(logs));
+                
+                // Update UI
+                updateUI();
+            }
+            
+            // Function to export data
+            function exportDataToJson(data) {
+                if (!data || data.length === 0) {
+                    alert("No data to export.");
+                    return;
+                }
+                
+                const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
+                    JSON.stringify(data, null, 2)
+                )}`;
+                const link = document.createElement("a");
+                link.href = jsonString;
+                link.download = "water_consumption_data.json";
+                link.click();
+            }
+        });
+    </script>
+<p style="border-radius: 8px; text-align: center; font-size: 12px; color: #fff; margin-top: 16px;position: fixed; left: 8px; bottom: 8px; z-index: 10; background: rgba(0, 0, 0, 0.8); padding: 4px 8px;">Made with <img src="https://enzostvs-deepsite.hf.space/logo.svg" alt="DeepSite Logo" style="width: 16px; height: 16px; vertical-align: middle;display:inline-block;margin-right:3px;filter:brightness(0) invert(1);"><a href="https://enzostvs-deepsite.hf.space" style="color: #fff;text-decoration: underline;" target="_blank" >DeepSite</a> - 🧬 <a href="https://enzostvs-deepsite.hf.space?remix=cschaf/water-tracker" style="color: #fff;text-decoration: underline;" target="_blank" >Remix</a></p></body>
+</html>
