@@ -189,14 +189,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Get the last 7 days of data
         const last7DaysData = [];
-        for (let i = 0; i < 7; i++) {
+        for (let i = 6; i >= 0; i--) {
             const d = new Date(today);
             d.setDate(today.getDate() - i);
             const dateStr = d.toISOString().split('T')[0];
             const log = logs.find(l => l.date === dateStr);
             const total = log ? log.entries.reduce((sum, entry) => sum + entry.amount, 0) : 0;
             last7DaysData.push({
-                day: days[(d.getDay() + 7) % 7],
+                day: days[d.getDay()],
                 total: total
             });
             if (total > 0) {
@@ -204,16 +204,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 daysWithIntake++;
             }
         }
-        last7DaysData.reverse(); // To have the current day at the end
 
         const maxIntake = Math.max(...last7DaysData.map(d => d.total), dailyGoal);
 
         weeklyChart.innerHTML = last7DaysData.map(data => {
             const percentage = maxIntake > 0 ? (data.total / maxIntake) * 100 : 0;
             return `
-                <div class="flex flex-1 flex-col items-center">
-                    <div class="w-10 bg-blue-500 rounded-t-lg mb-2" style="height: ${percentage}%" title="${data.total} ml"></div>
-                    <span class="text-sm text-gray-600">${data.day}</span>
+                <div class="flex flex-1 flex-col items-center justify-end h-full">
+                    <div class="w-10 bg-blue-500 rounded-t-lg" style="height: ${percentage}%" title="${data.total} ml"></div>
+                    <span class="text-sm text-gray-600 mt-2">${data.day}</span>
                 </div>
             `;
         }).join('');
