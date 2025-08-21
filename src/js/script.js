@@ -64,21 +64,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const timestamp = Date.now();
         const entry = { amount, timestamp };
 
-        // Add to today's log
-        todayLog.entries.push(entry);
-
-        // Update logs array
-        const index = logs.findIndex(log => log.date === todayStr);
-        if (index > -1) {
-            logs[index] = todayLog;
-        } else {
-            logs.push(todayLog);
+        // Ensure today's log object exists and get a fresh reference.
+        let logForToday = logs.find(log => log.date === todayStr);
+        if (!logForToday) {
+            logForToday = { date: todayStr, entries: [] };
+            logs.push(logForToday);
         }
+        todayLog = logForToday; // Keep the global reference up to date.
 
-        // Save to localStorage
+        // Add the new entry to the log object from the array.
+        logForToday.entries.push(entry);
+
+        // Save to localStorage and update the UI
         localStorage.setItem('waterTrackerData', JSON.stringify(logs));
-
-        // Update UI
         updateUI();
     }
 
@@ -143,24 +141,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to delete entry
     function deleteEntry(timestamp) {
-        // Remove entry from today's log
-        todayLog.entries = todayLog.entries.filter(entry => entry.timestamp !== timestamp);
+        // Get a fresh reference to today's log.
+        let logForToday = logs.find(log => log.date === todayStr);
+        if (!logForToday) return; // Should not happen if delete button is visible.
 
-        // Update logs array
-        const index = logs.findIndex(log => log.date === todayStr);
-        if (index > -1) {
-            logs[index] = todayLog;
-        }
+        // Remove the entry from the log.
+        logForToday.entries = logForToday.entries.filter(entry => entry.timestamp !== timestamp);
+        todayLog = logForToday; // Keep the global reference up to date.
 
-        // Remove log if no entries left
-        if (todayLog.entries.length === 0) {
+        // If the last entry is gone, remove the entire log for today.
+        if (logForToday.entries.length === 0) {
             logs = logs.filter(log => log.date !== todayStr);
         }
 
-        // Save to localStorage
+        // Save to localStorage and update the UI.
         localStorage.setItem('waterTrackerData', JSON.stringify(logs));
-
-        // Update UI
         updateUI();
     }
 
