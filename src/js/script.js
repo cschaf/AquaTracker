@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
         weeklyChart.innerHTML = last7DaysData.map(data => {
             const percentage = maxIntake > 0 ? (data.total / maxIntake) * 100 : 0;
             return `
-                <div class="flex flex-col items-center w-1/7">
+                <div class="flex flex-1 flex-col items-center">
                     <div class="w-10 bg-blue-500 rounded-t-lg mb-2" style="height: ${percentage}%" title="${data.total} ml"></div>
                     <span class="text-sm text-gray-600">${data.day}</span>
                 </div>
