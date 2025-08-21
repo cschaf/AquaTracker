@@ -142,38 +142,11 @@
                 <!-- Weekly Chart -->
                 <div class="chart-container">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Weekly Consumption</h2>
-                    <div class="h-64 flex items-end justify-between px-4">
-                        <div class="flex flex-col items-center">
-                            <div class="w-10 bg-blue-400 rounded-t-lg mb-2" style="height: 40%"></div>
-                            <span class="text-sm text-gray-600">Mon</span>
-                        </div>
-                        <div class="flex flex-col items-center">
-                            <div class="w-10 bg-blue-500 rounded-t-lg mb-2" style="height: 60%"></div>
-                            <span class="text-sm text-gray-600">Tue</span>
-                        </div>
-                        <div class="flex flex-col items-center">
-                            <div class="w-10 bg-blue-600 rounded-t-lg mb-2" style="height: 80%"></div>
-                            <span class="text-sm text-gray-600">Wed</span>
-                        </div>
-                        <div class="flex flex-col items-center">
-                            <div class="w-10 bg-blue-700 rounded-t-lg mb-2" style="height: 90%"></div>
-                            <span class="text-sm text-gray-600">Thu</span>
-                        </div>
-                        <div class="flex flex-col items-center">
-                            <div class="w-10 bg-blue-600 rounded-t-lg mb-2" style="height: 70%"></div>
-                            <span class="text-sm text-gray-600">Fri</span>
-                        </div>
-                        <div class="flex flex-col items-center">
-                            <div class="w-10 bg-blue-500 rounded-t-lg mb-2" style="height: 50%"></div>
-                            <span class="text-sm text-gray-600">Sat</span>
-                        </div>
-                        <div class="flex flex-col items-center">
-                            <div class="w-10 bg-blue-400 rounded-t-lg mb-2" style="height: 30%"></div>
-                            <span class="text-sm text-gray-600">Sun</span>
-                        </div>
+                    <div id="weekly-chart" class="h-64 flex items-end justify-between px-4">
+                        <!-- Chart bars will be dynamically inserted here -->
                     </div>
                     <div class="mt-6 text-center">
-                        <p class="text-gray-600">Average: <span class="font-bold text-blue-600">1.8L</span> per day</p>
+                        <p class="text-gray-600">Average: <span id="weekly-avg" class="font-bold text-blue-600">0L</span> per day</p>
                     </div>
                 </div>
                 

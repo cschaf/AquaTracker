@@ -93,6 +93,9 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('water-level').style.width = `${percentage}%`;
         document.getElementById('progress-percentage').textContent = `${Math.round(percentage)}%`;
 
+        // Update weekly chart
+        updateWeeklyChart();
+
         // Update entries list
         const entriesContainer = document.getElementById('entries-container');
         if (todayLog.entries.length === 0) {
@@ -175,5 +178,52 @@ document.addEventListener('DOMContentLoaded', function() {
         link.href = jsonString;
         link.download = "water_consumption_data.json";
         link.click();
+    }
+
+    // Function to update the weekly chart
+    function updateWeeklyChart() {
+        const weeklyChart = document.getElementById('weekly-chart');
+        const weeklyAvg = document.getElementById('weekly-avg');
+        if (!weeklyChart || !weeklyAvg) return;
+
+        const today = new Date();
+        const dayOfWeek = today.getDay(); // Sunday - 0, Monday - 1, ...
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        let weeklyTotal = 0;
+        let daysWithIntake = 0;
+
+        // Get the last 7 days of data
+        const last7DaysData = [];
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(today);
+            d.setDate(today.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
+            const log = logs.find(l => l.date === dateStr);
+            const total = log ? log.entries.reduce((sum, entry) => sum + entry.amount, 0) : 0;
+            last7DaysData.push({
+                day: days[(d.getDay() + 7) % 7],
+                total: total
+            });
+            if (total > 0) {
+                weeklyTotal += total;
+                daysWithIntake++;
+            }
+        }
+        last7DaysData.reverse(); // To have the current day at the end
+
+        const maxIntake = Math.max(...last7DaysData.map(d => d.total), dailyGoal);
+
+        weeklyChart.innerHTML = last7DaysData.map(data => {
+            const percentage = maxIntake > 0 ? (data.total / maxIntake) * 100 : 0;
+            return `
+                <div class="flex flex-col items-center w-1/7">
+                    <div class="w-10 bg-blue-500 rounded-t-lg mb-2" style="height: ${percentage}%" title="${data.total} ml"></div>
+                    <span class="text-sm text-gray-600">${data.day}</span>
+                </div>
+            `;
+        }).join('');
+
+        const avgIntake = daysWithIntake > 0 ? weeklyTotal / daysWithIntake : 0;
+        weeklyAvg.textContent = `${(avgIntake / 1000).toFixed(1)}L`;
     }
 });
