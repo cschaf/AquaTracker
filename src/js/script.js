@@ -301,7 +301,17 @@ document.addEventListener('DOMContentLoaded', function() {
         if (dailyTotals.size > 0) {
             const sortedDates = [...dailyTotals.keys()].sort();
             const firstLogDate = new Date(sortedDates[0]);
-            let streakDate = new Date(); // Start from today
+
+            let startDate = new Date(); // Today
+            const todayStr = startDate.toISOString().split('T')[0];
+            const todayTotal = dailyTotals.get(todayStr) || 0;
+
+            // If today's goal is not met, start checking from yesterday
+            if (todayTotal < dailyGoal) {
+                startDate.setDate(startDate.getDate() - 1);
+            }
+
+            let streakDate = startDate;
 
             while (streakDate >= firstLogDate) {
                 const dateStr = streakDate.toISOString().split('T')[0];
