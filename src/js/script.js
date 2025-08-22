@@ -59,6 +59,16 @@ document.addEventListener('DOMContentLoaded', function() {
         exportDataToJson(logs);
     });
 
+    // Import data button
+    document.getElementById('import-data').addEventListener('click', function() {
+        const importFile = document.getElementById('import-file').files[0];
+        if (importFile) {
+            importData(importFile);
+        } else {
+            alert("Please select a file to import.");
+        }
+    });
+
     // Function to add water entry
     function addWaterEntry(amount) {
         const timestamp = Date.now();
@@ -176,6 +186,28 @@ document.addEventListener('DOMContentLoaded', function() {
         link.href = jsonString;
         link.download = "water_consumption_data.json";
         link.click();
+    }
+
+    // Function to import data from a JSON file
+    function importData(file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            try {
+                const importedData = JSON.parse(event.target.result);
+                // Basic validation: check if it's an array and has the expected structure
+                if (Array.isArray(importedData) && importedData.every(log => 'date' in log && 'entries' in log)) {
+                    localStorage.setItem('waterTrackerData', JSON.stringify(importedData));
+                    alert("Data imported successfully! The page will now reload to apply the changes.");
+                    location.reload();
+                } else {
+                    alert("Invalid data format. Please import a valid JSON file exported from AquaTracker.");
+                }
+            } catch (error) {
+                alert("Error reading or parsing the file. Please ensure it's a valid JSON file.");
+                console.error("Import error:", error);
+            }
+        };
+        reader.readAsText(file);
     }
 
     // Function to update the weekly chart

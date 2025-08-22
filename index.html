@@ -193,6 +193,18 @@
                         <i class="fas fa-file-export mr-2"></i>Export as JSON
                     </button>
                 </div>
+
+                <!-- Import Data -->
+                <div class="bg-white rounded-2xl shadow-xl p-6 text-center">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Import Your Data</h2>
+                    <p class="text-gray-600 mb-6">Import a previously exported JSON file to restore your data.</p>
+                    <div class="flex flex-col items-center space-y-4">
+                        <input type="file" id="import-file" accept=".json" class="w-full max-w-xs text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+                        <button id="import-data" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-xl transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-file-import mr-2"></i>Import from JSON
+                        </button>
+                    </div>
+                </div>
                 
                 <!-- Tips -->
                 <div class="bg-gradient-to-r from-amber-100 to-orange-100 rounded-2xl shadow-xl p-6 border border-amber-200">
