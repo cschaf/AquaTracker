@@ -94,6 +94,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update weekly chart
         updateWeeklyChart();
 
+        // Update stats overview
+        updateStatsOverview();
+
         // Update entries list
         const entriesContainer = document.getElementById('entries-container');
         if (todayLog.entries.length === 0) {
@@ -176,6 +179,58 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Function to update the weekly chart
+    function updateStatsOverview() {
+        const thisWeekTotalEl = document.getElementById('this-week-total');
+
+        // Calculate this week's total
+        const today = new Date();
+        const dayOfWeek = today.getDay(); // Sunday - 0, Monday - 1, ...
+        const firstDayOfWeek = new Date(today);
+        // Adjust to Monday
+        firstDayOfWeek.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+
+        let weeklyTotal = 0;
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(firstDayOfWeek);
+            d.setDate(firstDayOfWeek.getDate() + i);
+            const dateStr = d.toISOString().split('T')[0];
+            const log = logs.find(l => l.date === dateStr);
+            if (log) {
+                weeklyTotal += log.entries.reduce((sum, entry) => sum + entry.amount, 0);
+            }
+        }
+        thisWeekTotalEl.textContent = `${(weeklyTotal / 1000).toFixed(1)}L`;
+
+        // Calculate best streak
+        const bestStreakEl = document.getElementById('best-streak');
+        let bestStreak = 0;
+        let currentStreak = 0;
+        if (logs.length > 0) {
+            const sortedLogs = [...logs].sort((a, b) => new Date(a.date) - new Date(b.date));
+            const firstDate = new Date(sortedLogs[0].date);
+            const lastDate = new Date(sortedLogs[sortedLogs.length - 1].date);
+
+            for (let d = firstDate; d <= lastDate; d.setDate(d.getDate() + 1)) {
+                const dateStr = d.toISOString().split('T')[0];
+                const log = logs.find(l => l.date === dateStr);
+                const total = log ? log.entries.reduce((sum, entry) => sum + entry.amount, 0) : 0;
+
+                if (total >= dailyGoal) {
+                    currentStreak++;
+                } else {
+                    if (currentStreak > bestStreak) {
+                        bestStreak = currentStreak;
+                    }
+                    currentStreak = 0;
+                }
+            }
+            if (currentStreak > bestStreak) {
+                bestStreak = currentStreak;
+            }
+        }
+        bestStreakEl.textContent = `${bestStreak} days`;
+    }
+
     function updateWeeklyChart() {
         const weeklyChart = document.getElementById('weekly-chart');
         const weeklyAvg = document.getElementById('weekly-avg');
