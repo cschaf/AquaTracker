@@ -181,6 +181,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to update the weekly chart
     function updateStatsOverview() {
         const thisWeekTotalEl = document.getElementById('this-week-total');
+        const thisWeekGoalEl = document.getElementById('this-week-goal');
+        const thisWeekProgressEl = document.getElementById('this-week-progress');
 
         // Calculate this week's total
         const today = new Date();
@@ -200,6 +202,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         thisWeekTotalEl.textContent = `${(weeklyTotal / 1000).toFixed(1)}L`;
+
+        // Update weekly goal
+        const weeklyGoal = dailyGoal * 7;
+        thisWeekGoalEl.textContent = `Goal: ${(weeklyGoal / 1000).toFixed(1)}L`;
+        const weeklyProgress = weeklyGoal > 0 ? (weeklyTotal / weeklyGoal) * 100 : 0;
+        thisWeekProgressEl.style.width = `${weeklyProgress}%`;
 
         // Calculate best streak
         const bestStreakEl = document.getElementById('best-streak');
