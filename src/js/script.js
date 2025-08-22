@@ -28,6 +28,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Get today's date string
     const todayStr = now.toISOString().split('T')[0];
 
+    // Modal elements
+    const achievementModal = document.getElementById('achievement-modal');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+    const modalIcon = document.getElementById('modal-icon').querySelector('i');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDescription = document.getElementById('modal-description');
+
     // Get today's log
     let todayLog = logs.find(log => log.date === todayStr);
     if (!todayLog) {
@@ -721,11 +728,54 @@ document.addEventListener('DOMContentLoaded', async function() {
             const description = isUnlocked ? achievement.description : 'Locked';
 
             return `
-                <div class="achievement-badge ${badgeClasses} rounded-xl p-3 text-center transition-all duration-300 transform hover:scale-110" title="${achievement.name}: ${description}">
+                <div class="achievement-badge ${badgeClasses} rounded-xl p-3 text-center transition-all duration-300 transform hover:scale-110" data-achievement-id="${achievement.id}" title="${achievement.name}: ${description}">
                     <i class="${achievement.icon} text-2xl mb-2 ${iconClass}"></i>
-                    <p class="font-semibold text-xs ${textClass}">${achievement.name}</p>
+                    <p class="font-semibold text-xs ${textClass} break-words">${achievement.name}</p>
                 </div>
             `;
         }).join('');
+
+        // Add event listeners to badges
+        document.querySelectorAll('.achievement-badge').forEach(badge => {
+            badge.addEventListener('click', () => {
+                const achievementId = badge.getAttribute('data-achievement-id');
+                const achievement = allAchievements.find(a => a.id === achievementId);
+                if (achievement) {
+                    openAchievementModal(achievement);
+                }
+            });
+        });
     }
+
+    function openAchievementModal(achievement) {
+        const isUnlocked = (JSON.parse(localStorage.getItem('unlockedAchievements')) || []).includes(achievement.id);
+
+        const iconContainer = document.getElementById('modal-icon');
+        const iconEl = iconContainer.querySelector('i');
+        iconEl.className = `${achievement.icon} text-4xl`;
+
+        if (isUnlocked) {
+            iconContainer.className = 'w-20 h-20 rounded-full bg-blue-500 flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-lg';
+            iconEl.classList.add('text-white');
+        } else {
+            iconContainer.className = 'w-20 h-20 rounded-full bg-gray-700 flex items-center justify-center mx-auto mb-4 border-4 border-gray-400 shadow-lg';
+            iconEl.classList.add('text-gray-400');
+        }
+
+        modalTitle.textContent = achievement.name;
+        modalDescription.textContent = isUnlocked ? achievement.description : 'This achievement is still locked. Keep tracking your intake to unlock it!';
+        achievementModal.classList.remove('hidden');
+    }
+
+    function closeAchievementModal() {
+        achievementModal.classList.add('hidden');
+    }
+
+    // Modal event listeners
+    modalCloseBtn.addEventListener('click', closeAchievementModal);
+    achievementModal.addEventListener('click', (e) => {
+        if (e.target === achievementModal) {
+            closeAchievementModal();
+        }
+    });
 });
