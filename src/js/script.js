@@ -209,9 +209,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
         weeklyChart.innerHTML = last7DaysData.map(data => {
             const percentage = maxIntake > 0 ? (data.total / maxIntake) * 100 : 0;
+            const barHeight = percentage > 5 ? `${percentage}%` : 'auto';
+            const textColor = percentage > 15 ? 'text-white' : 'text-gray-800';
+            const amountPosition = percentage > 15 ? '' : 'bar-amount-outside';
+
             return `
                 <div class="flex flex-1 flex-col items-center justify-end h-full">
-                    <div class="w-10 bg-blue-500 rounded-t-lg" style="height: ${percentage}%" title="${data.total} ml"></div>
+                    <div class="w-10 bg-blue-500 rounded-t-lg relative" style="height: ${barHeight}" title="${data.total} ml">
+                        <div class="bar-amount ${textColor} ${amountPosition}">${data.total} ml</div>
+                    </div>
                     <span class="text-sm text-gray-600 mt-2">${data.day}</span>
                 </div>
             `;
