@@ -94,7 +94,7 @@
     "id": "first-log-before-6am",
     "name": "The Early Bird",
     "description": "Log your first glass of water before 6 AM.",
-    "icon": "fas fa-sunrise",
+    "icon": "fas fa-cloud-sun",
     "trigger": { "type": "log_before_time", "hour": 6 }
   },
   {
@@ -157,7 +157,7 @@
     "id": "goal-saturday-sunday-4-weeks",
     "name": "Weekend Warrior",
     "description": "Meet your daily goal every Saturday and Sunday for a month.",
-    "icon": "fas fa-calendar-weekend",
+    "icon": "fas fa-calendar-day",
     "trigger": { "type": "weekend_goal", "weeks": 4 }
   }
 ]
