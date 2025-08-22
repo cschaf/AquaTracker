@@ -59,6 +59,14 @@ document.addEventListener('DOMContentLoaded', function() {
         exportDataToJson(logs, dailyGoal);
     });
 
+    // Enable/disable import button based on file selection
+    const importFileInput = document.getElementById('import-file');
+    const importDataButton = document.getElementById('import-data');
+
+    importFileInput.addEventListener('change', function() {
+        importDataButton.disabled = this.files.length === 0;
+    });
+
     // Import data button
     document.getElementById('import-data').addEventListener('click', function() {
         const importFile = document.getElementById('import-file').files[0];
