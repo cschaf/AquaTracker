@@ -206,20 +206,25 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update weekly goal
         const weeklyGoal = dailyGoal * 7;
         thisWeekGoalEl.textContent = `Goal: ${(weeklyGoal / 1000).toFixed(1)}L`;
-        const weeklyProgress = weeklyGoal > 0 ? (weeklyTotal / weeklyGoal) * 100 : 0;
+        let weeklyProgress = weeklyGoal > 0 ? (weeklyTotal / weeklyGoal) * 100 : 0;
+        weeklyProgress = Math.min(weeklyProgress, 100);
         thisWeekProgressEl.style.width = `${weeklyProgress}%`;
 
         // Calculate best streak
         const bestStreakEl = document.getElementById('best-streak');
+        const currentStreakTextEl = document.getElementById('current-streak-text');
+        const currentStreakProgressEl = document.getElementById('current-streak-progress');
+
         let bestStreak = 0;
         let currentStreak = 0;
         if (logs.length > 0) {
             const sortedLogs = [...logs].sort((a, b) => new Date(a.date) - new Date(b.date));
             const firstDate = new Date(sortedLogs[0].date);
-            const lastDate = new Date(sortedLogs[sortedLogs.length - 1].date);
+            const lastDate = new Date();
+            let currentDate = new Date(firstDate);
 
-            for (let d = firstDate; d <= lastDate; d.setDate(d.getDate() + 1)) {
-                const dateStr = d.toISOString().split('T')[0];
+            while(currentDate <= lastDate) {
+                const dateStr = currentDate.toISOString().split('T')[0];
                 const log = logs.find(l => l.date === dateStr);
                 const total = log ? log.entries.reduce((sum, entry) => sum + entry.amount, 0) : 0;
 
@@ -231,12 +236,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     currentStreak = 0;
                 }
+                currentDate.setDate(currentDate.getDate() + 1);
             }
             if (currentStreak > bestStreak) {
                 bestStreak = currentStreak;
             }
         }
         bestStreakEl.textContent = `${bestStreak} days`;
+        currentStreakTextEl.textContent = `Current: ${currentStreak} days`;
+        let streakProgress = bestStreak > 0 ? (currentStreak / bestStreak) * 100 : 0;
+        streakProgress = Math.min(streakProgress, 100);
+        currentStreakProgressEl.style.width = `${streakProgress}%`;
     }
 
     function updateWeeklyChart() {
