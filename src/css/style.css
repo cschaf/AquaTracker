@@ -127,3 +127,18 @@ body {
 .achievement-badge {
     animation: float 4s ease-in-out infinite;
 }
+
+.bar-amount {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    width: 100%;
+}
+
+.bar-amount-outside {
+    top: -20px;
+}
