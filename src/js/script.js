@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Export data button
     document.getElementById('export-data').addEventListener('click', function() {
-        exportDataToJson(logs);
+        exportDataToJson(logs, dailyGoal);
     });
 
     // Import data button
@@ -173,14 +173,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Function to export data
-    function exportDataToJson(data) {
-        if (!data || data.length === 0) {
+    function exportDataToJson(logs, goal) {
+        if (!logs || logs.length === 0) {
             alert("No data to export.");
             return;
         }
 
+        const exportData = {
+            goal: goal,
+            logs: logs
+        };
+
         const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
-            JSON.stringify(data, null, 2)
+            JSON.stringify(exportData, null, 2)
         )}`;
         const link = document.createElement("a");
         link.href = jsonString;
@@ -194,12 +199,21 @@ document.addEventListener('DOMContentLoaded', function() {
         reader.onload = function(event) {
             try {
                 const importedData = JSON.parse(event.target.result);
-                // Basic validation: check if it's an array and has the expected structure
-                if (Array.isArray(importedData) && importedData.every(log => 'date' in log && 'entries' in log)) {
-                    localStorage.setItem('waterTrackerData', JSON.stringify(importedData));
+
+                // New format validation
+                if (importedData && typeof importedData.goal === 'number' && Array.isArray(importedData.logs)) {
+                    localStorage.setItem('waterTrackerGoal', importedData.goal);
+                    localStorage.setItem('waterTrackerData', JSON.stringify(importedData.logs));
                     alert("Data imported successfully! The page will now reload to apply the changes.");
                     location.reload();
-                } else {
+                }
+                // Old format validation (for backward compatibility)
+                else if (Array.isArray(importedData)) {
+                    localStorage.setItem('waterTrackerData', JSON.stringify(importedData));
+                    alert("Data imported successfully (using old format). The page will now reload.");
+                    location.reload();
+                }
+                else {
                     alert("Invalid data format. Please import a valid JSON file exported from AquaTracker.");
                 }
             } catch (error) {
