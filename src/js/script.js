@@ -1,5 +1,20 @@
 // Initialize app
-document.addEventListener('DOMContentLoaded', function() {
+let allAchievements = [];
+
+async function loadAchievements() {
+    try {
+        const response = await fetch('src/js/achievements.json');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        allAchievements = await response.json();
+    } catch (error) {
+        console.error("Could not load achievements:", error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', async function() {
+    await loadAchievements();
     // Set current date
     const now = new Date();
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -12,6 +27,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Get today's date string
     const todayStr = now.toISOString().split('T')[0];
+
+    // Modal elements
+    const achievementModal = document.getElementById('achievement-modal');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+    const modalIcon = document.getElementById('modal-icon').querySelector('i');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDescription = document.getElementById('modal-description');
 
     // Get today's log
     let todayLog = logs.find(log => log.date === todayStr);
@@ -98,6 +120,292 @@ document.addEventListener('DOMContentLoaded', function() {
         updateUI();
     }
 
+    // ----------------------------------------------------------------------------------
+    // Achievement Calculation Logic
+    // ----------------------------------------------------------------------------------
+
+    function calculateAndStoreAchievements() {
+        let unlockedAchievements = JSON.parse(localStorage.getItem('unlockedAchievements')) || [];
+        const dailyTotals = new Map();
+        logs.forEach(log => {
+            const total = log.entries.reduce((sum, entry) => sum + entry.amount, 0);
+            dailyTotals.set(log.date, total);
+        });
+
+        allAchievements.forEach(achievement => {
+            if (unlockedAchievements.includes(achievement.id)) {
+                return; // Skip already unlocked achievements
+            }
+
+            let earned = false;
+            const trigger = achievement.trigger;
+
+            switch (trigger.type) {
+                case 'log_count':
+                    earned = dailyTotals.size >= trigger.days;
+                    break;
+                case 'consecutive_goals':
+                    earned = checkConsecutiveGoals(dailyTotals, dailyGoal, trigger.days);
+                    break;
+                case 'total_volume':
+                    const totalVolume = logs.reduce((sum, log) => sum + log.entries.reduce((s, e) => s + e.amount, 0), 0);
+                    earned = totalVolume >= trigger.amount;
+                    break;
+                case 'goal_met':
+                     const goalsMetCount = [...dailyTotals.values()].filter(total => total >= dailyGoal).length;
+                    earned = goalsMetCount >= trigger.times;
+                    break;
+                case 'goals_in_week':
+                    earned = checkGoalsInWeek(dailyTotals, dailyGoal, trigger.count);
+                    break;
+                case 'exceed_goal_by':
+                    earned = [...dailyTotals.values()].some(total => total >= dailyGoal * (trigger.percentage / 100));
+                    break;
+                case 'log_before_time':
+                    earned = logs.some(log => log.entries.some(e => new Date(e.timestamp).getHours() < trigger.hour));
+                    break;
+                case 'log_after_time':
+                    earned = logs.some(log => log.entries.some(e => new Date(e.timestamp).getHours() >= trigger.hour));
+                    break;
+                case 'logs_per_day_for_days':
+                    earned = checkLogsPerDayForDays(logs, trigger.logs, trigger.days);
+                    break;
+                case 'log_on_date':
+                    earned = logs.some(log => {
+                        const logDate = new Date(log.date);
+                        return logDate.getUTCMonth() + 1 === trigger.month && logDate.getUTCDate() === trigger.day;
+                    });
+                    break;
+                case 'log_date_range':
+                    earned = checkLogDateRange(dailyTotals, dailyGoal, trigger.start, trigger.end);
+                    break;
+                case 'log_after_break':
+                    earned = checkLogAfterBreak(dailyTotals, trigger.days);
+                    break;
+                case 'log_streak':
+                    earned = checkLogStreak(dailyTotals, trigger.days);
+                    break;
+                case 'log_at_time_for_days':
+                    earned = checkLogAtTimeForDays(logs, trigger.hour, trigger.days);
+                    break;
+                case 'single_log_amount':
+                    earned = logs.some(log => log.entries.some(e => e.amount >= trigger.amount));
+                    break;
+                case 'weekend_goal':
+                    earned = checkWeekendGoal(dailyTotals, dailyGoal, trigger.weeks);
+                    break;
+            }
+
+            if (earned) {
+                unlockedAchievements.push(achievement.id);
+            }
+        });
+
+        localStorage.setItem('unlockedAchievements', JSON.stringify(unlockedAchievements));
+    }
+
+    function checkConsecutiveGoals(dailyTotals, goal, days) {
+        const sortedDates = [...dailyTotals.keys()].sort();
+        if (sortedDates.length < days) return false;
+        let consecutiveCount = 0;
+        let lastDate = null;
+
+        for (const dateStr of sortedDates) {
+            const currentDate = new Date(dateStr);
+            if (lastDate && (currentDate - lastDate) / (1000 * 60 * 60 * 24) === 1) {
+                if (dailyTotals.get(dateStr) >= goal) {
+                    consecutiveCount++;
+                } else {
+                    consecutiveCount = 0;
+                }
+            } else {
+                 if (dailyTotals.get(dateStr) >= goal) {
+                    consecutiveCount = 1;
+                } else {
+                    consecutiveCount = 0;
+                }
+            }
+            if (consecutiveCount >= days) return true;
+            lastDate = currentDate;
+        }
+        return false;
+    }
+
+    function checkGoalsInWeek(dailyTotals, goal, count) {
+        const weeks = {};
+        for (const [dateStr, total] of dailyTotals.entries()) {
+            if (total >= goal) {
+                const date = new Date(dateStr);
+                const year = date.getUTCFullYear();
+                const week = getWeekNumber(date);
+                const weekId = `${year}-${week}`;
+                if (!weeks[weekId]) weeks[weekId] = 0;
+                weeks[weekId]++;
+                if (weeks[weekId] >= count) return true;
+            }
+        }
+        return false;
+    }
+
+    function getWeekNumber(d) {
+        d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+        d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+        const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        return weekNo;
+    }
+
+    function checkLogsPerDayForDays(logs, logCount, numDays) {
+        const dailyLogCounts = new Map();
+        logs.forEach(log => {
+            dailyLogCounts.set(log.date, log.entries.length);
+        });
+
+        const sortedDates = [...dailyLogCounts.keys()].sort();
+        if(sortedDates.length < numDays) return false;
+
+        let consecutiveDays = 0;
+        let lastDate = null;
+
+        for(const dateStr of sortedDates){
+            const currentDate = new Date(dateStr);
+            if (lastDate && (currentDate - lastDate) / (1000 * 60 * 60 * 24) === 1) {
+                if(dailyLogCounts.get(dateStr) >= logCount){
+                    consecutiveDays++;
+                } else {
+                    consecutiveDays = 0;
+                }
+            } else {
+                if(dailyLogCounts.get(dateStr) >= logCount){
+                    consecutiveDays = 1;
+                } else {
+                    consecutiveDays = 0;
+                }
+            }
+            if(consecutiveDays >= numDays) return true;
+            lastDate = currentDate;
+        }
+        return false;
+    }
+
+    function checkLogDateRange(dailyTotals, goal, start, end) {
+        const [startMonth, startDay] = start.split('-').map(Number);
+        const [endMonth, endDay] = end.split('-').map(Number);
+
+        const years = new Set([...dailyTotals.keys()].map(d => new Date(d).getFullYear()));
+
+        for(const year of years) {
+            let allDaysMet = true;
+            const startDate = new Date(year, startMonth - 1, startDay);
+            const endDate = new Date(year, endMonth - 1, endDay);
+
+            for (let d = startDate; d <= endDate; d.setDate(d.getDate() + 1)) {
+                const dateStr = d.toISOString().split('T')[0];
+                if (!dailyTotals.has(dateStr) || dailyTotals.get(dateStr) < goal) {
+                    allDaysMet = false;
+                    break;
+                }
+            }
+            if(allDaysMet) return true;
+        }
+        return false;
+    }
+
+    function checkLogAfterBreak(dailyTotals, breakDays) {
+        const sortedDates = [...dailyTotals.keys()].sort();
+        if (sortedDates.length < 2) return false;
+
+        for (let i = 1; i < sortedDates.length; i++) {
+            const prevDate = new Date(sortedDates[i-1]);
+            const currDate = new Date(sortedDates[i]);
+            const diffDays = (currDate - prevDate) / (1000 * 60 * 60 * 24);
+            if (diffDays > breakDays) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function checkLogStreak(dailyTotals, days){
+         const sortedDates = [...dailyTotals.keys()].sort();
+        if (sortedDates.length < days) return false;
+        let consecutiveCount = 0;
+        let lastDate = null;
+
+        for (const dateStr of sortedDates) {
+            const currentDate = new Date(dateStr);
+            if (lastDate && (currentDate - lastDate) / (1000 * 60 * 60 * 24) === 1) {
+                consecutiveCount++;
+            } else {
+                consecutiveCount = 1;
+            }
+            if (consecutiveCount >= days) return true;
+            lastDate = currentDate;
+        }
+        return false;
+    }
+
+    function checkLogAtTimeForDays(logs, hour, numDays) {
+        const datesWithSpecificLog = new Set();
+        logs.forEach(log => {
+            if (log.entries.some(e => new Date(e.timestamp).getHours() === hour)) {
+                datesWithSpecificLog.add(log.date);
+            }
+        });
+
+        const sortedDates = [...datesWithSpecificLog].sort();
+        if(sortedDates.length < numDays) return false;
+
+        let consecutiveCount = 0;
+        let lastDate = null;
+
+        for(const dateStr of sortedDates) {
+            const currentDate = new Date(dateStr);
+             if (lastDate && (currentDate - lastDate) / (1000 * 60 * 60 * 24) === 1) {
+                consecutiveCount++;
+            } else {
+                consecutiveCount = 1;
+            }
+            if (consecutiveCount >= numDays) return true;
+            lastDate = currentDate;
+        }
+        return false;
+    }
+
+    function checkWeekendGoal(dailyTotals, goal, weeks) {
+        const weekendGoalsMet = new Set();
+        for (const [dateStr, total] of dailyTotals.entries()) {
+            if (total >= goal) {
+                const date = new Date(dateStr);
+                const dayOfWeek = date.getUTCDay();
+                if (dayOfWeek === 6 || dayOfWeek === 0) { // Saturday or Sunday
+                    const year = date.getUTCFullYear();
+                    const week = getWeekNumber(date);
+                    weekendGoalsMet.add(`${year}-${week}-${dayOfWeek}`);
+                }
+            }
+        }
+
+        // Count weeks with both Saturday and Sunday goals met
+        const weekCounts = {};
+        for(const item of weekendGoalsMet){
+            const [year, week, day] = item.split('-');
+            const weekId = `${year}-${week}`;
+            if(!weekCounts[weekId]) weekCounts[weekId] = new Set();
+            weekCounts[weekId].add(day);
+        }
+
+        let completeWeekendCount = 0;
+        for(const weekId in weekCounts){
+            if(weekCounts[weekId].has('0') && weekCounts[weekId].has('6')){
+                completeWeekendCount++;
+            }
+        }
+
+        return completeWeekendCount >= weeks;
+    }
+
+
     // Function to update UI
     function updateUI() {
         // Calculate daily total
@@ -114,6 +422,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Update stats overview, which includes weekly total, best streak, and current streak.
         updateStatsOverview();
+
+        // Calculate and display achievements
+        calculateAndStoreAchievements();
+        displayAchievements();
 
         // Update entries list
         const entriesContainer = document.getElementById('entries-container');
@@ -390,4 +702,80 @@ document.addEventListener('DOMContentLoaded', function() {
         const avgIntake = daysWithIntake > 0 ? weeklyTotal / daysWithIntake : 0;
         weeklyAvg.textContent = `${(avgIntake / 1000).toFixed(1)}L`;
     }
+
+    function displayAchievements() {
+        const container = document.getElementById('achievements-container');
+        if (!container) return;
+
+        const unlockedAchievements = JSON.parse(localStorage.getItem('unlockedAchievements')) || [];
+
+        // Sort achievements: unlocked first, then by original order
+        const sortedAchievements = [...allAchievements].sort((a, b) => {
+            const aUnlocked = unlockedAchievements.includes(a.id);
+            const bUnlocked = unlockedAchievements.includes(b.id);
+            if (aUnlocked && !bUnlocked) return -1;
+            if (!aUnlocked && bUnlocked) return 1;
+            return 0; // Keep original order among locked/unlocked groups
+        });
+
+        container.innerHTML = sortedAchievements.map(achievement => {
+            const isUnlocked = unlockedAchievements.includes(achievement.id);
+            const badgeClasses = isUnlocked
+                ? 'bg-white bg-opacity-20'
+                : 'bg-black bg-opacity-20 filter grayscale cursor-help';
+            const iconClass = isUnlocked ? 'text-amber-300' : 'text-gray-500';
+            const textClass = isUnlocked ? 'text-white' : 'text-gray-300';
+            const description = isUnlocked ? achievement.description : 'Locked';
+
+            return `
+                <div class="achievement-badge ${badgeClasses} rounded-xl p-3 text-center transition-all duration-300 transform hover:scale-110" data-achievement-id="${achievement.id}" title="${achievement.name}: ${description}">
+                    <i class="${achievement.icon} text-2xl mb-2 ${iconClass}"></i>
+                    <p class="font-semibold text-xs ${textClass} break-words">${achievement.name}</p>
+                </div>
+            `;
+        }).join('');
+
+        // Add event listeners to badges
+        document.querySelectorAll('.achievement-badge').forEach(badge => {
+            badge.addEventListener('click', () => {
+                const achievementId = badge.getAttribute('data-achievement-id');
+                const achievement = allAchievements.find(a => a.id === achievementId);
+                if (achievement) {
+                    openAchievementModal(achievement);
+                }
+            });
+        });
+    }
+
+    function openAchievementModal(achievement) {
+        const isUnlocked = (JSON.parse(localStorage.getItem('unlockedAchievements')) || []).includes(achievement.id);
+
+        const iconContainer = document.getElementById('modal-icon');
+        const iconEl = iconContainer.querySelector('i');
+        iconEl.className = `${achievement.icon} text-4xl`;
+
+        if (isUnlocked) {
+            iconContainer.className = 'w-20 h-20 rounded-full bg-blue-500 flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-lg';
+            iconEl.classList.add('text-white');
+        } else {
+            iconContainer.className = 'w-20 h-20 rounded-full bg-gray-700 flex items-center justify-center mx-auto mb-4 border-4 border-gray-400 shadow-lg';
+            iconEl.classList.add('text-gray-400');
+        }
+
+        modalTitle.textContent = achievement.name;
+        modalDescription.textContent = isUnlocked ? achievement.description : 'This achievement is still locked. Keep tracking your intake to unlock it!';
+        achievementModal.classList.remove('hidden');
+    }
+
+    function closeAchievementModal() {
+        achievementModal.classList.add('hidden');
+    }
+
+    // Modal event listeners
+    modalCloseBtn.addEventListener('click', closeAchievementModal);
+    achievementModal.addEventListener('click', (e) => {
+        if (e.target === achievementModal) {
+            closeAchievementModal();
+        }
+    });
 });
