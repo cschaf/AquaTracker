@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update weekly chart
         updateWeeklyChart();
 
-        // Update stats overview
+        // Update stats overview, which includes weekly total, best streak, and current streak.
         updateStatsOverview();
 
         // Update entries list
@@ -210,39 +210,66 @@ document.addEventListener('DOMContentLoaded', function() {
         weeklyProgress = Math.min(weeklyProgress, 100);
         thisWeekProgressEl.style.width = `${weeklyProgress}%`;
 
+        // Pre-calculate daily totals for efficiency
+        const dailyTotals = new Map();
+        logs.forEach(log => {
+            const total = log.entries.reduce((sum, entry) => sum + entry.amount, 0);
+            dailyTotals.set(log.date, total);
+        });
+
         // Calculate best streak
         const bestStreakEl = document.getElementById('best-streak');
-        const currentStreakTextEl = document.getElementById('current-streak-text');
-        const currentStreakProgressEl = document.getElementById('current-streak-progress');
 
         let bestStreak = 0;
-        let currentStreak = 0;
-        if (logs.length > 0) {
-            const sortedLogs = [...logs].sort((a, b) => new Date(a.date) - new Date(b.date));
-            const firstDate = new Date(sortedLogs[0].date);
-            const lastDate = new Date();
+        if (dailyTotals.size > 0) {
+            const sortedDates = [...dailyTotals.keys()].sort();
+            const firstDate = new Date(sortedDates[0]);
+            const lastDate = new Date(sortedDates[sortedDates.length - 1]);
             let currentDate = new Date(firstDate);
+            let streakCounter = 0;
 
             while(currentDate <= lastDate) {
                 const dateStr = currentDate.toISOString().split('T')[0];
-                const log = logs.find(l => l.date === dateStr);
-                const total = log ? log.entries.reduce((sum, entry) => sum + entry.amount, 0) : 0;
+                const total = dailyTotals.get(dateStr) || 0;
+
+                if (total >= dailyGoal) {
+                    streakCounter++;
+                } else {
+                    if (streakCounter > bestStreak) {
+                        bestStreak = streakCounter;
+                    }
+                    streakCounter = 0;
+                }
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            if (streakCounter > bestStreak) {
+                bestStreak = streakCounter;
+            }
+        }
+        bestStreakEl.textContent = `${bestStreak} days`;
+
+        // Calculate current streak
+        const currentStreakTextEl = document.getElementById('current-streak-text');
+        const currentStreakProgressEl = document.getElementById('current-streak-progress');
+        let currentStreak = 0;
+        if (dailyTotals.size > 0) {
+            const sortedDates = [...dailyTotals.keys()].sort();
+            const firstLogDate = new Date(sortedDates[0]);
+            let streakDate = new Date(); // Start from today
+
+            while (streakDate >= firstLogDate) {
+                const dateStr = streakDate.toISOString().split('T')[0];
+                const total = dailyTotals.get(dateStr) || 0;
 
                 if (total >= dailyGoal) {
                     currentStreak++;
                 } else {
-                    if (currentStreak > bestStreak) {
-                        bestStreak = currentStreak;
-                    }
-                    currentStreak = 0;
+                    // Streak is broken
+                    break;
                 }
-                currentDate.setDate(currentDate.getDate() + 1);
-            }
-            if (currentStreak > bestStreak) {
-                bestStreak = currentStreak;
+                streakDate.setDate(streakDate.getDate() - 1);
             }
         }
-        bestStreakEl.textContent = `${bestStreak} days`;
         currentStreakTextEl.textContent = `Current: ${currentStreak} days`;
         let streakProgress = bestStreak > 0 ? (currentStreak / bestStreak) * 100 : 0;
         streakProgress = Math.min(streakProgress, 100);
