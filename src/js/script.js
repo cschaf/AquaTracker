@@ -94,6 +94,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update weekly chart
         updateWeeklyChart();
 
+        // Update stats overview, which includes weekly total, best streak, and current streak.
+        updateStatsOverview();
+
         // Update entries list
         const entriesContainer = document.getElementById('entries-container');
         if (todayLog.entries.length === 0) {
@@ -176,6 +179,103 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Function to update the weekly chart
+    function updateStatsOverview() {
+        const thisWeekTotalEl = document.getElementById('this-week-total');
+        const thisWeekGoalEl = document.getElementById('this-week-goal');
+        const thisWeekProgressEl = document.getElementById('this-week-progress');
+
+        // Calculate this week's total
+        const today = new Date();
+        const dayOfWeek = today.getDay(); // Sunday - 0, Monday - 1, ...
+        const firstDayOfWeek = new Date(today);
+        // Adjust to Monday
+        firstDayOfWeek.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+
+        let weeklyTotal = 0;
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(firstDayOfWeek);
+            d.setDate(firstDayOfWeek.getDate() + i);
+            const dateStr = d.toISOString().split('T')[0];
+            const log = logs.find(l => l.date === dateStr);
+            if (log) {
+                weeklyTotal += log.entries.reduce((sum, entry) => sum + entry.amount, 0);
+            }
+        }
+        thisWeekTotalEl.textContent = `${(weeklyTotal / 1000).toFixed(1)}L`;
+
+        // Update weekly goal
+        const weeklyGoal = dailyGoal * 7;
+        thisWeekGoalEl.textContent = `Goal: ${(weeklyGoal / 1000).toFixed(1)}L`;
+        let weeklyProgress = weeklyGoal > 0 ? (weeklyTotal / weeklyGoal) * 100 : 0;
+        weeklyProgress = Math.min(weeklyProgress, 100);
+        thisWeekProgressEl.style.width = `${weeklyProgress}%`;
+
+        // Pre-calculate daily totals for efficiency
+        const dailyTotals = new Map();
+        logs.forEach(log => {
+            const total = log.entries.reduce((sum, entry) => sum + entry.amount, 0);
+            dailyTotals.set(log.date, total);
+        });
+
+        // Calculate best streak
+        const bestStreakEl = document.getElementById('best-streak');
+
+        let bestStreak = 0;
+        if (dailyTotals.size > 0) {
+            const sortedDates = [...dailyTotals.keys()].sort();
+            const firstDate = new Date(sortedDates[0]);
+            const lastDate = new Date(sortedDates[sortedDates.length - 1]);
+            let currentDate = new Date(firstDate);
+            let streakCounter = 0;
+
+            while(currentDate <= lastDate) {
+                const dateStr = currentDate.toISOString().split('T')[0];
+                const total = dailyTotals.get(dateStr) || 0;
+
+                if (total >= dailyGoal) {
+                    streakCounter++;
+                } else {
+                    if (streakCounter > bestStreak) {
+                        bestStreak = streakCounter;
+                    }
+                    streakCounter = 0;
+                }
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            if (streakCounter > bestStreak) {
+                bestStreak = streakCounter;
+            }
+        }
+        bestStreakEl.textContent = `${bestStreak} days`;
+
+        // Calculate current streak
+        const currentStreakTextEl = document.getElementById('current-streak-text');
+        const currentStreakProgressEl = document.getElementById('current-streak-progress');
+        let currentStreak = 0;
+        if (dailyTotals.size > 0) {
+            const sortedDates = [...dailyTotals.keys()].sort();
+            const firstLogDate = new Date(sortedDates[0]);
+            let streakDate = new Date(); // Start from today
+
+            while (streakDate >= firstLogDate) {
+                const dateStr = streakDate.toISOString().split('T')[0];
+                const total = dailyTotals.get(dateStr) || 0;
+
+                if (total >= dailyGoal) {
+                    currentStreak++;
+                } else {
+                    // Streak is broken
+                    break;
+                }
+                streakDate.setDate(streakDate.getDate() - 1);
+            }
+        }
+        currentStreakTextEl.textContent = `Current: ${currentStreak} days`;
+        let streakProgress = bestStreak > 0 ? (currentStreak / bestStreak) * 100 : 0;
+        streakProgress = Math.min(streakProgress, 100);
+        currentStreakProgressEl.style.width = `${streakProgress}%`;
+    }
+
     function updateWeeklyChart() {
         const weeklyChart = document.getElementById('weekly-chart');
         const weeklyAvg = document.getElementById('weekly-avg');

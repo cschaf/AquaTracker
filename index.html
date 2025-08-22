@@ -152,34 +152,34 @@
                 
                 <!-- Stats Overview -->
                 <div class="grid grid-cols-2 gap-6">
-                    <div class="bg-gradient-to-br from-cyan-500 to-blue-500 rounded-2xl shadow-xl p-6 text-white">
+                    <div class="bg-gradient-to-br from-cyan-500 to-blue-500 rounded-2xl shadow-xl p-6 text-white flex flex-col justify-between">
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-lg opacity-90">This Week</p>
-                                <p class="text-3xl font-bold mt-1">12.6L</p>
+                                <p id="this-week-total" class="text-3xl font-bold mt-1">0L</p>
                             </div>
                             <i class="fas fa-calendar-week text-3xl opacity-80"></i>
                         </div>
                         <div class="mt-4">
-                            <p class="text-sm opacity-90">Goal: 14L</p>
+                            <p id="this-week-goal" class="text-sm opacity-90">Goal: 0L</p>
                             <div class="w-full bg-white bg-opacity-30 h-2 rounded-full mt-1">
-                                <div class="bg-white h-2 rounded-full" style="width: 90%"></div>
+                                <div id="this-week-progress" class="bg-white h-2 rounded-full" style="width: 0%"></div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl shadow-xl p-6 text-white">
+                    <div class="bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl shadow-xl p-6 text-white flex flex-col justify-between">
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-lg opacity-90">Best Streak</p>
-                                <p class="text-3xl font-bold mt-1">7 days</p>
+                                <p id="best-streak" class="text-3xl font-bold mt-1">0 days</p>
                             </div>
                             <i class="fas fa-fire text-3xl opacity-80"></i>
                         </div>
                         <div class="mt-4">
-                            <p class="text-sm opacity-90">Current: 3 days</p>
+                            <p id="current-streak-text" class="text-sm opacity-90">Current: 0 days</p>
                             <div class="w-full bg-white bg-opacity-30 h-2 rounded-full mt-1">
-                                <div class="bg-white h-2 rounded-full" style="width: 43%"></div>
+                                <div id="current-streak-progress" class="bg-white h-2 rounded-full" style="width: 0%"></div>
                             </div>
                         </div>
                     </div>
