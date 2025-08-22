@@ -56,7 +56,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Export data button
     document.getElementById('export-data').addEventListener('click', function() {
-        exportDataToJson(logs);
+        exportDataToJson(logs, dailyGoal);
+    });
+
+    // Enable/disable import button based on file selection
+    const importFileInput = document.getElementById('import-file');
+    const importDataButton = document.getElementById('import-data');
+
+    importFileInput.addEventListener('change', function() {
+        importDataButton.disabled = this.files.length === 0;
+    });
+
+    // Import data button
+    document.getElementById('import-data').addEventListener('click', function() {
+        const importFile = document.getElementById('import-file').files[0];
+        if (importFile) {
+            importData(importFile);
+        } else {
+            alert("Please select a file to import.");
+        }
     });
 
     // Function to add water entry
@@ -163,19 +181,55 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Function to export data
-    function exportDataToJson(data) {
-        if (!data || data.length === 0) {
+    function exportDataToJson(logs, goal) {
+        if (!logs || logs.length === 0) {
             alert("No data to export.");
             return;
         }
 
+        const exportData = {
+            goal: goal,
+            logs: logs
+        };
+
         const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
-            JSON.stringify(data, null, 2)
+            JSON.stringify(exportData, null, 2)
         )}`;
         const link = document.createElement("a");
         link.href = jsonString;
         link.download = "water_consumption_data.json";
         link.click();
+    }
+
+    // Function to import data from a JSON file
+    function importData(file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            try {
+                const importedData = JSON.parse(event.target.result);
+
+                // New format validation
+                if (importedData && typeof importedData.goal === 'number' && Array.isArray(importedData.logs)) {
+                    localStorage.setItem('waterTrackerGoal', importedData.goal);
+                    localStorage.setItem('waterTrackerData', JSON.stringify(importedData.logs));
+                    alert("Data imported successfully! The page will now reload to apply the changes.");
+                    location.reload();
+                }
+                // Old format validation (for backward compatibility)
+                else if (Array.isArray(importedData)) {
+                    localStorage.setItem('waterTrackerData', JSON.stringify(importedData));
+                    alert("Data imported successfully (using old format). The page will now reload.");
+                    location.reload();
+                }
+                else {
+                    alert("Invalid data format. Please import a valid JSON file exported from AquaTracker.");
+                }
+            } catch (error) {
+                alert("Error reading or parsing the file. Please ensure it's a valid JSON file.");
+                console.error("Import error:", error);
+            }
+        };
+        reader.readAsText(file);
     }
 
     // Function to update the weekly chart
@@ -255,7 +309,17 @@ document.addEventListener('DOMContentLoaded', function() {
         if (dailyTotals.size > 0) {
             const sortedDates = [...dailyTotals.keys()].sort();
             const firstLogDate = new Date(sortedDates[0]);
-            let streakDate = new Date(); // Start from today
+
+            let startDate = new Date(); // Today
+            const todayStr = startDate.toISOString().split('T')[0];
+            const todayTotal = dailyTotals.get(todayStr) || 0;
+
+            // If today's goal is not met, start checking from yesterday
+            if (todayTotal < dailyGoal) {
+                startDate.setDate(startDate.getDate() - 1);
+            }
+
+            let streakDate = startDate;
 
             while (streakDate >= firstLogDate) {
                 const dateStr = streakDate.toISOString().split('T')[0];
