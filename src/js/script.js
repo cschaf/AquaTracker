@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const amountPosition = percentage > 15 ? '' : 'bar-amount-outside';
 
             return `
-                <div class="flex flex-1 flex-col items-center justify-end h-full">
+                <div class="flex flex-col items-center justify-end h-full">
                     <div class="w-10 bg-blue-500 rounded-t-lg relative" style="height: ${barHeight}" title="${data.total} ml">
                         <div class="bar-amount ${textColor} ${amountPosition}">${data.total} ml</div>
                     </div>
