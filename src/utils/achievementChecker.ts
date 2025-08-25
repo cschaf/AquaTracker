@@ -224,14 +224,16 @@ export function checkAchievements(logs: Log[], dailyGoal: number, unlockedAchiev
             case 'consecutive_goals':
                 earned = checkConsecutiveGoals(dailyTotals, dailyGoal, trigger.days);
                 break;
-            case 'total_volume':
+            case 'total_volume': {
                 const totalVolume = logs.reduce((sum, log) => sum + log.entries.reduce((s, e) => s + e.amount, 0), 0);
                 earned = totalVolume >= trigger.amount;
                 break;
-            case 'goal_met':
+            }
+            case 'goal_met': {
                 const goalsMetCount = [...dailyTotals.values()].filter(total => total >= dailyGoal).length;
                 earned = goalsMetCount >= trigger.times;
                 break;
+            }
             case 'goals_in_week':
                 earned = checkGoalsInWeek(dailyTotals, dailyGoal, trigger.count);
                 break;

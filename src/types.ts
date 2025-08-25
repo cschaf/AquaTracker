@@ -1,4 +1,5 @@
 export interface Entry {
+  id: string;
   amount: number;
   timestamp: number;
 }
@@ -15,6 +16,6 @@ export interface Achievement {
   icon: string;
   trigger: {
     type: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
 }

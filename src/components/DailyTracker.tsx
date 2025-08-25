@@ -8,8 +8,8 @@ interface DailyTrackerProps {
   dailyGoal: number;
   setDailyGoal: (goal: number) => void;
   addWaterEntry: (amount: number) => void;
-  deleteEntry: (timestamp: number) => void;
-  updateEntry: (timestamp: number, newAmount: number) => void;
+  deleteEntry: (id: string) => void;
+  updateEntry: (id: string, newAmount: number) => void;
   dailyTotal: number;
 }
 
@@ -20,7 +20,6 @@ const DailyTracker: React.FC<DailyTrackerProps> = ({ logs, dailyGoal, setDailyGo
   return (
     <div className="space-y-8">
       <DailyIntakeCard
-        todayLog={todayLog}
         dailyGoal={dailyGoal}
         setDailyGoal={setDailyGoal}
         addWaterEntry={addWaterEntry}
