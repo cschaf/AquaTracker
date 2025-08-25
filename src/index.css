@@ -137,7 +137,6 @@ body {
 }
 
 .achievement-badge {
-    animation: float 4s ease-in-out infinite;
 }
 
 .bar-amount {
