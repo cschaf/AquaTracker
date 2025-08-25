@@ -10,7 +10,7 @@ import { checkWaterIntake, INTAKE_STATUS } from './utils/intakeWarnings';
 import { checkAchievements } from './utils/achievementChecker';
 import type { Log, Achievement, Entry } from './types';
 
-const allAchievements: Achievement[] = allAchievementsData;
+const allAchievements: Achievement[] = allAchievementsData as Achievement[];
 
 function App() {
   const [logs, setLogs] = useState<Log[]>([]);
