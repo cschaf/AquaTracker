@@ -23,8 +23,8 @@ const Achievements: React.FC<AchievementsProps> = ({ unlockedAchievements, allAc
           {sortedAchievements.map(achievement => {
             const isUnlocked = unlockedAchievements.includes(achievement.id);
             const badgeClasses = isUnlocked
-              ? 'bg-white bg-opacity-20'
-              : 'bg-black bg-opacity-20 filter grayscale cursor-help';
+              ? 'bg-yellow-400 bg-opacity-30'
+              : 'bg-blue-900 bg-opacity-40 filter grayscale cursor-help';
             const iconClass = isUnlocked ? 'text-amber-300' : 'text-gray-500';
             const textClass = isUnlocked ? 'text-white' : 'text-gray-300';
             const description = isUnlocked ? achievement.description : 'Locked';
