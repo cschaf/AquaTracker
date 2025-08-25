@@ -37,10 +37,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Get today's log
     let todayLog = logs.find(log => log.date === todayStr);
-    if (!todayLog) {
-        todayLog = { date: todayStr, entries: [] };
-        logs.push(todayLog);
-    }
 
     // Update UI with today's data
     updateUI();
@@ -421,11 +417,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Function to update UI
     function updateUI() {
         // Calculate daily total
-        const dailyTotal = todayLog.entries.reduce((sum, entry) => sum + entry.amount, 0);
+        const dailyTotal = todayLog ? todayLog.entries.reduce((sum, entry) => sum + entry.amount, 0) : 0;
         document.getElementById('daily-total').textContent = dailyTotal;
 
         // Update progress bar
-        const percentage = Math.min((dailyTotal / dailyGoal) * 100, 100);
+        const percentage = dailyGoal > 0 ? Math.min((dailyTotal / dailyGoal) * 100, 100) : 0;
         document.getElementById('water-level').style.width = `${percentage}%`;
         document.getElementById('progress-percentage').textContent = `${Math.round(percentage)}%`;
 
@@ -442,7 +438,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         // Update entries list
         const entriesContainer = document.getElementById('entries-container');
-        if (todayLog.entries.length === 0) {
+        if (!todayLog || todayLog.entries.length === 0) {
             entriesContainer.innerHTML = `
                 <div class="text-center py-8 text-gray-500">
                     <i class="fas fa-glass-water text-4xl mb-3 text-blue-300"></i>
@@ -493,11 +489,13 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         // Remove the entry from the log.
         logForToday.entries = logForToday.entries.filter(entry => entry.timestamp !== timestamp);
-        todayLog = logForToday; // Keep the global reference up to date.
 
-        // If the last entry is gone, remove the entire log for today.
+        // If the last entry is gone, remove the entire log for today and update todayLog.
         if (logForToday.entries.length === 0) {
             logs = logs.filter(log => log.date !== todayStr);
+            todayLog = undefined; // Crucial: update the global reference
+        } else {
+            todayLog = logForToday; // Keep the global reference up to date.
         }
 
         // Save to localStorage and update the UI.
