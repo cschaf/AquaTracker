@@ -125,18 +125,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     // ----------------------------------------------------------------------------------
 
     function calculateAndStoreAchievements() {
-        let unlockedAchievements = JSON.parse(localStorage.getItem('unlockedAchievements')) || [];
+        let newlyUnlocked = [];
+        const previouslyUnlocked = JSON.parse(localStorage.getItem('unlockedAchievements')) || [];
+
         const dailyTotals = new Map();
         logs.forEach(log => {
             const total = log.entries.reduce((sum, entry) => sum + entry.amount, 0);
             dailyTotals.set(log.date, total);
         });
 
-        allAchievements.forEach(achievement => {
-            if (unlockedAchievements.includes(achievement.id)) {
-                return; // Skip already unlocked achievements
-            }
-
+        const currentUnlocked = allAchievements.filter(achievement => {
             let earned = false;
             const trigger = achievement.trigger;
 
@@ -152,7 +150,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                     earned = totalVolume >= trigger.amount;
                     break;
                 case 'goal_met':
-                     const goalsMetCount = [...dailyTotals.values()].filter(total => total >= dailyGoal).length;
+                    const goalsMetCount = [...dailyTotals.values()].filter(total => total >= dailyGoal).length;
                     earned = goalsMetCount >= trigger.times;
                     break;
                 case 'goals_in_week':
@@ -195,13 +193,27 @@ document.addEventListener('DOMContentLoaded', async function() {
                     earned = checkWeekendGoal(dailyTotals, dailyGoal, trigger.weeks);
                     break;
             }
+            return earned;
+        }).map(a => a.id);
 
-            if (earned) {
-                unlockedAchievements.push(achievement.id);
-            }
-        });
+        newlyUnlocked = currentUnlocked.filter(id => !previouslyUnlocked.includes(id));
+        localStorage.setItem('unlockedAchievements', JSON.stringify(currentUnlocked));
 
-        localStorage.setItem('unlockedAchievements', JSON.stringify(unlockedAchievements));
+        return newlyUnlocked;
+    }
+
+    function handleNewAchievements(newlyUnlocked) {
+        if (newlyUnlocked.length > 0) {
+            newlyUnlocked.forEach(achievementId => {
+                const achievement = allAchievements.find(a => a.id === achievementId);
+                if (achievement) {
+                    // Slight delay to allow the main UI to update first
+                    setTimeout(() => {
+                        openAchievementModal(achievement, true);
+                    }, 500);
+                }
+            });
+        }
     }
 
     function checkConsecutiveGoals(dailyTotals, goal, days) {
@@ -424,8 +436,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         updateStatsOverview();
 
         // Calculate and display achievements
-        calculateAndStoreAchievements();
+        const newlyUnlocked = calculateAndStoreAchievements();
         displayAchievements();
+        handleNewAchievements(newlyUnlocked);
 
         // Update entries list
         const entriesContainer = document.getElementById('entries-container');
@@ -747,7 +760,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     }
 
-    function openAchievementModal(achievement) {
+    function openAchievementModal(achievement, isNew = false) {
         const isUnlocked = (JSON.parse(localStorage.getItem('unlockedAchievements')) || []).includes(achievement.id);
 
         const iconContainer = document.getElementById('modal-icon');
@@ -762,7 +775,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             iconEl.classList.add('text-gray-400');
         }
 
-        modalTitle.textContent = achievement.name;
+        modalTitle.textContent = isNew ? "Achievement Unlocked!" : achievement.name;
         modalDescription.textContent = isUnlocked ? achievement.description : 'This achievement is still locked. Keep tracking your intake to unlock it!';
         achievementModal.classList.remove('hidden');
     }
