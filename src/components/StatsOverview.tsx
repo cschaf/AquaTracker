@@ -1,5 +1,5 @@
 import React from 'react';
-import { Log } from '../App';
+import type { Log } from '../types';
 
 interface StatsOverviewProps {
   logs: Log[];

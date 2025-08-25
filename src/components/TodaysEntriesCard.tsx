@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Log, Entry } from '../App';
+import type { Log, Entry } from '../types';
 
 interface TodaysEntriesCardProps {
   todayLog: Log | undefined;

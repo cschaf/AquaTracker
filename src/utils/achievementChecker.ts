@@ -1,4 +1,4 @@
-import { Log, Achievement } from '../App';
+import type { Log, Achievement } from '../types';
 
 function getWeekNumber(d: Date) {
     d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
