@@ -3,30 +3,30 @@ import type { Log, Entry } from '../types';
 
 interface TodaysEntriesCardProps {
   todayLog: Log | undefined;
-  deleteEntry: (timestamp: number) => void;
-  updateEntry: (timestamp: number, newAmount: number) => void;
+  deleteEntry: (id: string) => void;
+  updateEntry: (id: string, newAmount: number) => void;
 }
 
 const TodaysEntriesCard: React.FC<TodaysEntriesCardProps> = ({ todayLog, deleteEntry, updateEntry }) => {
-  const [editingTimestamp, setEditingTimestamp] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [editingAmount, setEditingAmount] = useState<string>('');
 
   const handleEdit = (entry: Entry) => {
-    setEditingTimestamp(entry.timestamp);
+    setEditingId(entry.id);
     setEditingAmount(entry.amount.toString());
   };
 
   const handleCancel = () => {
-    setEditingTimestamp(null);
+    setEditingId(null);
     setEditingAmount('');
   };
 
-  const handleSave = (timestamp: number) => {
+  const handleSave = (id: string) => {
     const newAmount = parseInt(editingAmount);
     if (newAmount > 0) {
-      updateEntry(timestamp, newAmount);
+      updateEntry(id, newAmount);
     }
-    setEditingTimestamp(null);
+    setEditingId(null);
     setEditingAmount('');
   };
 
@@ -44,8 +44,8 @@ const TodaysEntriesCard: React.FC<TodaysEntriesCardProps> = ({ todayLog, deleteE
             </div>
           ) : (
             sortedEntries.map(entry => (
-              <div key={entry.timestamp} className="entry-item bg-blue-50 p-4 rounded-xl flex items-center justify-between">
-                {editingTimestamp === entry.timestamp ? (
+              <div key={entry.id} className="entry-item bg-blue-50 p-4 rounded-xl flex items-center justify-between">
+                {editingId === entry.id ? (
                   <>
                     <div className="flex items-center flex-grow">
                       <input
@@ -56,7 +56,7 @@ const TodaysEntriesCard: React.FC<TodaysEntriesCardProps> = ({ todayLog, deleteE
                       />
                     </div>
                     <div className="flex">
-                      <button onClick={() => handleSave(entry.timestamp)} className="text-green-500 hover:text-green-700 mr-2">
+                      <button onClick={() => handleSave(entry.id)} className="text-green-500 hover:text-green-700 mr-2">
                         <i className="fas fa-check"></i>
                       </button>
                       <button onClick={handleCancel} className="text-red-500 hover:text-red-700">
@@ -79,7 +79,7 @@ const TodaysEntriesCard: React.FC<TodaysEntriesCardProps> = ({ todayLog, deleteE
                       <button onClick={() => handleEdit(entry)} className="edit-entry text-blue-500 hover:text-blue-700 mr-2">
                         <i className="fas fa-pencil-alt"></i>
                       </button>
-                      <button onClick={() => deleteEntry(entry.timestamp)} className="delete-entry text-red-500 hover:text-red-700">
+                      <button onClick={() => deleteEntry(entry.id)} className="delete-entry text-red-500 hover:text-red-700">
                         <i className="fas fa-trash"></i>
                       </button>
                     </div>

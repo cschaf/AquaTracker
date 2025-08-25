@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
-import type { Log } from '../types';
 
 interface DailyIntakeCardProps {
-  todayLog: Log | undefined;
   dailyGoal: number;
   setDailyGoal: (goal: number) => void;
   addWaterEntry: (amount: number) => void;
   dailyTotal: number;
 }
 
-const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ todayLog, dailyGoal, setDailyGoal, addWaterEntry, dailyTotal }) => {
+const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGoal, addWaterEntry, dailyTotal }) => {
   const [customAmount, setCustomAmount] = useState('');
 
   const percentage = dailyGoal > 0 ? Math.min((dailyTotal / dailyGoal) * 100, 100) : 0;

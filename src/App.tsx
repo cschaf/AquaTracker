@@ -45,7 +45,11 @@ function App() {
 
   const addWaterEntry = (amount: number) => {
     const todayStr = new Date().toISOString().split('T')[0];
-    const newEntry: Entry = { amount, timestamp: Date.now() };
+    const newEntry: Entry = {
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      amount,
+      timestamp: Date.now()
+    };
 
     setLogs(prevLogs => {
       const todayLogIndex = prevLogs.findIndex(log => log.date === todayStr);
@@ -59,13 +63,13 @@ function App() {
     });
   };
 
-  const deleteEntry = (timestamp: number) => {
+  const deleteEntry = (id: string) => {
     const todayStr = new Date().toISOString().split('T')[0];
     setLogs(prevLogs => {
       const newLogs = [...prevLogs];
       const todayLogIndex = newLogs.findIndex(log => log.date === todayStr);
       if (todayLogIndex > -1) {
-        newLogs[todayLogIndex].entries = newLogs[todayLogIndex].entries.filter(entry => entry.timestamp !== timestamp);
+        newLogs[todayLogIndex].entries = newLogs[todayLogIndex].entries.filter(entry => entry.id !== id);
         if (newLogs[todayLogIndex].entries.length === 0) {
           return newLogs.filter(log => log.date !== todayStr);
         }
@@ -74,13 +78,13 @@ function App() {
     });
   };
 
-  const updateEntry = (timestamp: number, newAmount: number) => {
+  const updateEntry = (id: string, newAmount: number) => {
     const todayStr = new Date().toISOString().split('T')[0];
     setLogs(prevLogs => {
       const newLogs = [...prevLogs];
       const todayLogIndex = newLogs.findIndex(log => log.date === todayStr);
       if (todayLogIndex > -1) {
-        const entryIndex = newLogs[todayLogIndex].entries.findIndex(entry => entry.timestamp === timestamp);
+        const entryIndex = newLogs[todayLogIndex].entries.findIndex(entry => entry.id === id);
         if (entryIndex > -1) {
           newLogs[todayLogIndex].entries[entryIndex].amount = newAmount;
         }
