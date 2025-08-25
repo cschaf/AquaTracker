@@ -97,6 +97,24 @@ body {
     transition: all 0.3s ease;
 }
 
+/* Added for intake warnings */
+#intake-warning-banner, #critical-warning-modal {
+    z-index: 100;
+}
+
+#critical-warning-modal .fa-exclamation-triangle {
+    animation: pulse-warning 1.5s infinite;
+}
+
+@keyframes pulse-warning {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
 .entry-item:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);

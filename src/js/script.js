@@ -1,5 +1,36 @@
 // Initialize app
+const WARNING_THRESHOLD = 8000; // 8 liters in ml
+const CRITICAL_THRESHOLD = 10000; // 10 liters in ml
+
+const INTAKE_STATUS = {
+    OK: 'OK',
+    WARNING: 'WARNING',
+    CRITICAL: 'CRITICAL'
+};
+
 let allAchievements = [];
+
+function checkWaterIntake(dailyIntake) {
+    if (dailyIntake >= CRITICAL_THRESHOLD) {
+        return {
+            status: INTAKE_STATUS.CRITICAL,
+            message: "CRITICAL WARNING: Your water intake has reached a potentially dangerous level. Stop drinking water immediately and seek medical advice if you feel unwell (e.g., headache, nausea).",
+            threshold: CRITICAL_THRESHOLD
+        };
+    } else if (dailyIntake >= WARNING_THRESHOLD) {
+        return {
+            status: INTAKE_STATUS.WARNING,
+            message: "Warning: Your daily water intake is high. Exceeding 10 liters can be dangerous. Please be mindful.",
+            threshold: WARNING_THRESHOLD
+        };
+    } else {
+        return {
+            status: INTAKE_STATUS.OK,
+            message: "",
+            threshold: null
+        };
+    }
+}
 
 async function loadAchievements() {
     try {
@@ -34,6 +65,19 @@ document.addEventListener('DOMContentLoaded', async function() {
     const modalIcon = document.getElementById('modal-icon').querySelector('i');
     const modalTitle = document.getElementById('modal-title');
     const modalDescription = document.getElementById('modal-description');
+
+    // Warning UI Elements
+    const intakeWarningBanner = document.getElementById('intake-warning-banner');
+    const intakeWarningMessage = document.getElementById('intake-warning-message');
+    const criticalWarningModal = document.getElementById('critical-warning-modal');
+    const criticalWarningMessage = document.getElementById('critical-warning-message');
+    const criticalModalCloseBtn = document.getElementById('critical-modal-close-btn');
+
+    // Add water controls
+    const quickAddButtons = document.querySelectorAll('.quick-add');
+    const customAmountInput = document.getElementById('custom-amount');
+    const addCustomButton = document.getElementById('add-custom');
+
 
     // Get today's log
     let todayLog = logs.find(log => log.date === todayStr);
@@ -414,11 +458,51 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
 
+    criticalModalCloseBtn.addEventListener('click', () => {
+        criticalWarningModal.classList.add('hidden');
+    });
+
     // Function to update UI
     function updateUI() {
         // Calculate daily total
         const dailyTotal = todayLog ? todayLog.entries.reduce((sum, entry) => sum + entry.amount, 0) : 0;
         document.getElementById('daily-total').textContent = dailyTotal;
+
+        // Check water intake status
+        const intakeStatus = checkWaterIntake(dailyTotal);
+
+        // Handle UI updates based on intake status
+        // Hide both warnings by default
+        intakeWarningBanner.classList.add('hidden');
+        criticalWarningModal.classList.add('hidden');
+
+        if (intakeStatus.status === INTAKE_STATUS.WARNING) {
+            intakeWarningMessage.textContent = intakeStatus.message;
+            intakeWarningBanner.classList.remove('hidden');
+        } else if (intakeStatus.status === INTAKE_STATUS.CRITICAL) {
+            criticalWarningMessage.textContent = intakeStatus.message;
+            criticalWarningModal.classList.remove('hidden');
+        }
+
+        // Disable controls if critical limit is reached
+        const isCritical = intakeStatus.status === INTAKE_STATUS.CRITICAL;
+        quickAddButtons.forEach(button => {
+            button.disabled = isCritical;
+            button.classList.toggle('opacity-50', isCritical);
+            button.classList.toggle('cursor-not-allowed', isCritical);
+            button.classList.toggle('hover:bg-blue-200', !isCritical);
+            button.classList.toggle('hover:scale-105', !isCritical);
+
+        });
+        customAmountInput.disabled = isCritical;
+        customAmountInput.classList.toggle('bg-gray-200', isCritical);
+
+        addCustomButton.disabled = isCritical;
+        addCustomButton.classList.toggle('opacity-50', isCritical);
+        addCustomButton.classList.toggle('cursor-not-allowed', isCritical);
+        addCustomButton.classList.toggle('hover:bg-green-600', !isCritical);
+        addCustomButton.classList.toggle('hover:scale-105', !isCritical);
+
 
         // Update progress bar
         const percentage = dailyGoal > 0 ? Math.min((dailyTotal / dailyGoal) * 100, 100) : 0;
