@@ -1,5 +1,5 @@
 import React from 'react';
-import { Achievement } from '../App';
+import type { Achievement } from '../types';
 
 interface AchievementsProps {
   unlockedAchievements: string[];

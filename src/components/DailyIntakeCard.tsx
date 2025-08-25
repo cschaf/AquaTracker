@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Log } from '../App';
+import type { Log } from '../types';
 
 interface DailyIntakeCardProps {
   todayLog: Log | undefined;

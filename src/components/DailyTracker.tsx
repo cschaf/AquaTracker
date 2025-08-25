@@ -1,7 +1,7 @@
 import React from 'react';
 import DailyIntakeCard from './DailyIntakeCard';
 import TodaysEntriesCard from './TodaysEntriesCard';
-import { Log } from '../App';
+import type { Log } from '../types';
 
 interface DailyTrackerProps {
   logs: Log[];

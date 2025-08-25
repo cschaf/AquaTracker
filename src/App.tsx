@@ -8,27 +8,7 @@ import CriticalWarningModal from './components/CriticalWarningModal';
 import allAchievementsData from './data/achievements.json';
 import { checkWaterIntake, INTAKE_STATUS } from './utils/intakeWarnings';
 import { checkAchievements } from './utils/achievementChecker';
-
-export interface Entry {
-  amount: number;
-  timestamp: number;
-}
-
-export interface Log {
-  date: string;
-  entries: Entry[];
-}
-
-export interface Achievement {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  trigger: {
-    type: string;
-    [key: string]: any;
-  };
-}
+import type { Log, Achievement, Entry } from './types';
 
 const allAchievements: Achievement[] = allAchievementsData;
 

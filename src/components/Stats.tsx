@@ -5,7 +5,7 @@ import Achievements from './Achievements';
 import Tips from './Tips';
 import ExportData from './ExportData';
 import ImportData from './ImportData';
-import { Log, Achievement } from '../App';
+import type { Log, Achievement } from '../types';
 
 interface StatsProps {
   logs: Log[];
