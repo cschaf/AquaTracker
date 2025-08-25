@@ -8,6 +8,7 @@ import CriticalWarningModal from './components/CriticalWarningModal';
 import allAchievementsData from './data/achievements.json';
 import { checkWaterIntake, INTAKE_STATUS } from './utils/intakeWarnings';
 import { checkAchievements } from './utils/achievementChecker';
+import { generateRandomId } from './utils/idGenerator';
 import type { Log, Achievement, Entry } from './types';
 
 const allAchievements: Achievement[] = allAchievementsData as Achievement[];
@@ -45,19 +46,29 @@ function App() {
 
   const addWaterEntry = (amount: number) => {
     const todayStr = new Date().toISOString().split('T')[0];
+    const now = Date.now();
     const newEntry: Entry = {
-      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `${now}-${generateRandomId()}`,
       amount,
-      timestamp: Date.now()
+      timestamp: now
     };
 
     setLogs(prevLogs => {
       const todayLogIndex = prevLogs.findIndex(log => log.date === todayStr);
+
       if (todayLogIndex > -1) {
-        const newLogs = [...prevLogs];
-        newLogs[todayLogIndex].entries.push(newEntry);
-        return newLogs;
+        // If today's log exists, update it
+        return prevLogs.map((log, index) => {
+          if (index === todayLogIndex) {
+            return {
+              ...log,
+              entries: [...log.entries, newEntry]
+            };
+          }
+          return log;
+        });
       } else {
+        // If today's log doesn't exist, create it
         return [...prevLogs, { date: todayStr, entries: [newEntry] }];
       }
     });
@@ -66,14 +77,18 @@ function App() {
   const deleteEntry = (id: string) => {
     const todayStr = new Date().toISOString().split('T')[0];
     setLogs(prevLogs => {
-      const newLogs = [...prevLogs];
-      const todayLogIndex = newLogs.findIndex(log => log.date === todayStr);
-      if (todayLogIndex > -1) {
-        newLogs[todayLogIndex].entries = newLogs[todayLogIndex].entries.filter(entry => entry.id !== id);
-        if (newLogs[todayLogIndex].entries.length === 0) {
-          return newLogs.filter(log => log.date !== todayStr);
+      const newLogs = prevLogs.map(log => {
+        if (log.date === todayStr) {
+          const updatedEntries = log.entries.filter(entry => entry.id !== id);
+          // If all entries for today are deleted, remove the entire log for today
+          if (updatedEntries.length === 0) {
+            return null;
+          }
+          return { ...log, entries: updatedEntries };
         }
-      }
+        return log;
+      }).filter((log): log is Log => log !== null);
+
       return newLogs;
     });
   };
@@ -81,15 +96,17 @@ function App() {
   const updateEntry = (id: string, newAmount: number) => {
     const todayStr = new Date().toISOString().split('T')[0];
     setLogs(prevLogs => {
-      const newLogs = [...prevLogs];
-      const todayLogIndex = newLogs.findIndex(log => log.date === todayStr);
-      if (todayLogIndex > -1) {
-        const entryIndex = newLogs[todayLogIndex].entries.findIndex(entry => entry.id === id);
-        if (entryIndex > -1) {
-          newLogs[todayLogIndex].entries[entryIndex].amount = newAmount;
+      return prevLogs.map(log => {
+        if (log.date === todayStr) {
+          return {
+            ...log,
+            entries: log.entries.map(entry =>
+              entry.id === id ? { ...entry, amount: newAmount } : entry
+            )
+          };
         }
-      }
-      return newLogs;
+        return log;
+      });
     });
   };
 
