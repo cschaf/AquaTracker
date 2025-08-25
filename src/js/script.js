@@ -454,7 +454,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 const timeString = entryDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
                 return `
-                    <div class="entry-item bg-blue-50 p-4 rounded-xl flex items-center justify-between">
+                    <div class="entry-item bg-blue-50 p-4 rounded-xl flex items-center justify-between" data-timestamp="${entry.timestamp}">
                         <div class="flex items-center">
                             <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center mr-3">
                                 <i class="fas fa-tint text-white"></i>
@@ -464,18 +464,58 @@ document.addEventListener('DOMContentLoaded', async function() {
                                 <p class="text-sm text-gray-500">${timeString}</p>
                             </div>
                         </div>
-                        <button class="delete-entry text-red-500 hover:text-red-700" data-timestamp="${entry.timestamp}">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                        <div>
+                            <button class="edit-entry text-blue-500 hover:text-blue-700 mr-2">
+                                <i class="fas fa-pencil-alt"></i>
+                            </button>
+                            <button class="delete-entry text-red-500 hover:text-red-700" data-timestamp="${entry.timestamp}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
                 `;
             }).join('');
 
-            // Add event listeners to delete buttons
+            // Add event listeners
             document.querySelectorAll('.delete-entry').forEach(button => {
-                button.addEventListener('click', function() {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
                     const timestamp = parseInt(this.getAttribute('data-timestamp'));
                     deleteEntry(timestamp);
+                });
+            });
+
+            document.querySelectorAll('.edit-entry').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const entryItem = this.closest('.entry-item');
+                    const timestamp = parseInt(entryItem.getAttribute('data-timestamp'));
+                    const entry = todayLog.entries.find(e => e.timestamp === timestamp);
+
+                    entryItem.innerHTML = `
+                        <div class="flex items-center flex-grow">
+                            <input type="number" value="${entry.amount}" class="w-full p-2 border-2 border-blue-300 rounded-lg">
+                        </div>
+                        <div class="flex">
+                            <button class="save-entry text-green-500 hover:text-green-700 mr-2">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="cancel-edit text-red-500 hover:text-red-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
+
+                    entryItem.querySelector('.save-entry').addEventListener('click', () => {
+                        const newAmount = parseInt(entryItem.querySelector('input').value);
+                        if (newAmount && newAmount > 0) {
+                            updateEntry(timestamp, newAmount);
+                        }
+                    });
+
+                    entryItem.querySelector('.cancel-edit').addEventListener('click', () => {
+                        updateUI();
+                    });
                 });
             });
         }
@@ -499,6 +539,19 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
 
         // Save to localStorage and update the UI.
+        localStorage.setItem('waterTrackerData', JSON.stringify(logs));
+        updateUI();
+    }
+
+    function updateEntry(timestamp, newAmount) {
+        let logForToday = logs.find(log => log.date === todayStr);
+        if (!logForToday) return;
+
+        const entry = logForToday.entries.find(e => e.timestamp === timestamp);
+        if (entry) {
+            entry.amount = newAmount;
+        }
+
         localStorage.setItem('waterTrackerData', JSON.stringify(logs));
         updateUI();
     }
