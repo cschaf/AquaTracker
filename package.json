@@ -2,7 +2,7 @@
   "name": "aqua-tracker",
   "private": true,
   "version": "0.0.1",
-  "homepage": "https://cschaf.github.io/AquaTracker/",
+  "homepage": "https://aqua-tracker.schaflabs.com/",
   "type": "module",
   "scripts": {
     "dev": "vite",
