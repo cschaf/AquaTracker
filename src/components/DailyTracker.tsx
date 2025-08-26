@@ -4,7 +4,7 @@ import TodaysEntriesCard from './TodaysEntriesCard';
 import type { Log } from '../types';
 
 interface DailyTrackerProps {
-  logs: Log[];
+  todayLog: Log | undefined;
   dailyGoal: number;
   setDailyGoal: (goal: number) => void;
   addWaterEntry: (amount: number) => void;
@@ -13,10 +13,7 @@ interface DailyTrackerProps {
   dailyTotal: number;
 }
 
-const DailyTracker: React.FC<DailyTrackerProps> = ({ logs, dailyGoal, setDailyGoal, addWaterEntry, deleteEntry, updateEntry, dailyTotal }) => {
-  const todayStr = new Date().toISOString().split('T')[0];
-  const todayLog = logs.find(log => log.date === todayStr);
-
+const DailyTracker: React.FC<DailyTrackerProps> = ({ todayLog, dailyGoal, setDailyGoal, addWaterEntry, deleteEntry, updateEntry, dailyTotal }) => {
   return (
     <div className="space-y-8">
       <DailyIntakeCard
