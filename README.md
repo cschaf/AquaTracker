@@ -32,6 +32,7 @@ AquaTracker is a web-based application designed to help you monitor and log your
 ## Technologies Used
 
 *   **HTML5:** For the structure of the application.
+*   **Typescript:** For the implementation of javascript code.
 *   **CSS3 & Tailwind CSS:** For styling and creating a modern, responsive user interface.
 *   **JavaScript (ES6+):** For the application logic, interactivity, and data management.
 *   **Font Awesome:** For icons used throughout the application.
