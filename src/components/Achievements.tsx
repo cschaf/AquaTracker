@@ -4,9 +4,10 @@ import type { Achievement } from '../types';
 interface AchievementsProps {
   unlockedAchievements: string[];
   allAchievements: Achievement[];
+  onAchievementClick: (achievement: Achievement, isUnlocked: boolean) => void;
 }
 
-const Achievements: React.FC<AchievementsProps> = ({ unlockedAchievements, allAchievements }) => {
+const Achievements: React.FC<AchievementsProps> = ({ unlockedAchievements, allAchievements, onAchievementClick }) => {
   const sortedAchievements = [...allAchievements].sort((a, b) => {
     const aUnlocked = unlockedAchievements.includes(a.id);
     const bUnlocked = unlockedAchievements.includes(b.id);
@@ -24,13 +25,16 @@ const Achievements: React.FC<AchievementsProps> = ({ unlockedAchievements, allAc
             const isUnlocked = unlockedAchievements.includes(achievement.id);
             const badgeClasses = isUnlocked
               ? 'bg-white bg-opacity-40'
-              : 'bg-blue-900 bg-opacity-40 filter grayscale cursor-help';
+              : 'bg-blue-900 bg-opacity-40 filter grayscale cursor-pointer';
             const iconClass = isUnlocked ? 'text-amber-300' : 'text-gray-500';
             const textClass = isUnlocked ? 'text-indigo-800' : 'text-gray-300';
-            const description = isUnlocked ? achievement.description : 'Locked';
 
             return (
-              <div key={achievement.id} className={`achievement-badge ${badgeClasses} rounded-xl p-3 text-center transition-all duration-300 transform hover:scale-110`} title={`${achievement.name}: ${description}`}>
+              <div
+                key={achievement.id}
+                className={`achievement-badge ${badgeClasses} rounded-xl p-3 text-center transition-all duration-300 transform hover:scale-110`}
+                onClick={() => onAchievementClick(achievement, isUnlocked)}
+              >
                 <i className={`${achievement.icon} text-2xl mb-2 ${iconClass}`}></i>
                 <p className={`font-semibold text-xs ${textClass} break-words`}>{achievement.name}</p>
               </div>

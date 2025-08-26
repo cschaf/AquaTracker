@@ -12,11 +12,12 @@ interface StatsProps {
   dailyGoal: number;
   unlockedAchievements: string[];
   allAchievements: Achievement[];
+  onAchievementClick: (achievement: Achievement, isUnlocked: boolean) => void;
   exportData: () => void;
   importData: (file: File) => void;
 }
 
-const Stats: React.FC<StatsProps> = ({ logs, dailyGoal, unlockedAchievements, allAchievements, exportData, importData }) => {
+const Stats: React.FC<StatsProps> = ({ logs, dailyGoal, unlockedAchievements, allAchievements, onAchievementClick, exportData, importData }) => {
   return (
     <div className="space-y-8">
       <WeeklyChart logs={logs} dailyGoal={dailyGoal} />
@@ -24,6 +25,7 @@ const Stats: React.FC<StatsProps> = ({ logs, dailyGoal, unlockedAchievements, al
       <Achievements
         unlockedAchievements={unlockedAchievements}
         allAchievements={allAchievements}
+        onAchievementClick={onAchievementClick}
       />
       <Tips />
       <ExportData exportData={exportData} />

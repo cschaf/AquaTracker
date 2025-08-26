@@ -17,10 +17,11 @@ function App() {
   const [logs, setLogs] = useState<Log[]>([]);
   const [dailyGoal, setDailyGoal] = useState<number>(2000);
   const [unlockedAchievements, setUnlockedAchievements] = useState<string[]>([]);
-  const [newlyUnlocked, setNewlyUnlocked] = useState<Achievement | null>(null);
+  const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
   const [isAchievementModalOpen, setIsAchievementModalOpen] = useState(false);
   const [isCriticalModalOpen, setIsCriticalModalOpen] = useState(false);
   const [intakeWarningMessage, setIntakeWarningMessage] = useState('');
+  const [isSelectedAchievementUnlocked, setIsSelectedAchievementUnlocked] = useState(false);
 
   useEffect(() => {
     const savedLogs = JSON.parse(localStorage.getItem('waterTrackerData') || '[]') as Log[];
@@ -153,6 +154,12 @@ function App() {
     reader.readAsText(file);
   }
 
+  const handleAchievementClick = (achievement: Achievement, isUnlocked: boolean) => {
+    setSelectedAchievement(achievement);
+    setIsSelectedAchievementUnlocked(isUnlocked);
+    setIsAchievementModalOpen(true);
+  };
+
   const todayStr = new Date().toISOString().split('T')[0];
   const todayLog = logs.find(log => log.date === todayStr);
   const dailyTotal = todayLog ? todayLog.entries.reduce((sum, entry) => sum + entry.amount, 0) : 0;
@@ -171,8 +178,7 @@ function App() {
     const newlyUnlockedAchievements = checkAchievements(logs, dailyGoal, unlockedAchievements, allAchievements);
     if (newlyUnlockedAchievements.length > 0) {
       setUnlockedAchievements(prev => [...prev, ...newlyUnlockedAchievements.map(a => a.id)]);
-      setNewlyUnlocked(newlyUnlockedAchievements[0]);
-      setIsAchievementModalOpen(true);
+      handleAchievementClick(newlyUnlockedAchievements[0], true);
     }
   }, [logs, dailyGoal, unlockedAchievements]);
 
@@ -196,6 +202,7 @@ function App() {
             dailyGoal={dailyGoal}
             unlockedAchievements={unlockedAchievements}
             allAchievements={allAchievements}
+            onAchievementClick={handleAchievementClick}
             exportData={exportData}
             importData={importData}
           />
@@ -204,8 +211,9 @@ function App() {
       </div>
       <AchievementModal
         isOpen={isAchievementModalOpen}
-        achievement={newlyUnlocked}
+        achievement={selectedAchievement}
         onClose={() => setIsAchievementModalOpen(false)}
+        isUnlocked={isSelectedAchievementUnlocked}
       />
       <CriticalWarningModal
         isOpen={isCriticalModalOpen}
