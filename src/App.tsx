@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Header from './components/Header';
+import WarningBanner from './components/WarningBanner';
 import DailyTracker from './components/DailyTracker';
 import Stats from './components/Stats';
 import Footer from './components/Footer';
@@ -20,7 +21,7 @@ function App() {
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
   const [isAchievementModalOpen, setIsAchievementModalOpen] = useState(false);
   const [isCriticalModalOpen, setIsCriticalModalOpen] = useState(false);
-  const [intakeWarningMessage, setIntakeWarningMessage] = useState('');
+  const [intakeStatus, setIntakeStatus] = useState({ status: INTAKE_STATUS.OK, message: '' });
   const [isSelectedAchievementUnlocked, setIsSelectedAchievementUnlocked] = useState(false);
 
   useEffect(() => {
@@ -165,9 +166,10 @@ function App() {
   const dailyTotal = todayLog ? todayLog.entries.reduce((sum, entry) => sum + entry.amount, 0) : 0;
 
   useEffect(() => {
-    const intakeStatus = checkWaterIntake(dailyTotal);
-    if (intakeStatus.status === INTAKE_STATUS.CRITICAL) {
-      setIntakeWarningMessage(intakeStatus.message);
+    const currentIntakeStatus = checkWaterIntake(dailyTotal);
+    setIntakeStatus(currentIntakeStatus);
+
+    if (currentIntakeStatus.status === INTAKE_STATUS.CRITICAL) {
       setIsCriticalModalOpen(true);
     } else {
       setIsCriticalModalOpen(false);
@@ -187,6 +189,7 @@ function App() {
     <div className="bg-gradient-to-br from-blue-50 to-cyan-50 min-h-screen">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <Header />
+        <WarningBanner status={intakeStatus.status} message={intakeStatus.message} />
         <main className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <DailyTracker
             logs={logs}
@@ -217,7 +220,7 @@ function App() {
       />
       <CriticalWarningModal
         isOpen={isCriticalModalOpen}
-        message={intakeWarningMessage}
+        message={intakeStatus.message}
         onClose={() => setIsCriticalModalOpen(false)}
       />
     </div>
