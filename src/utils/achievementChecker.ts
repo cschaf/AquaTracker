@@ -1,38 +1,29 @@
 import type { Log, Achievement } from '../types';
 
-function getWeekNumber(d: Date) {
-    d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-    const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
-    return weekNo;
-}
-
-function checkConsecutiveGoals(dailyTotals: Map<string, number>, goal: number, days: number) {
-    const sortedDates = [...dailyTotals.keys()].sort();
-    if (sortedDates.length < days) return false;
+function checkConsecutiveDays(dates: string[], days: number) {
+    if (dates.length < days) return false;
     let consecutiveCount = 0;
     let lastDate: Date | null = null;
 
-    for (const dateStr of sortedDates) {
+    for (const dateStr of dates) {
         const currentDate = new Date(dateStr);
         if (lastDate && (currentDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24) === 1) {
-            if (dailyTotals.get(dateStr)! >= goal) {
-                consecutiveCount++;
-            } else {
-                consecutiveCount = 0;
-            }
+            consecutiveCount++;
         } else {
-             if (dailyTotals.get(dateStr)! >= goal) {
-                consecutiveCount = 1;
-            } else {
-                consecutiveCount = 0;
-            }
+            consecutiveCount = 1;
         }
         if (consecutiveCount >= days) return true;
         lastDate = currentDate;
     }
     return false;
+}
+
+function checkConsecutiveGoals(dailyTotals: Map<string, number>, goal: number, days: number) {
+    const datesWithGoalMet = [...dailyTotals.entries()]
+        .filter(([, total]) => total >= goal)
+        .map(([date]) => date)
+        .sort();
+    return checkConsecutiveDays(datesWithGoalMet, days);
 }
 
 function checkGoalsInWeek(dailyTotals: Map<string, number>, goal: number, count: number) {
@@ -52,36 +43,11 @@ function checkGoalsInWeek(dailyTotals: Map<string, number>, goal: number, count:
 }
 
 function checkLogsPerDayForDays(logs: Log[], logCount: number, numDays: number) {
-    const dailyLogCounts = new Map<string, number>();
-    logs.forEach(log => {
-        dailyLogCounts.set(log.date, log.entries.length);
-    });
-
-    const sortedDates = [...dailyLogCounts.keys()].sort();
-    if(sortedDates.length < numDays) return false;
-
-    let consecutiveDays = 0;
-    let lastDate: Date | null = null;
-
-    for(const dateStr of sortedDates){
-        const currentDate = new Date(dateStr);
-        if (lastDate && (currentDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24) === 1) {
-            if(dailyLogCounts.get(dateStr)! >= logCount){
-                consecutiveDays++;
-            } else {
-                consecutiveDays = 0;
-            }
-        } else {
-            if(dailyLogCounts.get(dateStr)! >= logCount){
-                consecutiveDays = 1;
-            } else {
-                consecutiveDays = 0;
-            }
-        }
-        if(consecutiveDays >= numDays) return true;
-        lastDate = currentDate;
-    }
-    return false;
+    const datesWithEnoughLogs = logs
+        .filter(log => log.entries.length >= logCount)
+        .map(log => log.date)
+        .sort();
+    return checkConsecutiveDays(datesWithEnoughLogs, numDays);
 }
 
 function checkLogDateRange(dailyTotals: Map<string, number>, goal: number, start: string, end: string) {
@@ -122,23 +88,9 @@ function checkLogAfterBreak(dailyTotals: Map<string, number>, breakDays: number)
     return false;
 }
 
-function checkLogStreak(dailyTotals: Map<string, number>, days: number){
-     const sortedDates = [...dailyTotals.keys()].sort();
-    if (sortedDates.length < days) return false;
-    let consecutiveCount = 0;
-    let lastDate: Date | null = null;
-
-    for (const dateStr of sortedDates) {
-        const currentDate = new Date(dateStr);
-        if (lastDate && (currentDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24) === 1) {
-            consecutiveCount++;
-        } else {
-            consecutiveCount = 1;
-        }
-        if (consecutiveCount >= days) return true;
-        lastDate = currentDate;
-    }
-    return false;
+function checkLogStreak(dailyTotals: Map<string, number>, days: number) {
+    const sortedDates = [...dailyTotals.keys()].sort();
+    return checkConsecutiveDays(sortedDates, days);
 }
 
 function checkLogAtTimeForDays(logs: Log[], hour: number, numDays: number) {
