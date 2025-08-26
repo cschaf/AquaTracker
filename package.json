@@ -1,8 +1,8 @@
 {
-  "name": "aqua-tracker",
+  "name": "aquatracker",
   "private": true,
   "version": "0.0.1",
-  "homepage": "https://aqua-tracker.schaflabs.com/",
+  "homepage": "https://aquatracker.schaflabs.com/",
   "type": "module",
   "scripts": {
     "dev": "vite",
