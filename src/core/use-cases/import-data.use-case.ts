@@ -9,10 +9,16 @@ interface ImportedData {
 }
 
 export class ImportDataUseCase {
+  private readonly waterIntakeGateway: WaterIntakeGateway;
+  private readonly goalGateway: GoalGateway;
+
   constructor(
-    private readonly waterIntakeGateway: WaterIntakeGateway,
-    private readonly goalGateway: GoalGateway
-  ) {}
+    waterIntakeGateway: WaterIntakeGateway,
+    goalGateway: GoalGateway
+  ) {
+    this.waterIntakeGateway = waterIntakeGateway;
+    this.goalGateway = goalGateway;
+  }
 
   async execute(file: File): Promise<{ success: boolean; message: string }> {
     return new Promise((resolve) => {

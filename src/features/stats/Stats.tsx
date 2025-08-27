@@ -7,7 +7,6 @@ import ExportData from './ExportData';
 import ImportData from './ImportData';
 import { useStats } from './useStats';
 import { useModal } from '../../app/modal-provider';
-import type { Achievement } from '../../core/entities/achievement';
 
 const Stats: React.FC = () => {
   const {
