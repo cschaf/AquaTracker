@@ -3,9 +3,9 @@ import type { GoalGateway } from '../gateways/goal.gateway';
 import type { AchievementGateway } from '../gateways/achievement.gateway';
 import type { Achievement } from '../entities/achievement';
 import allAchievementsData from '../data/achievements.json';
-import { checkAchievements } from '../utils/achievementChecker';
+import { calculateMetAchievements } from '../utils/achievementChecker';
 
-export class CheckForNewAchievementsUseCase {
+export class RecalculateAchievementsUseCase {
   private readonly waterIntakeGateway: WaterIntakeGateway;
   private readonly goalGateway: GoalGateway;
   private readonly achievementGateway: AchievementGateway;
@@ -21,7 +21,7 @@ export class CheckForNewAchievementsUseCase {
   }
 
   async execute(): Promise<Achievement[]> {
-    const [logs, dailyGoal, unlockedIds] = await Promise.all([
+    const [logs, dailyGoal, oldUnlockedIds] = await Promise.all([
       this.waterIntakeGateway.getLogs(),
       this.goalGateway.getDailyGoal(),
       this.achievementGateway.getUnlockedAchievementIds(),
@@ -29,15 +29,18 @@ export class CheckForNewAchievementsUseCase {
 
     const allAchievements = allAchievementsData as Achievement[];
 
-    const newlyUnlocked = checkAchievements(logs, dailyGoal, unlockedIds, allAchievements);
+    const allMetAchievements = calculateMetAchievements(logs, dailyGoal, allAchievements);
+    const allMetAchievementIds = allMetAchievements.map(a => a.id);
 
-    if (newlyUnlocked.length > 0) {
-      const newUnlockedIds = newlyUnlocked.map(a => a.id);
-      const allUnlockedIds = [...unlockedIds, ...newUnlockedIds];
-      await this.achievementGateway.saveUnlockedAchievementIds(allUnlockedIds);
-      return newlyUnlocked;
-    }
+    // Save the new complete list, overwriting the old one
+    await this.achievementGateway.saveUnlockedAchievementIds(allMetAchievementIds);
 
-    return [];
+    // Now, determine which achievements are newly earned to show the modal
+    const oldUnlockedIdSet = new Set(oldUnlockedIds);
+    const newlyEarnedAchievements = allMetAchievements.filter(
+      (achievement) => !oldUnlockedIdSet.has(achievement.id)
+    );
+
+    return newlyEarnedAchievements;
   }
 }

@@ -13,7 +13,7 @@ import { SetDailyGoalUseCase } from '../core/use-cases/set-daily-goal.use-case';
 import { GetLogsUseCase } from '../core/use-cases/get-logs.use-case';
 import { GetAllAchievementsUseCase } from '../core/use-cases/get-all-achievements.use-case';
 import { GetUnlockedAchievementsUseCase } from '../core/use-cases/get-unlocked-achievements.use-case';
-import { CheckForNewAchievementsUseCase } from '../core/use-cases/check-for-new-achievements.use-case';
+import { RecalculateAchievementsUseCase } from '../core/use-cases/recalculate-achievements.use-case';
 import { ExportDataUseCase } from '../core/use-cases/export-data.use-case';
 import { ImportDataUseCase } from '../core/use-cases/import-data.use-case';
 
@@ -32,7 +32,7 @@ const setDailyGoalUseCase = new SetDailyGoalUseCase(goalGateway);
 const getLogsUseCase = new GetLogsUseCase(waterIntakeGateway);
 const getAllAchievementsUseCase = new GetAllAchievementsUseCase();
 const getUnlockedAchievementsUseCase = new GetUnlockedAchievementsUseCase(achievementGateway);
-const checkForNewAchievementsUseCase = new CheckForNewAchievementsUseCase(waterIntakeGateway, goalGateway, achievementGateway);
+const recalculateAchievementsUseCase = new RecalculateAchievementsUseCase(waterIntakeGateway, goalGateway, achievementGateway);
 const exportDataUseCase = new ExportDataUseCase(waterIntakeGateway, goalGateway);
 const importDataUseCase = new ImportDataUseCase(waterIntakeGateway, goalGateway);
 
@@ -46,7 +46,7 @@ export const useCases = {
   getLogs: getLogsUseCase,
   getAllAchievements: getAllAchievementsUseCase,
   getUnlockedAchievements: getUnlockedAchievementsUseCase,
-  checkForNewAchievements: checkForNewAchievementsUseCase,
+  checkForNewAchievements: recalculateAchievementsUseCase,
   exportData: exportDataUseCase,
   importData: importDataUseCase,
 };

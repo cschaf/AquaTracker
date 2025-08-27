@@ -162,19 +162,15 @@ function checkWeekendGoal(dailyTotals: Map<string, number>, goal: number, weeks:
 }
 
 
-export function checkAchievements(logs: Log[], dailyGoal: number, unlockedAchievements: string[], allAchievements: Achievement[]): Achievement[] {
-    const newlyUnlocked: Achievement[] = [];
+export function calculateMetAchievements(logs: Log[], dailyGoal: number, allAchievements: Achievement[]): Achievement[] {
+    const metAchievements: Achievement[] = [];
     const dailyTotals = new Map<string, number>();
     logs.forEach(log => {
-        const total = log.entries.reduce((sum, entry) => sum + entry.amount, 0);
+        const total = log.entries.reduce((sum: number, entry) => sum + entry.amount, 0);
         dailyTotals.set(log.date, total);
     });
 
     allAchievements.forEach(achievement => {
-        if (unlockedAchievements.includes(achievement.id)) {
-            return;
-        }
-
         let earned = false;
         const trigger = achievement.trigger;
 
@@ -237,9 +233,9 @@ export function checkAchievements(logs: Log[], dailyGoal: number, unlockedAchiev
         }
 
         if (earned) {
-            newlyUnlocked.push(achievement);
+            metAchievements.push(achievement);
         }
     });
 
-    return newlyUnlocked;
+    return metAchievements;
 }
