@@ -1,5 +1,5 @@
 import React from 'react';
-import { INTAKE_STATUS } from '../utils/intakeWarnings';
+import { INTAKE_STATUS } from '../lib/intakeWarnings';
 
 interface WarningBannerProps {
   message: string;

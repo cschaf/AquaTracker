@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Log } from '../types';
+import type { Log, Entry } from '../../core/entities/water-intake';
 
 interface StatsOverviewProps {
   logs: Log[];
@@ -19,7 +19,7 @@ const StatsOverview: React.FC<StatsOverviewProps> = ({ logs, dailyGoal }) => {
     const dateStr = d.toISOString().split('T')[0];
     const log = logs.find(l => l.date === dateStr);
     if (log) {
-      weeklyTotal += log.entries.reduce((sum, entry) => sum + entry.amount, 0);
+      weeklyTotal += log.entries.reduce((sum: number, entry: Entry) => sum + entry.amount, 0);
     }
   }
 
@@ -29,7 +29,7 @@ const StatsOverview: React.FC<StatsOverviewProps> = ({ logs, dailyGoal }) => {
 
   const dailyTotals = new Map<string, number>();
   logs.forEach(log => {
-    const total = log.entries.reduce((sum, entry) => sum + entry.amount, 0);
+    const total = log.entries.reduce((sum: number, entry: Entry) => sum + entry.amount, 0);
     dailyTotals.set(log.date, total);
   });
 

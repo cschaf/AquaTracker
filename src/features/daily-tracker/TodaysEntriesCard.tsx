@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import type { Log, Entry } from '../types';
+// The new entity location
+import type { Entry } from '../../core/entities/water-intake';
 
 interface TodaysEntriesCardProps {
-  todayLog: Log | undefined;
+  entries: Entry[];
   deleteEntry: (id: string) => void;
   updateEntry: (id: string, newAmount: number) => void;
 }
 
-const TodaysEntriesCard: React.FC<TodaysEntriesCardProps> = ({ todayLog, deleteEntry, updateEntry }) => {
+const TodaysEntriesCard: React.FC<TodaysEntriesCardProps> = ({ entries, deleteEntry, updateEntry }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingAmount, setEditingAmount] = useState<string>('');
 
@@ -30,7 +31,7 @@ const TodaysEntriesCard: React.FC<TodaysEntriesCardProps> = ({ todayLog, deleteE
     setEditingAmount('');
   };
 
-  const sortedEntries = todayLog ? [...todayLog.entries].sort((a, b) => b.timestamp - a.timestamp) : [];
+  const sortedEntries = [...entries].sort((a, b) => b.timestamp - a.timestamp);
 
   return (
     <div className="bg-white rounded-2xl shadow-xl overflow-hidden drop-shadow">

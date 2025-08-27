@@ -2,22 +2,33 @@ import React from 'react';
 import WeeklyChart from './WeeklyChart';
 import StatsOverview from './StatsOverview';
 import Achievements from './Achievements';
-import Tips from './Tips';
+import Tips from '../../shared/components/Tips';
 import ExportData from './ExportData';
 import ImportData from './ImportData';
-import type { Log, Achievement } from '../types';
+import { useStats } from './useStats';
+import { useModal } from '../../app/modal-provider';
 
-interface StatsProps {
-  logs: Log[];
-  dailyGoal: number;
-  unlockedAchievements: string[];
-  allAchievements: Achievement[];
-  onAchievementClick: (achievement: Achievement, isUnlocked: boolean) => void;
-  exportData: () => void;
-  importData: (file: File) => void;
-}
+const Stats: React.FC = () => {
+  const {
+    logs,
+    dailyGoal,
+    allAchievements,
+    unlockedAchievements,
+    isLoading,
+    importData,
+    exportData,
+  } = useStats();
 
-const Stats: React.FC<StatsProps> = ({ logs, dailyGoal, unlockedAchievements, allAchievements, onAchievementClick, exportData, importData }) => {
+  const { showAchievementModal } = useModal();
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8">
+        <div className="bg-white rounded-2xl shadow-xl p-6 text-center">Loading Stats...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       <WeeklyChart logs={logs} dailyGoal={dailyGoal} />
@@ -25,7 +36,7 @@ const Stats: React.FC<StatsProps> = ({ logs, dailyGoal, unlockedAchievements, al
       <Achievements
         unlockedAchievements={unlockedAchievements}
         allAchievements={allAchievements}
-        onAchievementClick={onAchievementClick}
+        onAchievementClick={showAchievementModal}
       />
       <Tips />
       <ExportData exportData={exportData} />
