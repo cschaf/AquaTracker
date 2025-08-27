@@ -29,22 +29,22 @@ describe('calculateMetAchievements', () => {
 
   // Mock Achievements
   const achievements: Achievement[] = [
-    { id: 'log_count_1', name: 'First Drop', description: '', trigger: { type: 'log_count', days: 1 } },
-    { id: 'consecutive_goals_3', name: '3 Day Goal Streak', description: '', trigger: { type: 'consecutive_goals', days: 3 } },
-    { id: 'total_volume_10000', name: '10L Club', description: '', trigger: { type: 'total_volume', amount: 10000 } },
-    { id: 'goal_met_5', name: '5 Goals Met', description: '', trigger: { type: 'goal_met', times: 5 } },
-    { id: 'goals_in_week_3', name: '3 Goals in a Week', description: '', trigger: { type: 'goals_in_week', count: 3 } },
-    { id: 'exceed_goal_by_150', name: 'Super Hydrated', description: '', trigger: { type: 'exceed_goal_by', percentage: 150 } },
-    { id: 'log_before_time_8', name: 'Early Bird', description: '', trigger: { type: 'log_before_time', hour: 8 } },
-    { id: 'log_after_time_22', name: 'Night Owl', description: '', trigger: { type: 'log_after_time', hour: 22 } },
-    { id: 'logs_per_day_for_days_5_2', name: 'Consistent Logger', description: '', trigger: { type: 'logs_per_day_for_days', logs: 5, days: 2 } },
-    { id: 'log_on_date_NY', name: 'New Year Hydration', description: '', trigger: { type: 'log_on_date', month: 1, day: 1 } },
-    { id: 'log_date_range', name: 'Hydration Week', description: '', trigger: { type: 'log_date_range', start: '08-01', end: '08-07' } },
-    { id: 'log_after_break_3', name: 'Back on Track', description: '', trigger: { type: 'log_after_break', days: 3 } },
-    { id: 'log_streak_7', name: '7-Day Streak', description: '', trigger: { type: 'log_streak', days: 7 } },
-    { id: 'log_at_time_for_days', name: 'Lunchtime Hydration', description: '', trigger: { type: 'log_at_time_for_days', hour: 12, days: 3 } },
-    { id: 'single_log_amount_1000', name: 'Big Gulp', description: '', trigger: { type: 'single_log_amount', amount: 1000 } },
-    { id: 'weekend_goal_2', name: 'Weekend Warrior', description: '', trigger: { type: 'weekend_goal', weeks: 1 } },
+    { id: 'log_count_1', name: 'First Drop', description: '', icon: '', trigger: { type: 'log_count', days: 1 } },
+    { id: 'consecutive_goals_3', name: '3 Day Goal Streak', description: '', icon: '', trigger: { type: 'consecutive_goals', days: 3 } },
+    { id: 'total_volume_10000', name: '10L Club', description: '', icon: '', trigger: { type: 'total_volume', amount: 10000 } },
+    { id: 'goal_met_5', name: '5 Goals Met', description: '', icon: '', trigger: { type: 'goal_met', times: 5 } },
+    { id: 'goals_in_week_3', name: '3 Goals in a Week', description: '', icon: '', trigger: { type: 'goals_in_week', count: 3 } },
+    { id: 'exceed_goal_by_150', name: 'Super Hydrated', description: '', icon: '', trigger: { type: 'exceed_goal_by', percentage: 150 } },
+    { id: 'log_before_time_8', name: 'Early Bird', description: '', icon: '', trigger: { type: 'log_before_time', hour: 8 } },
+    { id: 'log_after_time_22', name: 'Night Owl', description: '', icon: '', trigger: { type: 'log_after_time', hour: 22 } },
+    { id: 'logs_per_day_for_days_5_2', name: 'Consistent Logger', description: '', icon: '', trigger: { type: 'logs_per_day_for_days', logs: 5, days: 2 } },
+    { id: 'log_on_date_NY', name: 'New Year Hydration', description: '', icon: '', trigger: { type: 'log_on_date', month: 1, day: 1 } },
+    { id: 'log_date_range', name: 'Hydration Week', description: '', icon: '', trigger: { type: 'log_date_range', start: '08-01', end: '08-07' } },
+    { id: 'log_after_break_3', name: 'Back on Track', description: '', icon: '', trigger: { type: 'log_after_break', days: 3 } },
+    { id: 'log_streak_7', name: '7-Day Streak', description: '', icon: '', trigger: { type: 'log_streak', days: 7 } },
+    { id: 'log_at_time_for_days', name: 'Lunchtime Hydration', description: '', icon: '', trigger: { type: 'log_at_time_for_days', hour: 12, days: 3 } },
+    { id: 'single_log_amount_1000', name: 'Big Gulp', description: '', icon: '', trigger: { type: 'single_log_amount', amount: 1000 } },
+    { id: 'weekend_goal_2', name: 'Weekend Warrior', description: '', icon: '', trigger: { type: 'weekend_goal', weeks: 1 } },
   ];
 
   it('should return no achievements if none are met', () => {
