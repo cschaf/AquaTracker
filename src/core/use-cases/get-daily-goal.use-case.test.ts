@@ -13,7 +13,7 @@ const createMockGateway = (dailyGoal: DailyGoal): GoalGateway => {
 describe('GetDailyGoalUseCase', () => {
   it('should call the gateway to get the daily goal', async () => {
     // Arrange
-    const dailyGoal = { amount: 2500 };
+    const dailyGoal: DailyGoal = 2500;
     const mockGateway = createMockGateway(dailyGoal);
     const useCase = new GetDailyGoalUseCase(mockGateway);
 

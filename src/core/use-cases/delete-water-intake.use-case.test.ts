@@ -37,7 +37,7 @@ describe('DeleteWaterIntakeUseCase', () => {
     // Assert
     expect(mockGateway.saveLogs).toHaveBeenCalledTimes(1);
     const savedLogs = (mockGateway.saveLogs as any).mock.calls[0][0];
-    const todaysLog = savedLogs.find(log => log.date === today);
+    const todaysLog = savedLogs.find((log: Log) => log.date === today);
     expect(todaysLog.entries).toHaveLength(1);
     expect(todaysLog.entries[0].id).toBe('2');
   });

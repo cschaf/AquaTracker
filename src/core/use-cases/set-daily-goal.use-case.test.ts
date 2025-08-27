@@ -15,7 +15,7 @@ describe('SetDailyGoalUseCase', () => {
     // Arrange
     const mockGateway = createMockGateway();
     const useCase = new SetDailyGoalUseCase(mockGateway);
-    const newGoal: DailyGoal = { amount: 3000 };
+    const newGoal: DailyGoal = 3000;
 
     // Act
     await useCase.execute(newGoal);

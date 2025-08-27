@@ -36,7 +36,7 @@ describe('ExportDataUseCase', () => {
   it('should create and click a download link with the correct data', async () => {
     // Arrange
     const logs: Log[] = [{ date: '2023-01-01', entries: [] }];
-    const goal: DailyGoal = { amount: 2000 };
+    const goal: DailyGoal = 2000;
     const waterIntakeGateway = createMockWaterIntakeGateway(logs);
     const goalGateway = createMockGoalGateway(goal);
     const useCase = new ExportDataUseCase(waterIntakeGateway, goalGateway);

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { UpdateWaterIntakeUseCase } from './update-water-intake.use-case';
 import type { WaterIntakeGateway } from '../gateways/water-intake.gateway';
-import type { Log } from '../entities/water-intake';
+import type { Log, Entry } from '../entities/water-intake';
 
 const createMockGateway = (initialLogs: Log[] = []): WaterIntakeGateway => {
   let logs: Log[] = [...initialLogs];
@@ -38,8 +38,8 @@ describe('UpdateWaterIntakeUseCase', () => {
     // Assert
     expect(mockGateway.saveLogs).toHaveBeenCalledTimes(1);
     const savedLogs = (mockGateway.saveLogs as any).mock.calls[0][0];
-    const todaysLog = savedLogs.find(log => log.date === today);
-    const updatedEntry = todaysLog.entries.find(entry => entry.id === entryIdToUpdate);
+    const todaysLog = savedLogs.find((log: Log) => log.date === today);
+    const updatedEntry = todaysLog.entries.find((entry: Entry) => entry.id === entryIdToUpdate);
     expect(updatedEntry.amount).toBe(newAmount);
   });
 

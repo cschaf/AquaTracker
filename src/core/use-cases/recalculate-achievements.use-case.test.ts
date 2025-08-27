@@ -27,7 +27,7 @@ describe('RecalculateAchievementsUseCase', () => {
     // Arrange
     const today = new Date().toISOString().split('T')[0];
     const logs: Log[] = [{ date: today, entries: [{ id: '1', amount: 100, timestamp: Date.now() }] }];
-    const dailyGoal: DailyGoal = { amount: 2000 };
+    const dailyGoal: DailyGoal = 2000;
     const oldUnlockedIds: string[] = [];
 
     const waterIntakeGateway = createMockWaterIntakeGateway(logs);
@@ -53,7 +53,7 @@ describe('RecalculateAchievementsUseCase', () => {
     // Arrange
     const today = new Date().toISOString().split('T')[0];
     const logs: Log[] = [{ date: today, entries: [{ id: '1', amount: 100, timestamp: Date.now() }] }];
-    const dailyGoal: DailyGoal = { amount: 2000 };
+    const dailyGoal: DailyGoal = 2000;
     const oldUnlockedIds: string[] = ['first-day-logged'];
 
     const waterIntakeGateway = createMockWaterIntakeGateway(logs);

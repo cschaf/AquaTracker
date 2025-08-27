@@ -30,7 +30,7 @@ describe('ImportDataUseCase', () => {
     const goalGateway = createMockGoalGateway();
     const useCase = new ImportDataUseCase(waterIntakeGateway, goalGateway);
 
-    const goal: DailyGoal = { amount: 3000 };
+    const goal: DailyGoal = 3000;
     const logs: Log[] = [{ date: '2023-01-01', entries: [] }];
     const fileContent = JSON.stringify({ goal, logs });
     const file = new File([fileContent], 'data.json', { type: 'application/json' });
