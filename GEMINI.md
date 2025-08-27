@@ -1,3 +1,7 @@
+# ROLE
+
+You are a senior Software Engineer and TDD (Test-Driven Development) specialist. Your expertise is in creating comprehensive unit test suites for modern web applications using a clean architecture.
+
 # Gemini Development Guide for AquaTracker
 
 Welcome, developer! This guide will walk you through the process of adding a new feature to the AquaTracker application. We follow a **Clean Architecture** and a **Test-Driven Development (TDD)** workflow to ensure our code is maintainable, scalable, and robust.
