@@ -116,3 +116,103 @@ describe('DailyTracker', () => {
 ```
 
 By following this strategy, we can build a robust and reliable test suite that covers our application's logic and UI separately, leading to a more maintainable and stable codebase.
+
+## 3. TDD Workflow: Creating a New Use Case
+
+For new developers, the best way to ensure your code is correct and maintainable is to follow a **Test-Driven Development (TDD)** workflow. TDD is a process where you write your tests *before* you write your implementation code. This might feel backward at first, but it has several key advantages:
+
+-   **It forces you to think about requirements first.** You can't test a feature until you know what it's supposed to do.
+-   **It guarantees 100% test coverage** for your new logic.
+-   **It makes development faster in the long run** by catching bugs early and making your code easier to refactor.
+
+The TDD workflow follows a simple cycle: **Red, Green, Refactor**.
+
+1.  **Red**: Write a test that fails. This is because the feature you're testing doesn't exist yet.
+2.  **Green**: Write the *simplest possible* code to make the test pass. Don't worry about making it perfect.
+3.  **Refactor**: Clean up your code, remove duplication, and improve its design, all while making sure the test still passes.
+
+### Example: Creating a `ClearTodaysIntakeUseCase` with TDD
+
+Let's say we want to create a new feature that allows the user to clear all of today's water intake entries at once.
+
+#### Step 1: Write the Failing Test (Red)
+
+First, we create a new test file: `src/core/use-cases/clear-todays-intake.use-case.test.ts`. We will write a test for a use case that doesn't exist yet.
+
+```typescript
+// src/core/use-cases/clear-todays-intake.use-case.test.ts
+import { describe, it, expect, vi } from 'vitest';
+import { ClearTodaysIntakeUseCase } from './clear-todays-intake.use-case';
+import type { WaterIntakeGateway } from '../gateways/water-intake.gateway';
+import type { Log } from '../entities/water-intake';
+
+// Mock the gateway, as we always do for use case tests
+const createMockGateway = (initialLogs: Log[] = []): WaterIntakeGateway => {
+  let logs: Log[] = [...initialLogs];
+  return {
+    getLogs: vi.fn().mockResolvedValue(logs),
+    saveLogs: vi.fn().mockImplementation(async (updatedLogs: Log[]) => {
+      logs = updatedLogs;
+    }),
+  };
+};
+
+describe('ClearTodaysIntakeUseCase', () => {
+  it('should remove the log for today, but keep other days', async () => {
+    // Arrange
+    const today = new Date().toISOString().split('T')[0];
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    const initialLogs: Log[] = [
+      { date: today, entries: [{ id: '1', amount: 500, timestamp: Date.now() }] },
+      { date: yesterday, entries: [{ id: '2', amount: 1000, timestamp: Date.now() }] },
+    ];
+    const mockGateway = createMockGateway(initialLogs);
+    const useCase = new ClearTodaysIntakeUseCase(mockGateway);
+
+    // Act
+    await useCase.execute();
+
+    // Assert
+    expect(mockGateway.saveLogs).toHaveBeenCalledTimes(1);
+    const savedLogs = (mockGateway.saveLogs as any).mock.calls[0][0];
+    expect(savedLogs).toHaveLength(1);
+    expect(savedLogs[0].date).toBe(yesterday);
+  });
+});
+```
+
+If we run `npm test` now, it will fail because `ClearTodaysIntakeUseCase` doesn't exist. This is our **Red** step.
+
+#### Step 2: Write the Code to Make it Pass (Green)
+
+Now, we create the use case file at `src/core/use-cases/clear-todays-intake.use-case.ts` and write the simplest code to make the test pass.
+
+```typescript
+// src/core/use-cases/clear-todays-intake.use-case.ts
+import type { WaterIntakeGateway } from '../gateways/water-intake.gateway';
+
+export class ClearTodaysIntakeUseCase {
+  private readonly waterIntakeGateway: WaterIntakeGateway;
+
+  constructor(waterIntakeGateway: WaterIntakeGateway) {
+    this.waterIntakeGateway = waterIntakeGateway;
+  }
+
+  async execute(): Promise<void> {
+    const logs = await this.waterIntakeGateway.getLogs();
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    const updatedLogs = logs.filter(log => log.date !== todayStr);
+
+    await this.waterIntakeGateway.saveLogs(updatedLogs);
+  }
+}
+```
+
+If we run `npm test` again, the test will now pass. This is our **Green** step.
+
+#### Step 3: Refactor
+
+In this case, our code is already quite simple, so there's not much to refactor. However, if our implementation was more complex, this would be the time to clean it up, for example, by extracting a helper function or improving variable names, all while continuously re-running the test to ensure it still passes.
+
+By following this TDD cycle, you can build robust, well-tested features with confidence.
