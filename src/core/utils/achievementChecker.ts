@@ -2,7 +2,7 @@ import type { Log } from '../entities/water-intake';
 import type { Achievement } from '../entities/achievement';
 
 function getWeekNumber(d: Date) {
-    d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    d = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
     d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
     const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
     const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
@@ -63,14 +63,14 @@ function checkLogDateRange(dailyTotals: Map<string, number>, goal: number, start
     const [startMonth, startDay] = start.split('-').map(Number);
     const [endMonth, endDay] = end.split('-').map(Number);
 
-    const years = new Set([...dailyTotals.keys()].map(d => new Date(d).getFullYear()));
+    const years = new Set([...dailyTotals.keys()].map(d => new Date(d).getUTCFullYear()));
 
     for(const year of years) {
         let allDaysMet = true;
-        const startDate = new Date(year, startMonth - 1, startDay);
-        const endDate = new Date(year, endMonth - 1, endDay);
+        const startDate = new Date(Date.UTC(year, startMonth - 1, startDay));
+        const endDate = new Date(Date.UTC(year, endMonth - 1, endDay));
 
-        for (let d = startDate; d <= endDate; d.setDate(d.getDate() + 1)) {
+        for (let d = startDate; d <= endDate; d.setUTCDate(d.getUTCDate() + 1)) {
             const dateStr = d.toISOString().split('T')[0];
             if (!dailyTotals.has(dateStr) || dailyTotals.get(dateStr)! < goal) {
                 allDaysMet = false;
@@ -105,7 +105,7 @@ function checkLogStreak(dailyTotals: Map<string, number>, days: number) {
 function checkLogAtTimeForDays(logs: Log[], hour: number, numDays: number) {
     const datesWithSpecificLog = new Set<string>();
     logs.forEach(log => {
-        if (log.entries.some(e => new Date(e.timestamp).getHours() === hour)) {
+        if (log.entries.some(e => new Date(e.timestamp).getUTCHours() === hour)) {
             datesWithSpecificLog.add(log.date);
         }
     });
@@ -198,10 +198,10 @@ export function calculateMetAchievements(logs: Log[], dailyGoal: number, allAchi
                 earned = [...dailyTotals.values()].some(total => total >= dailyGoal * (trigger.percentage / 100));
                 break;
             case 'log_before_time':
-                earned = logs.some(log => log.entries.some(e => new Date(e.timestamp).getHours() < trigger.hour));
+                earned = logs.some(log => log.entries.some(e => new Date(e.timestamp).getUTCHours() < trigger.hour));
                 break;
             case 'log_after_time':
-                earned = logs.some(log => log.entries.some(e => new Date(e.timestamp).getHours() >= trigger.hour));
+                earned = logs.some(log => log.entries.some(e => new Date(e.timestamp).getUTCHours() >= trigger.hour));
                 break;
             case 'logs_per_day_for_days':
                 earned = checkLogsPerDayForDays(logs, trigger.logs, trigger.days);
