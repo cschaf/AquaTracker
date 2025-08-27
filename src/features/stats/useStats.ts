@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useUseCases } from '../../app/use-case-provider';
+import { eventBus } from '../../app/event-bus';
 import type { Log } from '../../core/entities/water-intake';
 import type { DailyGoal } from '../../core/entities/goal';
 import type { Achievement } from '../../core/entities/achievement';
@@ -41,11 +42,15 @@ export const useStats = () => {
   }, [getLogs, getDailyGoal, getAllAchievements, getUnlockedAchievements]);
 
   useEffect(() => {
-    loadData();
+    loadData(); // initial load
+    eventBus.on('intakeDataChanged', loadData); // subscribe to changes
+    return () => {
+      eventBus.off('intakeDataChanged', loadData); // unsubscribe on cleanup
+    };
   }, [loadData]);
 
-  const handleImportData = async (file: File) => {
-    const result = await importDataUseCase.execute(file);
+  const handleImportData = async (_file: File) => {
+    const result = await importDataUseCase.execute(_file); // The fix is here
     alert(result.message);
     if (result.success) {
       // The use case message says the page will reload, so we do it here.

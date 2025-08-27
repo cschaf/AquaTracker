@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useUseCases } from '../../app/use-case-provider';
 import { useModal } from '../../app/modal-provider';
+import { eventBus } from '../../app/event-bus';
 import type { DailySummary } from '../../core/use-cases/get-daily-summary.use-case';
 import type { DailyGoal } from '../../core/entities/goal';
 
@@ -31,14 +32,21 @@ export const useDailyTracker = () => {
       setGoal(goalData);
     } catch (error) {
       console.error("Failed to load daily tracker data", error);
-      // Optionally set some error state here
     } finally {
       setIsLoading(false);
     }
   }, [getDailySummary, getDailyGoal]);
 
   useEffect(() => {
-    loadData();
+    loadData(); // Initial load
+
+    // Subscribe to data changes
+    eventBus.on('intakeDataChanged', loadData);
+
+    // Unsubscribe on cleanup
+    return () => {
+      eventBus.off('intakeDataChanged', loadData);
+    };
   }, [loadData]);
 
   const handleAddEntry = useCallback(async (amount: number) => {
@@ -47,22 +55,24 @@ export const useDailyTracker = () => {
     if (newlyUnlocked.length > 0) {
       showAchievementModal(newlyUnlocked[0], true);
     }
-    loadData(); // Refresh data after adding
-  }, [addWaterIntake, loadData, checkForNewAchievements, showAchievementModal]);
+    eventBus.emit('intakeDataChanged');
+  }, [addWaterIntake, checkForNewAchievements, showAchievementModal]);
 
   const handleDeleteEntry = useCallback(async (entryId: string) => {
     await deleteWaterIntake.execute(entryId);
-    loadData(); // Refresh data after deleting
-  }, [deleteWaterIntake, loadData]);
+    eventBus.emit('intakeDataChanged');
+  }, [deleteWaterIntake]);
 
   const handleUpdateEntry = useCallback(async (entryId: string, amount: number) => {
     await updateWaterIntake.execute(entryId, amount);
-    loadData(); // Refresh data after updating
-  }, [updateWaterIntake, loadData]);
+    eventBus.emit('intakeDataChanged');
+  }, [updateWaterIntake]);
 
   const handleSetGoal = useCallback(async (newGoal: number) => {
     await setDailyGoalUseCase.execute(newGoal);
-    setGoal(newGoal); // Optimistic update or refresh from source
+    // We also optimistically update the local state for immediate feedback
+    setGoal(newGoal);
+    eventBus.emit('intakeDataChanged');
   }, [setDailyGoalUseCase]);
 
   return {
