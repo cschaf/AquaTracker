@@ -60,13 +60,20 @@ export const useDailyTracker = () => {
 
   const handleDeleteEntry = useCallback(async (entryId: string) => {
     await deleteWaterIntake.execute(entryId);
+    // Recalculate achievements after deleting an entry.
+    // It's unlikely to unlock one, but it correctly handles locking them again.
+    await checkForNewAchievements.execute();
     eventBus.emit('intakeDataChanged');
-  }, [deleteWaterIntake]);
+  }, [deleteWaterIntake, checkForNewAchievements]);
 
   const handleUpdateEntry = useCallback(async (entryId: string, amount: number) => {
     await updateWaterIntake.execute(entryId, amount);
+    const newlyUnlocked = await checkForNewAchievements.execute();
+    if (newlyUnlocked.length > 0) {
+      showAchievementModal(newlyUnlocked[0], true);
+    }
     eventBus.emit('intakeDataChanged');
-  }, [updateWaterIntake]);
+  }, [updateWaterIntake, checkForNewAchievements, showAchievementModal]);
 
   const handleSetGoal = useCallback(async (newGoal: number) => {
     await setDailyGoalUseCase.execute(newGoal);
