@@ -1,35 +1,26 @@
-import Header from './components/Header';
-import WarningBanner from './components/WarningBanner';
-import DailyTracker from './components/DailyTracker';
-import Stats from './components/Stats';
-import Footer from './components/Footer';
-import AchievementModal from './components/AchievementModal';
-import CriticalWarningModal from './components/CriticalWarningModal';
-import { useWaterTracker } from './hooks/useWaterTracker';
+import Header from './shared/components/Header';
+import WarningBanner from './shared/components/WarningBanner';
+import DailyTracker from './features/daily-tracker/DailyTracker';
+import Stats from './features/stats/Stats';
+import Footer from './shared/components/Footer';
+import AchievementModal from './shared/components/AchievementModal';
+import CriticalWarningModal from './shared/components/CriticalWarningModal';
+import { useModal } from './app/modal-provider';
+import { useAppNotifications } from './shared/hooks/useAppNotifications';
 
 function App() {
   const {
-    logs,
-    dailyGoal,
-    setDailyGoal,
-    unlockedAchievements,
-    selectedAchievement,
     isAchievementModalOpen,
-    setIsAchievementModalOpen,
+    selectedAchievement,
+    isSelectedAchievementUnlocked,
+    hideAchievementModal,
+  } = useModal();
+
+  const {
     isCriticalModalOpen,
     setIsCriticalModalOpen,
     intakeStatus,
-    isSelectedAchievementUnlocked,
-    addWaterEntry,
-    deleteEntry,
-    updateEntry,
-    exportData,
-    importData,
-    handleAchievementClick,
-    dailyTotal,
-    allAchievements,
-    todayLog
-  } = useWaterTracker();
+  } = useAppNotifications();
 
   return (
     <div className="bg-gradient-to-br from-blue-50 to-cyan-50 min-h-screen">
@@ -37,31 +28,15 @@ function App() {
         <Header />
         <WarningBanner status={intakeStatus.status} message={intakeStatus.message} />
         <main className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <DailyTracker
-            todayLog={todayLog}
-            dailyGoal={dailyGoal}
-            setDailyGoal={setDailyGoal}
-            addWaterEntry={addWaterEntry}
-            deleteEntry={deleteEntry}
-            updateEntry={updateEntry}
-            dailyTotal={dailyTotal}
-          />
-          <Stats
-            logs={logs}
-            dailyGoal={dailyGoal}
-            unlockedAchievements={unlockedAchievements}
-            allAchievements={allAchievements}
-            onAchievementClick={handleAchievementClick}
-            exportData={exportData}
-            importData={importData}
-          />
+          <DailyTracker />
+          <Stats />
         </main>
         <Footer />
       </div>
       <AchievementModal
         isOpen={isAchievementModalOpen}
         achievement={selectedAchievement}
-        onClose={() => setIsAchievementModalOpen(false)}
+        onClose={hideAchievementModal}
         isUnlocked={isSelectedAchievementUnlocked}
       />
       <CriticalWarningModal

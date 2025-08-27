@@ -1,4 +1,5 @@
-import type { Log, Achievement } from '../types';
+import type { Log } from '../entities/water-intake';
+import type { Achievement } from '../entities/achievement';
 
 function getWeekNumber(d: Date) {
     d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Log } from '../types';
+import type { Log, Entry } from '../../core/entities/water-intake';
 
 interface WeeklyChartProps {
   logs: Log[];
@@ -17,7 +17,7 @@ const WeeklyChart: React.FC<WeeklyChartProps> = ({ logs, dailyGoal }) => {
     d.setDate(today.getDate() - i);
     const dateStr = d.toISOString().split('T')[0];
     const log = logs.find(l => l.date === dateStr);
-    const total = log ? log.entries.reduce((sum, entry) => sum + entry.amount, 0) : 0;
+    const total = log ? log.entries.reduce((sum: number, entry: Entry) => sum + entry.amount, 0) : 0;
     if (total > 0) {
       weeklyTotal += total;
       daysWithIntake++;

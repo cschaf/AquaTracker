@@ -1,14 +1,3 @@
-export interface Entry {
-  id: string;
-  amount: number;
-  timestamp: number;
-}
-
-export interface Log {
-  date: string;
-  entries: Entry[];
-}
-
 interface LogCountTrigger {
   type: 'log_count';
   days: number;
