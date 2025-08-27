@@ -27,7 +27,7 @@ export class ImportDataUseCase {
         try {
           const importedData = JSON.parse(event.target!.result as string) as ImportedData;
 
-          if (importedData && typeof importedData.goal === 'number' && Array.isArray(importedData.logs)) {
+          if (importedData && importedData.goal && typeof importedData.goal.amount === 'number' && Array.isArray(importedData.logs)) {
             await this.goalGateway.saveDailyGoal(importedData.goal);
             await this.waterIntakeGateway.saveLogs(importedData.logs);
             resolve({ success: true, message: "Data imported successfully! The page will now reload to apply the changes." });
