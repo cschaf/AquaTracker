@@ -65,6 +65,24 @@ Our testing strategy is based on the principles of the Clean Architecture:
 
 For a detailed guide on our testing strategy, how to run tests, and how to write new tests using a Test-Driven Development (TDD) workflow, please see the **[TESTING.md](TESTING.md)** file.
 
+### End-to-End (E2E) Testing
+
+This project uses **Playwright** for end-to-end testing. E2E tests simulate real user interactions with the application in a browser environment.
+
+To run the E2E tests, follow these steps:
+
+1.  **Install browser dependencies:**
+    Before running the tests for the first time, you need to install the necessary browser binaries for Playwright. Run the following command:
+    ```bash
+    npx playwright install
+    ```
+
+2.  **Run the tests:**
+    Once the browsers are installed, you can run the E2E tests with this command:
+    ```bash
+    npm run test:e2e
+    ```
+
 ## How to Contribute
 
 Contributions are welcome! If you have ideas for new features, improvements, or bug fixes, please follow these steps:

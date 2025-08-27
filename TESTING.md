@@ -216,3 +216,21 @@ If we run `npm test` again, the test will now pass. This is our **Green** step.
 In this case, our code is already quite simple, so there's not much to refactor. However, if our implementation was more complex, this would be the time to clean it up, for example, by extracting a helper function or improving variable names, all while continuously re-running the test to ensure it still passes.
 
 By following this TDD cycle, you can build robust, well-tested features with confidence.
+
+## 4. End-to-End (E2E) Testing
+
+This project uses **Playwright** for end-to-end testing. E2E tests simulate real user interactions with the application in a browser environment, providing the highest level of confidence that the application is working as expected from a user's perspective.
+
+To run the E2E tests, follow these steps:
+
+1.  **Install browser dependencies:**
+    Before running the tests for the first time, you need to install the necessary browser binaries for Playwright. Run the following command from the project root:
+    ```bash
+    npx playwright install
+    ```
+
+2.  **Run the E2E tests:**
+    Once the browsers are installed, you can run the full suite of E2E tests with this command:
+    ```bash
+    npm run test:e2e
+    ```
