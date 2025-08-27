@@ -38,6 +38,33 @@ AquaTracker is a web-based application designed to help you monitor and log your
 *   **Font Awesome:** For icons used throughout the application.
 *   **Browser `localStorage`:** For storing user data persistently in the browser.
 
+## Project Structure
+
+This project is built using a **Clean Architecture** approach. The goal is to separate the core business logic from the UI, database, and other external concerns. This makes the application easier to maintain, test, and scale.
+
+The `src` directory is organized as follows:
+
+-   `src/core`: This is the heart of the application. It contains the core business logic, entities, and rules.
+    -   `entities`: The core data structures of the application (e.g., `WaterIntake`, `Goal`).
+    -   `use-cases`: The application-specific business rules (e.g., `AddWaterIntakeUseCase`). These orchestrate the flow of data between entities and gateways.
+    -   `gateways`: Interfaces that define how the core logic communicates with the outside world (e.g., for data storage).
+-   `src/app`: This layer connects the core business logic to the UI framework. It contains the dependency injection container and providers.
+-   `src/features`: Contains the React components that make up the UI. Each feature (e.g., `daily-tracker`, `stats`) is a self-contained module.
+-   `src/infrastructure`: This is where the external dependencies are implemented.
+    -   `storage`: Concrete implementations of the gateways defined in `src/core/gateways`. For this project, we use `localStorage`.
+-   `src/shared`: Contains reusable components, hooks, and utilities that are shared across multiple features.
+
+## Testing
+
+This project uses **Vitest** for running tests and **React Testing Library** for testing React components.
+
+Our testing strategy is based on the principles of the Clean Architecture:
+
+1.  **Core Logic (Use Cases) is Tested in Isolation:** We write pure TypeScript/JavaScript tests for our use cases. We use mock implementations of our gateways to ensure that we are only testing the business logic itself, without any dependencies on the UI or database.
+2.  **UI Components are Tested from the User's Perspective:** We test our React components by interacting with them as a user would. We mock the use cases that the components depend on, ensuring that our UI tests are not concerned with the underlying business logic.
+
+For a detailed guide on our testing strategy, how to run tests, and how to write new tests using a Test-Driven Development (TDD) workflow, please see the **[TESTING.md](TESTING.md)** file.
+
 ## How to Contribute
 
 Contributions are welcome! If you have ideas for new features, improvements, or bug fixes, please follow these steps:
