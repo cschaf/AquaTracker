@@ -17,17 +17,17 @@ const Achievements: React.FC<AchievementsProps> = ({ unlockedAchievements, allAc
   });
 
   return (
-    <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl shadow-xl overflow-hidden text-white">
+    <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
       <div className="p-6">
-        <h2 className="text-2xl font-bold mb-4">Your Achievements</h2>
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-44 overflow-y-auto pr-2">
+        <h2 className="text-2xl font-bold mb-4 text-gray-800">Your Achievements</h2>
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-4 xl:grid-cols-5 gap-4 pr-2">
           {sortedAchievements.map(achievement => {
             const isUnlocked = unlockedAchievements.includes(achievement.id);
             const badgeClasses = isUnlocked
-              ? 'bg-white bg-opacity-40'
-              : 'bg-blue-900 bg-opacity-40 filter grayscale cursor-pointer';
-            const iconClass = isUnlocked ? 'text-amber-300' : 'text-gray-500';
-            const textClass = isUnlocked ? 'text-indigo-800' : 'text-gray-300';
+              ? 'bg-amber-100'
+              : 'bg-gray-200 cursor-pointer';
+            const iconClass = isUnlocked ? 'text-amber-500' : 'text-gray-500';
+            const textClass = isUnlocked ? 'text-amber-800' : 'text-gray-700';
 
             return (
               <div
