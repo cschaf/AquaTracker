@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useUseCase } from '../../app/use-case-provider';
+import { useUseCases } from '../../app/use-case-provider';
 import type { QuickAddValues } from '../../core/entities/quick-add-values';
 
 interface DailyIntakeCardProps {
@@ -11,7 +11,7 @@ interface DailyIntakeCardProps {
 
 const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGoal, addWaterEntry, dailyTotal }) => {
   const [customAmount, setCustomAmount] = useState('');
-  const { getQuickAddValues } = useUseCase();
+  const { getQuickAddValues } = useUseCases();
   const [quickAddValues, setQuickAddValues] = useState<QuickAddValues | null>(null);
 
   useEffect(() => {

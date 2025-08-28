@@ -1,7 +1,8 @@
-import { defineConfig, UserConfig } from 'vite'
+import { defineConfig } from 'vite'
+import type { UserConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-import { InlineConfig } from 'vitest'
+import type { InlineConfig } from 'vitest'
 
 interface VitestConfigExport extends UserConfig {
   test: InlineConfig
@@ -20,6 +21,6 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    exclude: ['e2e/**', '**/node_modules/**', 'dist/**'],
+    exclude: ['e2e/**', '**/node_modules/**'],
   },
 } as VitestConfigExport)

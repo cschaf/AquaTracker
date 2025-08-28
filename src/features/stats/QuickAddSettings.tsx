@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useUseCase } from '../../app/use-case-provider';
+import { useUseCases } from '../../app/use-case-provider';
 import type { QuickAddValues } from '../../core/entities/quick-add-values';
-import { useAppNotifications } from '../../shared/hooks/useAppNotifications';
 
 const QuickAddSettings: React.FC = () => {
-  const { getQuickAddValues, updateQuickAddValues } = useUseCase();
-  const { showSuccessNotification, showErrorNotification } = useAppNotifications();
+  const { getQuickAddValues, updateQuickAddValues } = useUseCases();
   const [values, setValues] = useState<QuickAddValues | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    getQuickAddValues.execute().then(vals => {
+    getQuickAddValues.execute().then((vals: QuickAddValues) => {
       setValues(vals);
       setIsLoading(false);
     });
@@ -28,9 +26,9 @@ const QuickAddSettings: React.FC = () => {
     if (values) {
       try {
         await updateQuickAddValues.execute(values);
-        showSuccessNotification('Quick add values updated successfully!');
+        alert('Quick add values updated successfully!');
       } catch (error: any) {
-        showErrorNotification(error.message);
+        alert(error.message);
       }
     }
   };

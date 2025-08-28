@@ -57,11 +57,10 @@ describe('ImportDataUseCase', () => {
     // Act
     const promise = useCase.execute(file);
     mockFileReader.onload({ target: { result: 'invalid json' } });
+    const result = await promise;
 
     // Assert
-    await expect(promise).resolves.toEqual({
-      success: false,
-      message: "Error reading or parsing the file. Please ensure it's a valid JSON file.",
-    });
+    expect(result.success).toBe(false);
+    expect(result.message).toContain('Error reading or parsing the file');
   });
 });

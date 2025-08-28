@@ -2,7 +2,11 @@ import type { QuickAddGateway } from '../gateways/quick-add.gateway';
 import type { QuickAddValues } from '../entities/quick-add-values';
 
 export class UpdateQuickAddValuesUseCase {
-  constructor(private readonly quickAddGateway: QuickAddGateway) {}
+  private readonly quickAddGateway: QuickAddGateway;
+
+  constructor(quickAddGateway: QuickAddGateway) {
+    this.quickAddGateway = quickAddGateway;
+  }
 
   async execute(values: QuickAddValues): Promise<void> {
     if (!Array.isArray(values) || values.length !== 3) {
