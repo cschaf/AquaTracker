@@ -17,7 +17,8 @@ export default defineConfig({
     filename: 'sw.ts',
     includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
     devOptions: {
-      enabled: true // PWA in development mode aktivieren
+      enabled: true, // PWA in development mode aktivieren
+      type: 'module'
     }
   })],
   base: "/",
