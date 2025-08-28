@@ -12,43 +12,13 @@ interface VitestConfigExport extends UserConfig {
 export default defineConfig({
   plugins: [react(), tailwindcss(), VitePWA({
     registerType: 'autoUpdate',
-    workbox: {
-      globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-      runtimeCaching: [
-        {
-          urlPattern: /^https:\/\/aquatracker\.schaflabs\.com\/.*/i,
-          handler: 'CacheFirst',
-          options: {
-            cacheName: 'api-cache',
-          }
-        }
-      ]
-    },
+    strategies: 'injectManifest',
+    srcDir: 'src',
+    filename: 'sw.ts',
     includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
-    manifest: {
-      name: 'AquaTracker - Daily Water Intake Monitor',
-      short_name: 'AquaTracker',
-      description: 'Monitor and log your daily water intake. Stay hydrated with AquaTracker - make tracking your hydration goals easy and enjoyable.',
-      theme_color: '#2196F3',
-      background_color: '#FFFFFF',
-      display: 'standalone',
-      scope: '/',
-      start_url: '/',
-      icons: [
-        {
-          src: 'icons/icon-192x192.png',
-          sizes: '192x192',
-          type: 'image/png'
-        },
-        {
-          src: 'icons/icon-512x512.png',
-          sizes: '512x512',
-          type: 'image/png'
-        }
-      ]
-    },
     devOptions: {
-      enabled: true // PWA in development mode aktivieren
+      enabled: true, // PWA in development mode aktivieren
+      type: 'module'
     }
   })],
   base: "/",
