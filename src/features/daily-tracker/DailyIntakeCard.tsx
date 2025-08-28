@@ -30,7 +30,8 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
     };
   }, [fetchQuickAddValues]);
 
-  const percentage = dailyGoal > 0 ? Math.min((dailyTotal / dailyGoal) * 100, 100) : 0;
+  const displayPercentage = dailyGoal > 0 ? (dailyTotal / dailyGoal) * 100 : 0;
+  const progressPercentage = Math.min(displayPercentage, 100);
   const intakeStatus = checkWaterIntake(dailyTotal).status;
   const isCritical = intakeStatus === INTAKE_STATUS.CRITICAL;
 
@@ -94,7 +95,10 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
           </div>
 
           <div className="water-progress h-8 rounded-full overflow-hidden relative">
-            <div className="water-level h-full" style={{ width: `${percentage}%` }}></div>
+            <div
+              className={`water-level h-full ${displayPercentage > 100 ? 'water-level-over-goal' : ''}`}
+              style={{ width: `${progressPercentage}%` }}
+            ></div>
             <div className="water-bubble"></div>
             <div className="water-bubble"></div>
             <div className="water-bubble"></div>
@@ -104,7 +108,7 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
 
           <div className="mt-3 flex justify-between text-sm text-gray-500">
             <span>0%</span>
-            <span>{Math.round(percentage)}%</span>
+            <span>{Math.round(displayPercentage)}%</span>
             <span>100%</span>
           </div>
         </div>
