@@ -33,22 +33,24 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ activePage, setActivePage }
   ] as const;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white shadow-lg">
+    <nav className="fixed bottom-0 left-0 right-0 bg-sky-50 shadow-lg border-t border-gray-200">
       <div className="container mx-auto px-4">
         <div className="flex justify-around">
-          {navItems.map(({ page, label, icon }, index) => (
-            <React.Fragment key={page}>
-              {index > 0 && <div className="border-l border-gray-200 h-16"></div>}
-              <button
-                onClick={() => setActivePage(page)}
-                className={`flex flex-col items-center justify-center w-full pt-2 pb-1 text-sm ${
-                  activePage === page ? 'text-blue-500' : 'text-gray-500'
-                }`}
-              >
+          {navItems.map(({ page, label, icon }) => (
+            <button
+              key={page}
+              onClick={() => setActivePage(page)}
+              className={`flex flex-col items-center justify-center w-full pt-3 pb-2 text-sm transition-colors duration-200 ${
+                activePage === page
+                  ? 'text-blue-500 font-semibold'
+                  : 'text-gray-500 hover:text-blue-500'
+              }`}
+            >
+              <div className={`p-2 rounded-full transition-colors duration-200 ${activePage === page ? 'bg-blue-100' : ''}`}>
                 {icon}
-                <span className="mt-1">{label}</span>
-              </button>
-            </React.Fragment>
+              </div>
+              <span className="mt-1">{label}</span>
+            </button>
           ))}
         </div>
       </div>
