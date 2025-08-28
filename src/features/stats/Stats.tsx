@@ -20,7 +20,7 @@ const Stats: React.FC = () => {
     exportData,
   } = useStats();
 
-  const { showAchievementModal } = useModal();
+  const { showAchievementDetailModal } = useModal();
 
   if (isLoading) {
     return (
@@ -37,7 +37,7 @@ const Stats: React.FC = () => {
       <Achievements
         unlockedAchievements={unlockedAchievements}
         allAchievements={allAchievements}
-        onAchievementClick={showAchievementModal}
+        onAchievementClick={showAchievementDetailModal}
       />
       <Tips />
       <QuickAddSettings />

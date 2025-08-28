@@ -53,7 +53,7 @@ export const useDailyTracker = () => {
     await addWaterIntake.execute(amount);
     const newlyUnlocked = await checkForNewAchievements.execute();
     if (newlyUnlocked.length > 0) {
-      showAchievementModal(newlyUnlocked[0], true);
+      showAchievementModal(newlyUnlocked, true);
     }
     eventBus.emit('intakeDataChanged');
   }, [addWaterIntake, checkForNewAchievements, showAchievementModal]);
@@ -70,7 +70,7 @@ export const useDailyTracker = () => {
     await updateWaterIntake.execute(entryId, amount);
     const newlyUnlocked = await checkForNewAchievements.execute();
     if (newlyUnlocked.length > 0) {
-      showAchievementModal(newlyUnlocked[0], true);
+      showAchievementModal(newlyUnlocked, true);
     }
     eventBus.emit('intakeDataChanged');
   }, [updateWaterIntake, checkForNewAchievements, showAchievementModal]);

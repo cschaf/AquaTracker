@@ -4,6 +4,7 @@ import DailyTracker from './features/daily-tracker/DailyTracker';
 import Stats from './features/stats/Stats';
 import Footer from './shared/components/Footer';
 import AchievementModal from './shared/components/AchievementModal';
+import AchievementDetailModal from './shared/components/AchievementDetailModal';
 import CriticalWarningModal from './shared/components/CriticalWarningModal';
 import { useModal } from './app/modal-provider';
 import { useAppNotifications } from './shared/hooks/useAppNotifications';
@@ -11,9 +12,13 @@ import { useAppNotifications } from './shared/hooks/useAppNotifications';
 function App() {
   const {
     isAchievementModalOpen,
-    selectedAchievement,
+    selectedAchievements,
     isSelectedAchievementUnlocked,
     hideAchievementModal,
+    isAchievementDetailModalOpen,
+    selectedAchievementDetail,
+    isSelectedAchievementDetailUnlocked,
+    hideAchievementDetailModal,
   } = useModal();
 
   const {
@@ -35,9 +40,15 @@ function App() {
       </div>
       <AchievementModal
         isOpen={isAchievementModalOpen}
-        achievement={selectedAchievement}
+        achievements={selectedAchievements}
         onClose={hideAchievementModal}
         isUnlocked={isSelectedAchievementUnlocked}
+      />
+      <AchievementDetailModal
+        isOpen={isAchievementDetailModalOpen}
+        achievement={selectedAchievementDetail}
+        onClose={hideAchievementDetailModal}
+        isUnlocked={isSelectedAchievementDetailUnlocked}
       />
       <CriticalWarningModal
         isOpen={isCriticalModalOpen}
