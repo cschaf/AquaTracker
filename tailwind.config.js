@@ -8,10 +8,10 @@ export default {
   theme: {
     extend: {
       colors: {
-        'dark-blue': 'oklch(0.22 0.04 255)',
-        'dark-blue-lighter': 'oklch(0.27 0.045 255)',
-        'dark-text': 'oklch(0.8 0.02 255)',
-        'dark-text-secondary': 'oklch(0.6 0.02 255)',
+        'dark-blue': '#2C3E50',
+        'dark-blue-lighter': '#34495E',
+        'dark-text': '#ECF0F1',
+        'dark-text-secondary': '#BDC3C7',
       },
     },
   },
