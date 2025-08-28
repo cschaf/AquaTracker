@@ -1,11 +1,10 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import AchievementModal from './AchievementModal';
 import type { Achievement } from '../../core/entities/achievement';
 
 const mockAchievements: Achievement[] = [
-  { id: '1', name: 'First Achievement', description: 'Desc 1', icon: 'fas fa-star' },
-  { id: '2', name: 'Second Achievement', description: 'Desc 2', icon: 'fas fa-moon' },
+  { id: '1', name: 'First Achievement', description: 'Desc 1', icon: 'fas fa-star', trigger: { type: 'log_count', days: 1 } },
+  { id: '2', name: 'Second Achievement', description: 'Desc 2', icon: 'fas fa-moon', trigger: { type: 'log_count', days: 2 } },
 ];
 
 describe('AchievementModal', () => {
