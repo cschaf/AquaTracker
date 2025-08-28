@@ -2,7 +2,11 @@ import type { GeneralSettingsGateway } from '../gateways/general-settings.gatewa
 import type { GeneralSettings } from '../entities/general-settings';
 
 export class GetGeneralSettingsUseCase {
-  constructor(private readonly generalSettingsGateway: GeneralSettingsGateway) {}
+  private readonly generalSettingsGateway: GeneralSettingsGateway;
+
+  constructor(generalSettingsGateway: GeneralSettingsGateway) {
+    this.generalSettingsGateway = generalSettingsGateway;
+  }
 
   async execute(): Promise<GeneralSettings | null> {
     return this.generalSettingsGateway.get();

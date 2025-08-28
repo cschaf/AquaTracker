@@ -14,7 +14,7 @@ describe('GetGeneralSettingsUseCase', () => {
     const mockGateway = createMockGateway();
     const useCase = new GetGeneralSettingsUseCase(mockGateway);
     const settings: GeneralSettings = { theme: 'dark' };
-    (mockGateway.get as vi.Mock).mockResolvedValue(settings);
+    (mockGateway.get as any).mockResolvedValue(settings);
 
     // Act
     const result = await useCase.execute();
@@ -28,7 +28,7 @@ describe('GetGeneralSettingsUseCase', () => {
     // Arrange
     const mockGateway = createMockGateway();
     const useCase = new GetGeneralSettingsUseCase(mockGateway);
-    (mockGateway.get as vi.Mock).mockResolvedValue(null);
+    (mockGateway.get as any).mockResolvedValue(null);
 
     // Act
     const result = await useCase.execute();
