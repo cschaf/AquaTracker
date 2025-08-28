@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Header from './shared/components/Header';
 import WarningBanner from './shared/components/WarningBanner';
 import Footer from './shared/components/Footer';

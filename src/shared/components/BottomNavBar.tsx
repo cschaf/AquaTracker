@@ -30,7 +30,7 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ activePage, setActivePage }
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
       </svg>
     )},
-  ];
+  ] as const;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white shadow-lg">
