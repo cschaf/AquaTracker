@@ -69,8 +69,8 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-dark-text">Today's Intake</h2>
           <div className="relative">
-            <div className="flex items-center bg-blue-50 dark:bg-blue-900/50 rounded-full px-4 py-2">
-              <i className="fas fa-calendar-alt text-blue-500 dark:text-blue-400 mr-2"></i>
+            <div className="flex items-center bg-blue-50 dark:bg-muted-teal/20 rounded-full px-4 py-2">
+              <i className="fas fa-calendar-alt text-blue-500 dark:text-muted-teal mr-2"></i>
               <span className="font-medium text-gray-700 dark:text-dark-text">{currentDate}</span>
             </div>
           </div>
@@ -126,7 +126,7 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
                   key={index}
                   onClick={() => addWaterEntry(value)}
                   disabled={isCritical}
-                  className="quick-add bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/50 dark:hover:bg-blue-800/50 text-blue-700 dark:text-blue-300 font-bold py-4 rounded-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="quick-add bg-blue-100 hover:bg-blue-200 dark:bg-muted-teal/20 dark:hover:bg-muted-teal/30 text-blue-700 dark:text-dark-text font-bold py-4 rounded-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <i className={`${getIconForValue(value)} text-xl mb-1`}></i>
                   <span>{value >= 1000 ? `${value / 1000}L` : `${value} ml`}</span>

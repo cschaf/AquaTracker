@@ -12,6 +12,7 @@ export default {
         'dark-blue-lighter': '#34495E',
         'dark-text': '#ECF0F1',
         'dark-text-secondary': '#BDC3C7',
+        'muted-teal': '#6B9797',
       },
     },
   },
