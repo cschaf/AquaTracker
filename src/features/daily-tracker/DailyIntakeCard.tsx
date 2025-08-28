@@ -12,6 +12,7 @@ interface DailyIntakeCardProps {
 
 const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGoal, addWaterEntry, dailyTotal }) => {
   const [customAmount, setCustomAmount] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const { getQuickAddValues } = useUseCases();
   const [quickAddValues, setQuickAddValues] = useState<QuickAddValues | null>(null);
 
@@ -32,10 +33,20 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
 
   const handleAddCustom = () => {
     const amount = parseInt(customAmount);
-    if (amount > 0) {
-      addWaterEntry(amount);
-      setCustomAmount('');
+
+    if (isNaN(amount) || amount <= 0) {
+      setError('Please enter a positive number.');
+      return;
     }
+
+    if (amount > 5000) {
+      setError('Amount cannot be greater than 5000.');
+      return;
+    }
+
+    setError(null);
+    addWaterEntry(amount);
+    setCustomAmount('');
   };
 
   const now = new Date();
@@ -123,7 +134,12 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
               placeholder="Enter amount in ml"
               className="flex-1 p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition w-full"
               value={customAmount}
-              onChange={(e) => setCustomAmount(e.target.value)}
+              onChange={(e) => {
+                setCustomAmount(e.target.value);
+                if (error) {
+                  setError(null);
+                }
+              }}
               onKeyPress={(e) => e.key === 'Enter' && handleAddCustom()}
             />
             <button
@@ -133,6 +149,7 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
               <i className="fas fa-plus mr-2"></i>Add
             </button>
           </div>
+          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </div>
       </div>
     </div>
