@@ -1,16 +1,25 @@
-import { useState, useEffect } from 'react';
-
-type Theme = 'light' | 'dark' | 'system';
+import { useState, useEffect, useCallback } from 'react';
+import { useUseCases } from '../../app/use-case-provider';
+import type { Theme } from '../../core/entities/general-settings';
 
 export const useTheme = () => {
+  const { getGeneralSettings, updateGeneralSettings } = useUseCases();
   const [theme, setTheme] = useState<Theme>('system');
 
   useEffect(() => {
-    const storedTheme = localStorage.getItem('theme') as Theme | null;
-    if (storedTheme) {
-      setTheme(storedTheme);
-    }
-  }, []);
+    const fetchSettings = async () => {
+      const settings = await getGeneralSettings.execute();
+      if (settings) {
+        setTheme(settings.theme);
+      }
+    };
+    fetchSettings();
+  }, [getGeneralSettings]);
+
+  const updateTheme = useCallback(async (newTheme: Theme) => {
+    setTheme(newTheme);
+    await updateGeneralSettings.execute({ theme: newTheme });
+  }, [updateGeneralSettings]);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -21,9 +30,7 @@ export const useTheme = () => {
     } else {
       root.classList.remove('dark');
     }
-
-    localStorage.setItem('theme', theme);
   }, [theme]);
 
-  return { theme, setTheme };
+  return { theme, setTheme: updateTheme };
 };
