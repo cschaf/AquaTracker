@@ -2,7 +2,6 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import DailyIntakeCard from './DailyIntakeCard';
 import { UseCaseProvider } from '../../app/use-case-provider';
-import type { GetQuickAddValuesUseCase } from '../../core/use-cases/get-quick-add-values.use-case';
 
 // Mock the useUseCases hook
 vi.mock('../../app/use-case-provider', async () => {
@@ -12,7 +11,7 @@ vi.mock('../../app/use-case-provider', async () => {
         useUseCases: () => ({
             getQuickAddValues: {
                 execute: vi.fn().mockResolvedValue([100, 200, 300]),
-            } as GetQuickAddValuesUseCase,
+            } as any,
         }),
     };
 });
