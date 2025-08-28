@@ -3,9 +3,9 @@ import type { Achievement } from '../core/entities/achievement';
 
 interface ModalContextType {
   isAchievementModalOpen: boolean;
-  selectedAchievement: Achievement | null;
+  selectedAchievements: Achievement[];
   isSelectedAchievementUnlocked: boolean;
-  showAchievementModal: (achievement: Achievement, isUnlocked: boolean) => void;
+  showAchievementModal: (achievements: Achievement[], isUnlocked: boolean) => void;
   hideAchievementModal: () => void;
 }
 
@@ -13,23 +13,23 @@ const ModalContext = createContext<ModalContextType | null>(null);
 
 export const ModalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAchievementModalOpen, setIsAchievementModalOpen] = useState(false);
-  const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
+  const [selectedAchievements, setSelectedAchievements] = useState<Achievement[]>([]);
   const [isSelectedAchievementUnlocked, setIsSelectedAchievementUnlocked] = useState(false);
 
-  const showAchievementModal = useCallback((achievement: Achievement, isUnlocked: boolean) => {
-    setSelectedAchievement(achievement);
+  const showAchievementModal = useCallback((achievements: Achievement[], isUnlocked: boolean) => {
+    setSelectedAchievements(achievements);
     setIsSelectedAchievementUnlocked(isUnlocked);
     setIsAchievementModalOpen(true);
   }, []);
 
   const hideAchievementModal = useCallback(() => {
     setIsAchievementModalOpen(false);
-    setSelectedAchievement(null);
+    setSelectedAchievements([]);
   }, []);
 
   const value = {
     isAchievementModalOpen,
-    selectedAchievement,
+    selectedAchievements,
     isSelectedAchievementUnlocked,
     showAchievementModal,
     hideAchievementModal,
