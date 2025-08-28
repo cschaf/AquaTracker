@@ -38,19 +38,19 @@ const QuickAddSettings: React.FC = () => {
   }
 
   return (
-    <div className="bg-white dark:bg-dark-blue-lighter rounded-2xl shadow-xl p-6">
-      <h3 className="text-xl font-bold text-gray-800 dark:text-dark-text mb-4">Quick Add Settings</h3>
+    <div className="bg-white rounded-2xl shadow-xl p-6">
+      <h3 className="text-xl font-bold text-gray-800 mb-4">Quick Add Settings</h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {values && values.map((value, index) => (
           <div key={index}>
-            <label htmlFor={`quick-add-${index}`} className="block text-sm font-medium text-gray-700 dark:text-dark-text-secondary">
+            <label htmlFor={`quick-add-${index}`} className="block text-sm font-medium text-gray-700">
               Value {index + 1}
             </label>
             <input
               type="number"
               id={`quick-add-${index}`}
               name={`quick-add-${index}`}
-              className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-dark-blue rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
               value={value}
               onChange={(e) => handleValueChange(index, e.target.value)}
             />
