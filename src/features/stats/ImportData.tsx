@@ -30,7 +30,7 @@ const ImportData: React.FC<ImportDataProps> = ({ importData }) => {
           accept=".json"
           onChange={handleFileChange}
           ref={fileInputRef}
-          className="w-full max-w-xs text-sm text-gray-500 dark:text-dark-text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 dark:file:bg-blue-900/50 file:text-blue-700 dark:file:text-blue-300 hover:file:bg-blue-100 dark:hover:file:bg-blue-800/50 cursor-pointer"
+          className="w-full max-w-xs text-sm text-gray-500 dark:text-dark-text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 dark:file:bg-muted-teal/20 file:text-blue-700 dark:file:text-dark-text hover:file:bg-blue-100 dark:hover:file:bg-muted-teal/30 cursor-pointer"
         />
         <button
           onClick={handleImportClick}
