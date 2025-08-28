@@ -2,12 +2,12 @@
   "name": "AquaTracker - Daily Water Intake Monitor",
   "short_name": "AquaTracker",
   "description": "Monitor and log your daily water intake. Stay hydrated with AquaTracker - make tracking your hydration goals easy and enjoyable.",
-  "start_url": "https://aquatracker.schaflabs.com/",
+  "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
   "theme_color": "#2196F3",
   "background_color": "#FFFFFF",
-  "scope": "https://aquatracker.schaflabs.com/",
+  "scope": "/",
   "lang": "en-US",
   "categories": ["health", "lifestyle", "productivity"],
   "icons": [
@@ -40,7 +40,7 @@
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable any"
-    }
+    },
     {
       "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
