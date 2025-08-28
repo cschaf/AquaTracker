@@ -5,6 +5,7 @@ import Achievements from './Achievements';
 import Tips from '../../shared/components/Tips';
 import ExportData from './ExportData';
 import ImportData from './ImportData';
+import QuickAddSettings from './QuickAddSettings';
 import { useStats } from './useStats';
 import { useModal } from '../../app/modal-provider';
 
@@ -39,6 +40,7 @@ const Stats: React.FC = () => {
         onAchievementClick={showAchievementModal}
       />
       <Tips />
+      <QuickAddSettings />
       <ExportData exportData={exportData} />
       <ImportData importData={importData} />
     </div>

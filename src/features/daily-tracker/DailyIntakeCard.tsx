@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useUseCase } from '../../app/use-case-provider';
+import type { QuickAddValues } from '../../core/entities/quick-add-values';
 
 interface DailyIntakeCardProps {
   dailyGoal: number;
@@ -9,6 +11,12 @@ interface DailyIntakeCardProps {
 
 const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGoal, addWaterEntry, dailyTotal }) => {
   const [customAmount, setCustomAmount] = useState('');
+  const { getQuickAddValues } = useUseCase();
+  const [quickAddValues, setQuickAddValues] = useState<QuickAddValues | null>(null);
+
+  useEffect(() => {
+    getQuickAddValues.execute().then(setQuickAddValues);
+  }, [getQuickAddValues]);
 
   const percentage = dailyGoal > 0 ? Math.min((dailyTotal / dailyGoal) * 100, 100) : 0;
 
@@ -23,6 +31,12 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
   const now = new Date();
   const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
   const currentDate = now.toLocaleDateString('en-US', options);
+
+  const getIconForValue = (value: number) => {
+    if (value <= 300) return 'fas fa-glass-whiskey';
+    if (value <= 750) return 'fas fa-wine-bottle';
+    return 'fas fa-prescription-bottle';
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow-xl overflow-hidden drop-shadow">
@@ -74,18 +88,20 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
         <div className="mb-8">
           <p className="text-lg font-semibold text-gray-700 mb-4">Quick Add</p>
           <div className="grid grid-cols-3 gap-3">
-            <button onClick={() => addWaterEntry(250)} className="quick-add bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold py-4 rounded-xl transition-all duration-300 transform hover:scale-105">
-              <i className="fas fa-glass-whiskey text-xl mb-1"></i>
-              <span>250 ml</span>
-            </button>
-            <button onClick={() => addWaterEntry(500)} className="quick-add bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold py-4 rounded-xl transition-all duration-300 transform hover:scale-105">
-              <i className="fas fa-wine-bottle text-xl mb-1"></i>
-              <span>500 ml</span>
-            </button>
-            <button onClick={() => addWaterEntry(1000)} className="quick-add bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold py-4 rounded-xl transition-all duration-300 transform hover:scale-105">
-              <i className="fas fa-prescription-bottle text-xl mb-1"></i>
-              <span>1L</span>
-            </button>
+            {quickAddValues ? (
+              quickAddValues.map((value, index) => (
+                <button
+                  key={index}
+                  onClick={() => addWaterEntry(value)}
+                  className="quick-add bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold py-4 rounded-xl transition-all duration-300 transform hover:scale-105"
+                >
+                  <i className={`${getIconForValue(value)} text-xl mb-1`}></i>
+                  <span>{value >= 1000 ? `${value / 1000}L` : `${value} ml`}</span>
+                </button>
+              ))
+            ) : (
+              <div>Loading quick add values...</div>
+            )}
           </div>
         </div>
 
