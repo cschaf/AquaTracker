@@ -12,10 +12,12 @@ import MainPage from './pages/MainPage';
 import StatsPage from './pages/StatsPage';
 import AchievementsPage from './pages/AchievementsPage';
 import SettingsPage from './pages/SettingsPage';
+import { useTheme } from './shared/hooks/useTheme';
 
 type Page = 'main' | 'stats' | 'achievements' | 'settings';
 
 function App() {
+  useTheme();
   const [activePage, setActivePage] = useState<Page>('main');
   const {
     isAchievementModalOpen,
@@ -50,7 +52,7 @@ function App() {
   };
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 min-h-screen">
+    <div className="bg-blue-50 dark:bg-dark-blue text-gray-800 dark:text-dark-text min-h-screen">
       <div className="container mx-auto px-4 py-8 max-w-6xl pb-24">
         <Header />
         <WarningBanner status={intakeStatus.status} message={intakeStatus.message} />

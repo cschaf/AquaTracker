@@ -3,6 +3,7 @@ import { LocalStorageWaterIntakeGateway } from '../infrastructure/storage/local-
 import { LocalStorageGoalGateway } from '../infrastructure/storage/local-storage-goal.gateway';
 import { LocalStorageAchievementGateway } from '../infrastructure/storage/local-storage-achievement.gateway';
 import { LocalStorageQuickAddGateway } from '../infrastructure/storage/local-storage-quick-add.gateway';
+import { LocalStorageGeneralSettingsGateway } from '../infrastructure/storage/local-storage-general-settings.gateway';
 
 // Use Cases
 import { AddWaterIntakeUseCase } from '../core/use-cases/add-water-intake.use-case';
@@ -19,12 +20,15 @@ import { GetUnlockedAchievementsUseCase } from '../core/use-cases/get-unlocked-a
 import { RecalculateAchievementsUseCase } from '../core/use-cases/recalculate-achievements.use-case';
 import { ExportDataUseCase } from '../core/use-cases/export-data.use-case';
 import { ImportDataUseCase } from '../core/use-cases/import-data.use-case';
+import { GetGeneralSettingsUseCase } from '../core/use-cases/get-general-settings.use-case';
+import { UpdateGeneralSettingsUseCase } from '../core/use-cases/update-general-settings.use-case';
 
 // Instantiate Gateways
 const waterIntakeGateway = new LocalStorageWaterIntakeGateway();
 const goalGateway = new LocalStorageGoalGateway();
 const achievementGateway = new LocalStorageAchievementGateway();
 const quickAddGateway = new LocalStorageQuickAddGateway();
+const generalSettingsGateway = new LocalStorageGeneralSettingsGateway();
 
 // Instantiate Use Cases
 const addWaterIntakeUseCase = new AddWaterIntakeUseCase(waterIntakeGateway);
@@ -41,6 +45,8 @@ const getUnlockedAchievementsUseCase = new GetUnlockedAchievementsUseCase(achiev
 const recalculateAchievementsUseCase = new RecalculateAchievementsUseCase(waterIntakeGateway, goalGateway, achievementGateway);
 const exportDataUseCase = new ExportDataUseCase(waterIntakeGateway, goalGateway);
 const importDataUseCase = new ImportDataUseCase(waterIntakeGateway, goalGateway);
+const getGeneralSettingsUseCase = new GetGeneralSettingsUseCase(generalSettingsGateway);
+const updateGeneralSettingsUseCase = new UpdateGeneralSettingsUseCase(generalSettingsGateway);
 
 export const useCases = {
   addWaterIntake: addWaterIntakeUseCase,
@@ -57,6 +63,8 @@ export const useCases = {
   checkForNewAchievements: recalculateAchievementsUseCase,
   exportData: exportDataUseCase,
   importData: importDataUseCase,
+  getGeneralSettings: getGeneralSettingsUseCase,
+  updateGeneralSettings: updateGeneralSettingsUseCase,
 };
 
 export type UseCases = typeof useCases;
