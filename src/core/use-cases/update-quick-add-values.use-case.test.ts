@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { UpdateQuickAddValuesUseCase } from './update-quick-add-values.use-case';
-import type { QuickAddGateway } from '../gateways/quick-add.gateway';
 import type { QuickAddValues } from '../entities/quick-add-values';
 import { eventBus } from '../../app/event-bus';
 
@@ -12,13 +11,13 @@ vi.mock('../../app/event-bus', () => ({
   },
 }));
 
-const createMockQuickAddGateway = (): QuickAddGateway => ({
+const createMockQuickAddGateway = () => ({
   getQuickAddValues: vi.fn(),
   saveQuickAddValues: vi.fn(),
 });
 
 describe('UpdateQuickAddValuesUseCase', () => {
-  let mockGateway: QuickAddGateway;
+  let mockGateway: ReturnType<typeof createMockQuickAddGateway>;
   let useCase: UpdateQuickAddValuesUseCase;
 
   beforeEach(() => {

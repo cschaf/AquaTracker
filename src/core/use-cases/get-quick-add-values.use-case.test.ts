@@ -1,9 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { GetQuickAddValuesUseCase } from './get-quick-add-values.use-case';
-import type { QuickAddGateway } from '../gateways/quick-add.gateway';
 import type { QuickAddValues } from '../entities/quick-add-values';
 
-const createMockQuickAddGateway = (): QuickAddGateway => ({
+const createMockQuickAddGateway = () => ({
   getQuickAddValues: vi.fn(),
   saveQuickAddValues: vi.fn(),
 });
@@ -14,7 +13,7 @@ describe('GetQuickAddValuesUseCase', () => {
     const mockGateway = createMockQuickAddGateway();
     const useCase = new GetQuickAddValuesUseCase(mockGateway);
     const mockValues: QuickAddValues = [100, 200, 300];
-    (mockGateway.getQuickAddValues as vi.Mock).mockResolvedValue(mockValues);
+    mockGateway.getQuickAddValues.mockResolvedValue(mockValues);
 
     // Act
     const result = await useCase.execute();
