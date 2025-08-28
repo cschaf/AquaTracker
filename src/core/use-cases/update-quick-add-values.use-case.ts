@@ -1,5 +1,6 @@
 import type { QuickAddGateway } from '../gateways/quick-add.gateway';
 import type { QuickAddValues } from '../entities/quick-add-values';
+import { eventBus } from '../../app/event-bus';
 
 export class UpdateQuickAddValuesUseCase {
   private readonly quickAddGateway: QuickAddGateway;
@@ -20,5 +21,6 @@ export class UpdateQuickAddValuesUseCase {
     }
 
     await this.quickAddGateway.saveQuickAddValues(values);
+    eventBus.emit('quickAddValuesChanged');
   }
 }

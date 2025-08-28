@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useUseCases } from '../../app/use-case-provider';
 import type { QuickAddValues } from '../../core/entities/quick-add-values';
+import { eventBus } from '../../app/event-bus';
 
 interface DailyIntakeCardProps {
   dailyGoal: number;
@@ -14,9 +15,18 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
   const { getQuickAddValues } = useUseCases();
   const [quickAddValues, setQuickAddValues] = useState<QuickAddValues | null>(null);
 
-  useEffect(() => {
+  const fetchQuickAddValues = useCallback(() => {
     getQuickAddValues.execute().then(setQuickAddValues);
   }, [getQuickAddValues]);
+
+  useEffect(() => {
+    fetchQuickAddValues();
+    eventBus.on('quickAddValuesChanged', fetchQuickAddValues);
+
+    return () => {
+      eventBus.off('quickAddValuesChanged', fetchQuickAddValues);
+    };
+  }, [fetchQuickAddValues]);
 
   const percentage = dailyGoal > 0 ? Math.min((dailyTotal / dailyGoal) * 100, 100) : 0;
 
