@@ -22,7 +22,7 @@ export const useTheme = () => {
   }, [updateGeneralSettings]);
 
   useEffect(() => {
-    const root = document.getElementById('root');
+    const root = document.documentElement;
     if (!root) return;
 
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
