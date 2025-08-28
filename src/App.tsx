@@ -11,7 +11,7 @@ import { useAppNotifications } from './shared/hooks/useAppNotifications';
 function App() {
   const {
     isAchievementModalOpen,
-    selectedAchievement,
+    selectedAchievements,
     isSelectedAchievementUnlocked,
     hideAchievementModal,
   } = useModal();
@@ -35,7 +35,7 @@ function App() {
       </div>
       <AchievementModal
         isOpen={isAchievementModalOpen}
-        achievement={selectedAchievement}
+        achievements={selectedAchievements}
         onClose={hideAchievementModal}
         isUnlocked={isSelectedAchievementUnlocked}
       />
