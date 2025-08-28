@@ -98,6 +98,10 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
             <div
               className={`water-level h-full ${displayPercentage > 100 ? 'water-level-over-goal' : ''}`}
               style={{ width: `${progressPercentage}%` }}
+              role="progressbar"
+              aria-valuenow={progressPercentage}
+              aria-valuemin={0}
+              aria-valuemax={100}
             ></div>
             <div className="water-bubble"></div>
             <div className="water-bubble"></div>
