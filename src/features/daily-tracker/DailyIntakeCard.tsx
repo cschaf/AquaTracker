@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useUseCases } from '../../app/use-case-provider';
 import type { QuickAddValues } from '../../core/entities/quick-add-values';
 import { eventBus } from '../../app/event-bus';
+import { checkWaterIntake, INTAKE_STATUS } from '../../shared/lib/intakeWarnings';
 
 interface DailyIntakeCardProps {
   dailyGoal: number;
@@ -30,6 +31,8 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
   }, [fetchQuickAddValues]);
 
   const percentage = dailyGoal > 0 ? Math.min((dailyTotal / dailyGoal) * 100, 100) : 0;
+  const intakeStatus = checkWaterIntake(dailyTotal).status;
+  const isCritical = intakeStatus === INTAKE_STATUS.CRITICAL;
 
   const handleAddCustom = () => {
     const amount = parseInt(customAmount);
@@ -114,7 +117,8 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
                 <button
                   key={index}
                   onClick={() => addWaterEntry(value)}
-                  className="quick-add bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold py-4 rounded-xl transition-all duration-300 transform hover:scale-105"
+                  disabled={isCritical}
+                  className="quick-add bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold py-4 rounded-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <i className={`${getIconForValue(value)} text-xl mb-1`}></i>
                   <span>{value >= 1000 ? `${value / 1000}L` : `${value} ml`}</span>
@@ -132,7 +136,8 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
             <input
               type="number"
               placeholder="Enter amount in ml"
-              className="flex-1 p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition w-full"
+              disabled={isCritical}
+              className="flex-1 p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition w-full disabled:opacity-50 disabled:cursor-not-allowed"
               value={customAmount}
               onChange={(e) => {
                 setCustomAmount(e.target.value);
@@ -144,7 +149,8 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
             />
             <button
               onClick={handleAddCustom}
-              className="bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 w-full sm:w-auto"
+              disabled={isCritical}
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <i className="fas fa-plus mr-2"></i>Add
             </button>

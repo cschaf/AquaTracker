@@ -90,4 +90,21 @@ describe('DailyIntakeCard', () => {
     // Assert
     expect(screen.queryByText('Please enter a positive number.')).not.toBeInTheDocument();
   });
+
+  it('should disable buttons when daily intake is critical', async () => {
+    // Arrange
+    const props = {
+      ...defaultProps,
+      dailyTotal: 10000,
+    };
+    renderComponent(props);
+    const quickAddButtons = await screen.findAllByRole('button', { name: /ml/i });
+    const addButton = screen.getByRole('button', { name: /add/i });
+    const customAmountInput = screen.getByPlaceholderText('Enter amount in ml');
+
+    // Assert
+    quickAddButtons.forEach(button => expect(button).toBeDisabled());
+    expect(addButton).toBeDisabled();
+    expect(customAmountInput).toBeDisabled();
+  });
 });
