@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-// The new entity location
 import type { Entry } from '../../core/entities/water-intake';
+import { Card } from '../../shared/components/Card';
 
 interface TodaysEntriesCardProps {
   entries: Entry[];
@@ -34,7 +34,7 @@ const TodaysEntriesCard: React.FC<TodaysEntriesCardProps> = ({ entries, deleteEn
   const sortedEntries = [...entries].sort((a, b) => b.timestamp - a.timestamp);
 
   return (
-    <div className="bg-bg-primary rounded-2xl shadow-xl overflow-hidden drop-shadow">
+    <Card>
       <div className="p-6">
         <h2 className="text-2xl font-bold text-text-primary mb-4">Today's Entries</h2>
         <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
@@ -45,7 +45,7 @@ const TodaysEntriesCard: React.FC<TodaysEntriesCardProps> = ({ entries, deleteEn
             </div>
           ) : (
             sortedEntries.map(entry => (
-              <div key={entry.id} className="entry-item bg-bg-secondary p-4 rounded-xl flex items-center justify-between">
+              <div key={entry.id} className="entry-item bg-bg-tertiary p-4 rounded-xl flex items-center justify-between">
                 {editingId === entry.id ? (
                   <>
                     <div className="flex items-center flex-grow">
@@ -91,7 +91,7 @@ const TodaysEntriesCard: React.FC<TodaysEntriesCardProps> = ({ entries, deleteEn
           )}
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
 

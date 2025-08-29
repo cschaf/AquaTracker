@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Log, Entry } from '../../core/entities/water-intake';
+import { Card } from '../../shared/components/Card';
 
 interface WeeklyChartProps {
   logs: Log[];
@@ -32,7 +33,7 @@ const WeeklyChart: React.FC<WeeklyChartProps> = ({ logs, dailyGoal }) => {
   const avgIntake = daysWithIntake > 0 ? weeklyTotal / daysWithIntake : 0;
 
   return (
-    <div className="chart-container bg-bg-primary rounded-2xl shadow-xl">
+    <Card>
       <h2 className="text-2xl font-bold text-text-primary mb-6 text-center">Weekly Consumption</h2>
       <div className="h-64 flex items-end justify-center px-4 gap-1 sm:gap-2">
         {last7DaysData.map((data, index) => {
@@ -54,7 +55,7 @@ const WeeklyChart: React.FC<WeeklyChartProps> = ({ logs, dailyGoal }) => {
       <div className="mt-6 text-center">
         <p className="text-text-secondary">Average: <span className="font-bold text-accent-primary">{(avgIntake / 1000).toFixed(1)}L</span> per day</p>
       </div>
-    </div>
+    </Card>
   );
 };
 
