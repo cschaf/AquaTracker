@@ -47,7 +47,7 @@ const WeeklyChart: React.FC<WeeklyChartProps> = ({ logs, dailyGoal }) => {
               <div className="relative w-full h-full flex items-end justify-center">
                 {data.total > 0 && (
                   <div
-                    className="bg-accent-primary rounded-t-lg w-full"
+                    className="bg-accent-primary rounded-t-lg w-full flex items-center justify-center"
                     style={{ height: barHeight }}
                     title={`${data.total} ml`}
                   >
