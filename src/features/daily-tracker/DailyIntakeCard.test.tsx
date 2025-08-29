@@ -135,4 +135,19 @@ describe('DailyIntakeCard', () => {
     expect(progressBarFill.style.width).toBe('100%');
   });
 
+  it('should change progress bar color when intake exceeds 100%', () => {
+    // Arrange
+    const props = {
+      ...defaultProps,
+      dailyGoal: 2000,
+      dailyTotal: 3000,
+    };
+    renderComponent(props);
+    const progressBar = screen.getByRole('progressbar');
+    const fill = progressBar.firstChild as HTMLElement;
+
+    // Assert
+    expect(fill.className).toContain('bg-success');
+    expect(fill.className).not.toContain('bg-accent-primary');
+  });
 });
