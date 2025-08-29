@@ -50,7 +50,7 @@ const WeeklyChart: React.FC<WeeklyChartProps> = ({ logs, dailyGoal }) => {
                   style={{ height: barHeight }}
                   title={`${data.total} ml`}
                 >
-                  <div className={`bar-amount ${textColor} ${amountPosition}`}>{data.total} ml</div>
+                  <div className={`bar-amount ${textColor} ${amountPosition} text-xs sm:text-sm`}>{data.total} ml</div>
                 </div>
               )}
               <span className="text-sm text-text-secondary mt-2">{data.day}</span>
