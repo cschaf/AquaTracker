@@ -34,7 +34,6 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
   }, [fetchQuickAddValues]);
 
   const displayPercentage = dailyGoal > 0 ? (dailyTotal / dailyGoal) * 100 : 0;
-  const progressPercentage = Math.min(displayPercentage, 100);
   const intakeStatus = checkWaterIntake(dailyTotal).status;
   const isCritical = intakeStatus === INTAKE_STATUS.CRITICAL;
 
