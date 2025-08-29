@@ -18,14 +18,14 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
 
   return (
     <div
-      className={`h-4 rounded-full overflow-hidden bg-bg-secondary ${className}`}
+      className={`h-4 rounded-full overflow-hidden bg-accent-primary ${className}`}
       role="progressbar"
       aria-valuenow={value}
       aria-valuemin={0}
       aria-valuemax={max}
     >
       <div
-        className={`h-full bg-accent-primary transition-all duration-500 ${barClassName}`}
+        className={`h-full bg-bg-secondary transition-all duration-500 ${barClassName}`}
         style={{ width: `${progressPercentage}%` }}
       ></div>
     </div>

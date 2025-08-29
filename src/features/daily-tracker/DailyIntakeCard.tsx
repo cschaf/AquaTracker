@@ -109,9 +109,9 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
                 key={index}
                 onClick={() => addWaterEntry(value)}
                 disabled={isCritical}
-                className="bg-bg-secondary text-text-primary py-3 text-sm"
+                className="bg-bg-secondary text-text-primary py-3 text-sm flex items-center justify-center"
               >
-                <i className={`${getIconForValue(value)} text-lg mb-1`}></i>
+                <i className={`${getIconForValue(value)} text-lg mr-2`}></i>
                 <span>{value >= 1000 ? `${value / 1000}L` : `${value} ml`}</span>
               </Button>
             ))
@@ -126,7 +126,7 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
             type="number"
             placeholder="Enter amount in ml"
             disabled={isCritical}
-            className="flex-1 p-3 border border-border-card bg-bg-primary rounded-lg focus:outline-none focus:border-accent-primary transition w-full disabled:opacity-50"
+            className="flex-1 p-3 border border-border-card bg-bg-primary rounded-lg focus:outline-none focus:border-accent-primary transition w-full disabled:opacity-50 text-text-primary placeholder:text-text-secondary"
             value={customAmount}
             onChange={(e) => {
               setCustomAmount(e.target.value);
