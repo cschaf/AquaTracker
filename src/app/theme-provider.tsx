@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useGeneralSettings } from '../features/stats/useGeneralSettings';
+import { getInitialTheme } from './get-initial-theme';
 
 type Theme = 'light' | 'dark';
 
@@ -12,13 +13,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { settings, updateSettings } = useGeneralSettings();
-  const [theme, setTheme] = useState<Theme>('light');
-
-  useEffect(() => {
-    if (settings?.theme) {
-      setTheme(settings.theme);
-    }
-  }, [settings?.theme]);
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -31,6 +26,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setTheme(newTheme);
     if (settings) {
       updateSettings({ ...settings, theme: newTheme });
+    } else {
+      updateSettings({ theme: newTheme});
     }
   };
 
