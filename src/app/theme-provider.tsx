@@ -26,6 +26,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setTheme(newTheme);
     if (settings) {
       updateSettings({ ...settings, theme: newTheme });
+    } else {
+      updateSettings({ theme: newTheme, language: 'en' });
     }
   };
 
