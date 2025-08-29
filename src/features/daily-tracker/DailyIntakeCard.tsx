@@ -163,7 +163,7 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
               <i className="fas fa-plus mr-2"></i>Add
             </Button>
           </div>
-          {error && <p className="text-destructive text-sm mt-2">{error}</p>}
+          {error && <p className="text-warning text-sm mt-2">{error}</p>}
         </div>
       </div>
     </Card>

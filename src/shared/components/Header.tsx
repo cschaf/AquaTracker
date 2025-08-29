@@ -8,7 +8,7 @@ const Header: React.FC = () => {
         <ThemeSwitcher />
       </div>
       <div className="flex justify-center mb-4">
-        <div className="w-16 h-16 rounded-full bg-bg-primary flex items-center justify-center water-icon">
+        <div className="w-16 h-16 rounded-full bg-accent-primary flex items-center justify-center water-icon">
           <i className="fas fa-tint text-text-on-primary text-2xl"></i>
         </div>
       </div>
