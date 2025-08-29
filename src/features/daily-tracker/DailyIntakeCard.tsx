@@ -3,6 +3,7 @@ import { useUseCases } from '../../app/use-case-provider';
 import type { QuickAddValues } from '../../core/entities/quick-add-values';
 import { eventBus } from '../../app/event-bus';
 import { checkWaterIntake, INTAKE_STATUS } from '../../shared/lib/intakeWarnings';
+import ProgressBar from '../../shared/components/ProgressBar';
 
 interface DailyIntakeCardProps {
   dailyGoal: number;
@@ -31,7 +32,6 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
   }, [fetchQuickAddValues]);
 
   const displayPercentage = dailyGoal > 0 ? (dailyTotal / dailyGoal) * 100 : 0;
-  const progressPercentage = Math.min(displayPercentage, 100);
   const intakeStatus = checkWaterIntake(dailyTotal).status;
   const isCritical = intakeStatus === INTAKE_STATUS.CRITICAL;
 
@@ -69,8 +69,8 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800">Today's Intake</h2>
           <div className="relative">
-            <div className="flex items-center bg-blue-50 rounded-full px-4 py-2">
-              <i className="fas fa-calendar-alt text-blue-500 mr-2"></i>
+            <div className="flex items-center bg-gray-100 rounded-full px-4 py-2">
+              <i className="fas fa-calendar-alt text-muted-teal mr-2"></i>
               <span className="font-medium text-gray-700">{currentDate}</span>
             </div>
           </div>
@@ -79,7 +79,7 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
         <div className="mb-8">
           <div className="flex justify-between items-center mb-3">
             <div className="flex items-baseline">
-              <span className="text-4xl font-bold text-blue-600">{dailyTotal}</span>
+              <span className="text-4xl font-bold text-muted-teal">{dailyTotal}</span>
               <span className="text-xl text-gray-500 ml-1">ml</span>
             </div>
             <div className="flex items-baseline">
@@ -94,27 +94,7 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
             </div>
           </div>
 
-          <div className="water-progress h-8 rounded-full overflow-hidden relative">
-            <div
-              className={`water-level h-full ${displayPercentage > 100 ? 'water-level-over-goal' : ''}`}
-              style={{ width: `${progressPercentage}%` }}
-              role="progressbar"
-              aria-valuenow={progressPercentage}
-              aria-valuemin={0}
-              aria-valuemax={100}
-            ></div>
-            <div className="water-bubble"></div>
-            <div className="water-bubble"></div>
-            <div className="water-bubble"></div>
-            <div className="water-bubble"></div>
-            <div className="water-bubble"></div>
-          </div>
-
-          <div className="mt-3 flex justify-between text-sm text-gray-500">
-            <span>0%</span>
-            <span>{Math.round(displayPercentage)}%</span>
-            <span>100%</span>
-          </div>
+          <ProgressBar percentage={displayPercentage} displayPercentage={displayPercentage} color="bg-muted-teal" />
         </div>
 
         <div className="mb-8">
@@ -126,9 +106,9 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
                   key={index}
                   onClick={() => addWaterEntry(value)}
                   disabled={isCritical}
-                  className="quick-add bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold py-4 rounded-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="quick-add bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-4 rounded-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex flex-col items-center justify-center"
                 >
-                  <i className={`${getIconForValue(value)} text-xl mb-1`}></i>
+                  <i className={`${getIconForValue(value)} text-xl mb-1 text-muted-teal`}></i>
                   <span>{value >= 1000 ? `${value / 1000}L` : `${value} ml`}</span>
                 </button>
               ))
@@ -145,7 +125,7 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
               type="number"
               placeholder="Enter amount in ml"
               disabled={isCritical}
-              className="flex-1 p-4 border-2 border-gray-200 bg-white rounded-xl focus:outline-none focus:border-blue-500 transition w-full disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 p-4 border-2 border-gray-200 bg-white rounded-xl focus:outline-none focus:border-muted-teal transition w-full disabled:opacity-50 disabled:cursor-not-allowed"
               value={customAmount}
               onChange={(e) => {
                 setCustomAmount(e.target.value);
@@ -158,7 +138,7 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
             <button
               onClick={handleAddCustom}
               disabled={isCritical}
-              className="bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-muted-teal hover:bg-opacity-90 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <i className="fas fa-plus mr-2"></i>Add
             </button>

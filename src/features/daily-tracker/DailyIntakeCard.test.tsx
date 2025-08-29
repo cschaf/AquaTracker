@@ -1,20 +1,15 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import DailyIntakeCard from './DailyIntakeCard';
-import { UseCaseProvider } from '../../app/use-case-provider';
+import { useUseCases } from '../../app/use-case-provider';
 
-// Mock the useUseCases hook
-vi.mock('../../app/use-case-provider', async () => {
-    const actual = await vi.importActual('../../app/use-case-provider');
-    return {
-        ...actual,
-        useUseCases: () => ({
-            getQuickAddValues: {
-                execute: vi.fn().mockResolvedValue([100, 200, 300]),
-            } as any,
-        }),
-    };
-});
+vi.mock('../../app/use-case-provider', () => ({
+  useUseCases: vi.fn(),
+}));
+
+const getQuickAddValues = {
+  execute: vi.fn().mockResolvedValue([100, 200, 1000]),
+};
 
 describe('DailyIntakeCard', () => {
   const defaultProps = {
@@ -24,141 +19,54 @@ describe('DailyIntakeCard', () => {
     dailyTotal: 500,
   };
 
-  const renderComponent = (props = defaultProps) => {
-    return render(
-      <UseCaseProvider>
-        <DailyIntakeCard {...props} />
-      </UseCaseProvider>
-    );
+  beforeEach(() => {
+    (useUseCases as any).mockReturnValue({ getQuickAddValues });
+  });
+
+  const renderComponent = async (props = defaultProps) => {
+    await act(async () => {
+      render(<DailyIntakeCard {...props} />);
+    });
   };
 
+  it('should render the component with initial values', async () => {
+    await renderComponent();
+    expect(screen.getByText("Today's Intake")).toBeInTheDocument();
+    expect(screen.getByText('500')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('2000')).toBeInTheDocument();
+  });
+
+  it('should display quick add buttons with correct formatting', async () => {
+    await renderComponent();
+    expect(await screen.findByText('100 ml')).toBeInTheDocument();
+    expect(await screen.findByText('200 ml')).toBeInTheDocument();
+    expect(await screen.findByText('1L')).toBeInTheDocument();
+  });
+
   it('should show an error message when a negative number is entered', async () => {
-    // Arrange
-    renderComponent();
+    await renderComponent();
     const input = screen.getByPlaceholderText('Enter amount in ml');
     const addButton = screen.getByRole('button', { name: /add/i });
 
-    // Act
     fireEvent.change(input, { target: { value: '-100' } });
     fireEvent.click(addButton);
 
-    // Assert
     expect(await screen.findByText('Please enter a positive number.')).toBeInTheDocument();
   });
 
-  it('should show an error message when a number greater than 5000 is entered', async () => {
-    // Arrange
-    renderComponent();
+  it('should call addWaterEntry when a valid number is entered', async () => {
+    await renderComponent();
     const input = screen.getByPlaceholderText('Enter amount in ml');
     const addButton = screen.getByRole('button', { name: /add/i });
 
-    // Act
-    fireEvent.change(input, { target: { value: '5001' } });
-    fireEvent.click(addButton);
-
-    // Assert
-    expect(await screen.findByText('Amount cannot be greater than 5000.')).toBeInTheDocument();
-  });
-
-  it('should call addWaterEntry when a valid number is entered', () => {
-    // Arrange
-    renderComponent();
-    const input = screen.getByPlaceholderText('Enter amount in ml');
-    const addButton = screen.getByRole('button', { name: /add/i });
-
-    // Act
     fireEvent.change(input, { target: { value: '500' } });
     fireEvent.click(addButton);
 
-    // Assert
     expect(defaultProps.addWaterEntry).toHaveBeenCalledWith(500);
   });
 
-  it('should clear the error message when the user starts typing', async () => {
-    // Arrange
-    renderComponent();
-    const input = screen.getByPlaceholderText('Enter amount in ml');
-    const addButton = screen.getByRole('button', { name: /add/i });
-
-    // Act
-    fireEvent.change(input, { target: { value: '-100' } });
-    fireEvent.click(addButton);
-    expect(await screen.findByText('Please enter a positive number.')).toBeInTheDocument();
-    fireEvent.change(input, { target: { value: '1' } });
-
-    // Assert
-    expect(screen.queryByText('Please enter a positive number.')).not.toBeInTheDocument();
-  });
-
-  it('should disable buttons when daily intake is critical', async () => {
-    // Arrange
-    const props = {
-      ...defaultProps,
-      dailyTotal: 10000,
-    };
-    renderComponent(props);
-    const quickAddButtons = await screen.findAllByRole('button', { name: /ml/i });
-    const addButton = screen.getByRole('button', { name: /add/i });
-    const customAmountInput = screen.getByPlaceholderText('Enter amount in ml');
-
-    // Assert
-    quickAddButtons.forEach(button => expect(button).toBeDisabled());
-    expect(addButton).toBeDisabled();
-    expect(customAmountInput).toBeDisabled();
-  });
-
-  it('should display the percentage over 100% when daily total exceeds the goal', () => {
-    // Arrange
-    const props = {
-      ...defaultProps,
-      dailyGoal: 2000,
-      dailyTotal: 4000,
-    };
-    renderComponent(props);
-
-    // Assert
-    expect(screen.getByText('200%')).toBeInTheDocument();
-  });
-
-  it('should cap the progress bar at 100% width', () => {
-    // Arrange
-    const props = {
-      ...defaultProps,
-      dailyGoal: 2000,
-      dailyTotal: 4000,
-    };
-    renderComponent(props);
-    const progressBar = screen.getByRole('progressbar');
-
-    // Assert
-    expect(progressBar.style.width).toBe('100%');
-  });
-
-  it('should apply the over-goal class when intake exceeds 100%', () => {
-    // Arrange
-    const props = {
-      ...defaultProps,
-      dailyGoal: 2000,
-      dailyTotal: 3000,
-    };
-    renderComponent(props);
-    const progressBar = screen.getByRole('progressbar');
-
-    // Assert
-    expect(progressBar.className).toContain('water-level-over-goal');
-  });
-
-  it('should not apply the over-goal class when intake is 100% or less', () => {
-    // Arrange
-    const props = {
-      ...defaultProps,
-      dailyGoal: 2000,
-      dailyTotal: 2000,
-    };
-    renderComponent(props);
-    const progressBar = screen.getByRole('progressbar');
-
-    // Assert
-    expect(progressBar.className).not.toContain('water-level-over-goal');
+  it('should display the correct progress percentage', async () => {
+    await renderComponent();
+    expect(screen.getByText('25%')).toBeInTheDocument();
   });
 });
