@@ -1,11 +1,15 @@
 import { useTheme } from '../../hooks/useTheme';
 import { Button } from './Button';
 
-export function ThemeSwitcher() {
-  const { theme, toggleTheme } = useTheme();
+interface ThemeSwitcherProps {
+  onChange: () => void;
+}
+
+export function ThemeSwitcher({ onChange }: ThemeSwitcherProps) {
+  const { theme } = useTheme();
 
   return (
-    <Button onClick={toggleTheme}>
+    <Button onClick={onChange}>
       Switch to {theme === 'light' ? 'Dark' : 'Light'} Mode
     </Button>
   );

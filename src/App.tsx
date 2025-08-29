@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ThemeProvider } from './app/theme-provider';
 import Header from './shared/components/Header';
 import WarningBanner from './shared/components/WarningBanner';
 import Footer from './shared/components/Footer';
@@ -50,34 +51,36 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-bg-primary">
-      <div className="container mx-auto px-4 py-8 max-w-6xl pb-24">
-        <Header />
-        <WarningBanner status={intakeStatus.status} message={intakeStatus.message} />
-        <main>
-          {renderPage()}
-        </main>
-        <Footer />
+    <ThemeProvider>
+      <div className="min-h-screen bg-bg-primary">
+        <div className="container mx-auto px-4 py-8 max-w-6xl pb-24">
+          <Header />
+          <WarningBanner status={intakeStatus.status} message={intakeStatus.message} />
+          <main>
+            {renderPage()}
+          </main>
+          <Footer />
+        </div>
+        <BottomNavBar activePage={activePage} setActivePage={setActivePage} />
+        <AchievementModal
+          isOpen={isAchievementModalOpen}
+          achievements={selectedAchievements}
+          onClose={hideAchievementModal}
+          isUnlocked={isSelectedAchievementUnlocked}
+        />
+        <AchievementDetailModal
+          isOpen={isAchievementDetailModalOpen}
+          achievement={selectedAchievementDetail}
+          onClose={hideAchievementDetailModal}
+          isUnlocked={isSelectedAchievementDetailUnlocked}
+        />
+        <CriticalWarningModal
+          isOpen={isCriticalModalOpen}
+          message={intakeStatus.message}
+          onClose={() => setIsCriticalModalOpen(false)}
+        />
       </div>
-      <BottomNavBar activePage={activePage} setActivePage={setActivePage} />
-      <AchievementModal
-        isOpen={isAchievementModalOpen}
-        achievements={selectedAchievements}
-        onClose={hideAchievementModal}
-        isUnlocked={isSelectedAchievementUnlocked}
-      />
-      <AchievementDetailModal
-        isOpen={isAchievementDetailModalOpen}
-        achievement={selectedAchievementDetail}
-        onClose={hideAchievementDetailModal}
-        isUnlocked={isSelectedAchievementDetailUnlocked}
-      />
-      <CriticalWarningModal
-        isOpen={isCriticalModalOpen}
-        message={intakeStatus.message}
-        onClose={() => setIsCriticalModalOpen(false)}
-      />
-    </div>
+    </ThemeProvider>
   );
 }
 
