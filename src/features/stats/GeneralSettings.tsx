@@ -22,7 +22,7 @@ const GeneralSettings: React.FC = () => {
 
   return (
     <Card>
-      <h2 className="text-xl font-bold mb-4">General Settings</h2>
+      <h2 className="text-xl font-bold mb-4 text-text-primary">General Settings</h2>
       <div>
         <SettingsRow title="Theme">
           <ThemeSwitcher onChange={toggleTheme} />
