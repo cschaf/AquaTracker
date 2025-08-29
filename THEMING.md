@@ -61,7 +61,7 @@ Here is a list of the available semantic color classes:
 -   `text-text-primary`: Primary text color.
 -   `text-text-on-primary`: Text color for elements with a primary background.
 -   `border-border-card`: Border color for cards.
--   `text-destructive`: Color for destructive actions or error messages.
+-   `text-warning`: Color for destructive actions or error messages.
 
 You can find the full list of theme variables in `src/theme.css`.
 
@@ -78,7 +78,7 @@ For example, to add a new `accent` color, you would modify `src/theme.css` like 
   --color-text-primary: oklch(29% 0.02 264);
   --color-text-on-primary: oklch(100% 0 0);
   --color-border-card: oklch(90% 0.02 264);
-  --color-destructive: oklch(60% 0.22 15);
+  --color-warning: oklch(60% 0.22 15);
   --color-accent: oklch(60% 0.22 280); /* New accent color for light theme */
 }
 
@@ -88,7 +88,7 @@ For example, to add a new `accent` color, you would modify `src/theme.css` like 
   --color-text-primary: oklch(95% 0.02 264);
   --color-text-on-primary: oklch(100% 0 0);
   --color-border-card: oklch(35% 0.02 264);
-  --color-destructive: oklch(60% 0.22 15);
+  --color-warning: oklch(60% 0.22 15);
   --color-accent: oklch(70% 0.22 280); /* New accent color for dark theme */
 }
 ```
@@ -106,7 +106,7 @@ To create a new theme, you need to add a new class selector to `src/theme.css` w
   --color-text-primary: oklch(30% 0.05 80);
   --color-text-on-primary: oklch(95% 0.05 80);
   --color-border-card: oklch(85% 0.05 80);
-  --color-destructive: oklch(60% 0.22 15);
+  --color-warning: oklch(60% 0.22 15);
 }
 ```
 

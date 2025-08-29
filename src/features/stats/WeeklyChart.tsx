@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Log, Entry } from '../../core/entities/water-intake';
+import { Card } from '../../shared/components/Card';
 
 interface WeeklyChartProps {
   logs: Log[];
@@ -32,29 +33,29 @@ const WeeklyChart: React.FC<WeeklyChartProps> = ({ logs, dailyGoal }) => {
   const avgIntake = daysWithIntake > 0 ? weeklyTotal / daysWithIntake : 0;
 
   return (
-    <div className="chart-container">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Weekly Consumption</h2>
+    <Card>
+      <h2 className="text-2xl font-bold text-text-primary mb-6 text-center">Weekly Consumption</h2>
       <div className="h-64 flex items-end justify-center px-4 gap-1 sm:gap-2">
         {last7DaysData.map((data, index) => {
           const percentage = maxIntake > 0 ? (data.total / maxIntake) * 100 : 0;
           const barHeight = percentage > 5 ? `${percentage}%` : 'auto';
-          const textColor = percentage > 15 ? 'text-white' : 'text-gray-800';
+          const textColor = percentage > 15 ? 'text-text-on-primary' : 'text-text-primary';
           const amountPosition = percentage > 15 ? '' : 'bar-amount-outside';
 
           return (
             <div key={index} className="flex flex-col items-center justify-end h-full">
-              <div className="w-10 bg-blue-500 rounded-t-lg relative" style={{ height: barHeight }} title={`${data.total} ml`}>
+              <div className="w-10 bg-accent-primary rounded-t-lg relative" style={{ height: barHeight }} title={`${data.total} ml`}>
                 <div className={`bar-amount ${textColor} ${amountPosition}`}>{data.total} ml</div>
               </div>
-              <span className="text-sm text-gray-600 mt-2">{data.day}</span>
+              <span className="text-sm text-text-secondary mt-2">{data.day}</span>
             </div>
           );
         })}
       </div>
       <div className="mt-6 text-center">
-        <p className="text-gray-600">Average: <span className="font-bold text-blue-600">{(avgIntake / 1000).toFixed(1)}L</span> per day</p>
+        <p className="text-text-secondary">Average: <span className="font-bold text-accent-primary">{(avgIntake / 1000).toFixed(1)}L</span> per day</p>
       </div>
-    </div>
+    </Card>
   );
 };
 

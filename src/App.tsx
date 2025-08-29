@@ -50,7 +50,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-bg-primary">
       <div className="container mx-auto px-4 py-8 max-w-6xl pb-24">
         <Header />
         <WarningBanner status={intakeStatus.status} message={intakeStatus.message} />

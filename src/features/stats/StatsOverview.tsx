@@ -82,7 +82,7 @@ const StatsOverview: React.FC<StatsOverviewProps> = ({ logs, dailyGoal }) => {
 
   return (
     <div className="grid grid-cols-2 gap-6">
-      <div className="bg-gradient-to-br from-cyan-500 to-blue-500 rounded-2xl shadow-xl p-6 text-white flex flex-col justify-between">
+      <div className="bg-gradient-to-br from-weekly-gradient-from to-weekly-gradient-to rounded-2xl shadow-xl p-6 text-text-on-primary flex flex-col justify-between">
         <div className="flex justify-between items-start">
           <div>
             <p className="text-lg opacity-90">This Week</p>
@@ -98,7 +98,7 @@ const StatsOverview: React.FC<StatsOverviewProps> = ({ logs, dailyGoal }) => {
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl shadow-xl p-6 text-white flex flex-col justify-between">
+      <div className="bg-gradient-to-br from-streak-gradient-from to-streak-gradient-to rounded-2xl shadow-xl p-6 text-text-on-primary flex flex-col justify-between">
         <div className="flex justify-between items-start">
           <div>
             <p className="text-lg opacity-90">Best Streak</p>
