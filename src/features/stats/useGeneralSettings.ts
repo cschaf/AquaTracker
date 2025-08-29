@@ -1,21 +1,18 @@
-import { useUseCase } from '../../app/use-case-provider';
-import { GetGeneralSettingsUseCase } from '../../core/use-cases/get-general-settings.use-case';
-import { UpdateGeneralSettingsUseCase } from '../../core/use-cases/update-general-settings.use-case';
+import { useUseCases } from '../../app/use-case-provider';
 import { useEffect, useState } from 'react';
-import { GeneralSettings } from '../../core/entities/general-settings';
+import type { GeneralSettings } from '../../core/entities/general-settings';
 
 export const useGeneralSettings = () => {
-  const getGeneralSettingsUseCase = useUseCase(GetGeneralSettingsUseCase);
-  const updateGeneralSettingsUseCase = useUseCase(UpdateGeneralSettingsUseCase);
+  const { getGeneralSettings, updateGeneralSettings } = useUseCases();
 
   const [settings, setSettings] = useState<GeneralSettings | null>(null);
 
   useEffect(() => {
-    getGeneralSettingsUseCase.execute().then(setSettings);
-  }, [getGeneralSettingsUseCase]);
+    getGeneralSettings.execute().then(setSettings);
+  }, [getGeneralSettings]);
 
   const updateSettings = (newSettings: GeneralSettings) => {
-    updateGeneralSettingsUseCase.execute(newSettings).then(() => {
+    updateGeneralSettings.execute(newSettings).then(() => {
       setSettings(newSettings);
     });
   };

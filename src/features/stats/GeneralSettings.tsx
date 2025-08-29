@@ -7,7 +7,8 @@ const GeneralSettings: React.FC = () => {
   const { toggleTheme } = useTheme();
 
   return (
-    <Card title="General Settings">
+    <Card>
+      <h2 className="text-xl font-bold mb-4">General Settings</h2>
       <div className="p-4">
         <ThemeSwitcher onChange={toggleTheme} />
       </div>
