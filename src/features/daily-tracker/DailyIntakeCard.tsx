@@ -98,7 +98,7 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
 
           <div className="water-progress h-8 rounded-full overflow-hidden relative bg-bg-secondary">
             <div
-              className={`water-level h-full bg-primary ${displayPercentage > 100 ? 'water-level-over-goal' : ''}`}
+              className={`water-level h-full ${displayPercentage > 100 ? 'water-level-over-goal' : ''}`}
               style={{ width: `${progressPercentage}%` }}
               role="progressbar"
               aria-valuenow={progressPercentage}

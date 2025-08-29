@@ -37,12 +37,12 @@ body {
 .water-level {
     position: relative;
     z-index: 3;
-    background: linear-gradient(to top, #3b82f6, #60a5fa);
+    background: oklch(0.655 0.137 257.5);
     transition: width 1s ease-in-out;
 }
 
 .water-level-over-goal {
-    background: linear-gradient(to top, #f59e0b, #fcd34d);
+    background: oklch(0.741 0.134 68.6);
 }
 
 .water-bubble {
