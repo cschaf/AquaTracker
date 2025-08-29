@@ -35,18 +35,24 @@ const WeeklyChart: React.FC<WeeklyChartProps> = ({ logs, dailyGoal }) => {
   return (
     <Card>
       <h2 className="text-2xl font-bold text-text-primary mb-6 text-center">Weekly Consumption</h2>
-      <div className="h-64 flex items-end justify-center px-4 gap-1 sm:gap-2">
+      <div className="h-64 flex items-end justify-around px-4 gap-1 sm:gap-2">
         {last7DaysData.map((data, index) => {
           const percentage = maxIntake > 0 ? (data.total / maxIntake) * 100 : 0;
-          const barHeight = percentage > 5 ? `${percentage}%` : 'auto';
+          const barHeight = percentage > 0 ? `${percentage}%` : '0%';
           const textColor = percentage > 15 ? 'text-text-on-primary' : 'text-text-primary';
           const amountPosition = percentage > 15 ? '' : 'bar-amount-outside';
 
           return (
-            <div key={index} className="flex flex-col items-center justify-end h-full">
-              <div className="w-10 bg-accent-primary rounded-t-lg relative" style={{ height: barHeight }} title={`${data.total} ml`}>
-                <div className={`bar-amount ${textColor} ${amountPosition}`}>{data.total} ml</div>
-              </div>
+            <div key={index} className="flex flex-col items-center justify-end h-full flex-1 max-w-12">
+              {data.total > 0 && (
+                <div
+                  className="bg-accent-primary rounded-t-lg relative w-full"
+                  style={{ height: barHeight }}
+                  title={`${data.total} ml`}
+                >
+                  <div className={`bar-amount ${textColor} ${amountPosition}`}>{data.total} ml</div>
+                </div>
+              )}
               <span className="text-sm text-text-secondary mt-2">{data.day}</span>
             </div>
           );
