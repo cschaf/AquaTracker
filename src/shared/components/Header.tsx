@@ -1,15 +1,19 @@
 import React from 'react';
+import { ThemeSwitcher } from './ThemeSwitcher';
 
 const Header: React.FC = () => {
   return (
-    <header className="text-center mb-10">
+    <header className="text-center mb-10 relative">
+      <div className="absolute top-0 right-0">
+        <ThemeSwitcher />
+      </div>
       <div className="flex justify-center mb-4">
-        <div className="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center water-icon">
-          <i className="fas fa-tint text-white text-2xl"></i>
+        <div className="w-16 h-16 rounded-full bg-bg-primary flex items-center justify-center water-icon">
+          <i className="fas fa-tint text-text-on-primary text-2xl"></i>
         </div>
       </div>
-      <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-2">AquaTracker</h1>
-      <p className="text-lg text-gray-600">Stay hydrated, stay healthy</p>
+      <h1 className="text-4xl md:text-5xl font-bold text-text-primary mb-2">AquaTracker</h1>
+      <p className="text-lg text-text-primary">Stay hydrated, stay healthy</p>
     </header>
   );
 };
