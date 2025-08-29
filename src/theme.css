@@ -7,15 +7,15 @@
   --color-text-on-primary: oklch(100% 0 0);
   --color-border-card: oklch(90% 0.02 264);
   --color-destructive: oklch(60% 0.22 15);
+}
 
-  @dark {
-    --color-bg-primary: oklch(20% 0.02 264);
-    --color-bg-secondary: oklch(25% 0.02 264);
-    --color-text-primary: oklch(95% 0.02 264);
-    --color-text-on-primary: oklch(100% 0 0);
-    --color-border-card: oklch(35% 0.02 264);
-    --color-destructive: oklch(60% 0.22 15);
-  }
+.dark {
+  --color-bg-primary: oklch(20% 0.02 264);
+  --color-bg-secondary: oklch(25% 0.02 264);
+  --color-text-primary: oklch(95% 0.02 264);
+  --color-text-on-primary: oklch(100% 0 0);
+  --color-border-card: oklch(35% 0.02 264);
+  --color-destructive: oklch(60% 0.22 15);
 }
 
 @layer base {

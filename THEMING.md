@@ -80,16 +80,16 @@ For example, to add a new `accent` color, you would modify `src/theme.css` like 
   --color-border-card: oklch(90% 0.02 264);
   --color-destructive: oklch(60% 0.22 15);
   --color-accent: oklch(60% 0.22 280); /* New accent color for light theme */
+}
 
-  @dark {
-    --color-bg-primary: oklch(20% 0.02 264);
-    --color-bg-secondary: oklch(25% 0.02 264);
-    --color-text-primary: oklch(95% 0.02 264);
-    --color-text-on-primary: oklch(100% 0 0);
-    --color-border-card: oklch(35% 0.02 264);
-    --color-destructive: oklch(60% 0.22 15);
-    --color-accent: oklch(70% 0.22 280); /* New accent color for dark theme */
-  }
+.dark {
+  --color-bg-primary: oklch(20% 0.02 264);
+  --color-bg-secondary: oklch(25% 0.02 264);
+  --color-text-primary: oklch(95% 0.02 264);
+  --color-text-on-primary: oklch(100% 0 0);
+  --color-border-card: oklch(35% 0.02 264);
+  --color-destructive: oklch(60% 0.22 15);
+  --color-accent: oklch(70% 0.22 280); /* New accent color for dark theme */
 }
 ```
 
@@ -97,20 +97,16 @@ You can then use this new color in your components with the `bg-accent`, `text-a
 
 ## Creating a New Theme
 
-To create a new theme, you need to add a new block to the `@theme` directive in `src/theme.css`. For example, to add a `sepia` theme, you would add a new `@sepia` block:
+To create a new theme, you need to add a new class selector to `src/theme.css` with the theme's variables. For example, to add a `sepia` theme, you would add a new `.sepia` selector:
 
 ```css
-@theme {
-  /* ... light and dark theme definitions ... */
-
-  @sepia {
-    --color-bg-primary: oklch(95% 0.05 80);
-    --color-bg-secondary: oklch(90% 0.05 80);
-    --color-text-primary: oklch(30% 0.05 80);
-    --color-text-on-primary: oklch(95% 0.05 80);
-    --color-border-card: oklch(85% 0.05 80);
-    --color-destructive: oklch(60% 0.22 15);
-  }
+.sepia {
+  --color-bg-primary: oklch(95% 0.05 80);
+  --color-bg-secondary: oklch(90% 0.05 80);
+  --color-text-primary: oklch(30% 0.05 80);
+  --color-text-on-primary: oklch(95% 0.05 80);
+  --color-border-card: oklch(85% 0.05 80);
+  --color-destructive: oklch(60% 0.22 15);
 }
 ```
 
