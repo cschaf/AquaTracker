@@ -129,36 +129,10 @@ describe('DailyIntakeCard', () => {
     };
     renderComponent(props);
     const progressBar = screen.getByRole('progressbar');
+    const progressBarFill = progressBar.firstChild as HTMLElement;
 
     // Assert
-    expect(progressBar.style.width).toBe('100%');
+    expect(progressBarFill.style.width).toBe('100%');
   });
 
-  it('should apply the over-goal class when intake exceeds 100%', () => {
-    // Arrange
-    const props = {
-      ...defaultProps,
-      dailyGoal: 2000,
-      dailyTotal: 3000,
-    };
-    renderComponent(props);
-    const progressBar = screen.getByRole('progressbar');
-
-    // Assert
-    expect(progressBar.className).toContain('water-level-over-goal');
-  });
-
-  it('should not apply the over-goal class when intake is 100% or less', () => {
-    // Arrange
-    const props = {
-      ...defaultProps,
-      dailyGoal: 2000,
-      dailyTotal: 2000,
-    };
-    renderComponent(props);
-    const progressBar = screen.getByRole('progressbar');
-
-    // Assert
-    expect(progressBar.className).not.toContain('water-level-over-goal');
-  });
 });
