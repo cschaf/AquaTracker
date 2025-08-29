@@ -52,7 +52,7 @@ const QuickAddSettings: React.FC = () => {
               type="number"
               id={`quick-add-${index}`}
               name={`quick-add-${index}`}
-              className="mt-1 block w-full p-2 border border-border-card bg-bg-tertiary rounded-md shadow-sm focus:ring-accent-primary focus:border-accent-primary"
+              className="mt-1 block w-full p-2 border border-border-card bg-bg-tertiary rounded-md shadow-sm focus:ring-accent-primary focus:border-accent-primary text-text-primary"
               value={value}
               onChange={(e) => handleValueChange(index, e.target.value)}
             />
