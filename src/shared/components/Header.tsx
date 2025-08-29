@@ -1,14 +1,8 @@
 import React from 'react';
-import { ThemeSwitcher } from './ThemeSwitcher';
-import { useTheme } from '../../hooks/useTheme';
 
 const Header: React.FC = () => {
-  const { toggleTheme } = useTheme();
   return (
     <header className="text-center mb-10 relative">
-      <div className="absolute top-0 right-0">
-        <ThemeSwitcher onChange={toggleTheme} />
-      </div>
       <div className="flex justify-center mb-4">
         <div className="w-16 h-16 rounded-full bg-accent-primary flex items-center justify-center water-icon">
           <i className="fas fa-tint text-text-on-primary text-2xl"></i>
