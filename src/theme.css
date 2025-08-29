@@ -10,6 +10,7 @@
   --color-accent-primary: oklch(0.655 0.137 257.5);
   --color-success: oklch(0.653 0.126 157.3);
   --color-warning: oklch(0.741 0.134 68.6);
+  --color-destructive: oklch(60% 0.22 15);
   --color-achievement-gradient-from: oklch(0.95 0.1 150);
   --color-achievement-gradient-to: oklch(0.95 0.1 165);
   --color-border-achievement: oklch(1 0 0);

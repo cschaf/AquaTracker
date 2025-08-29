@@ -80,7 +80,7 @@ const TodaysEntriesCard: React.FC<TodaysEntriesCardProps> = ({ entries, deleteEn
                       <button onClick={() => handleEdit(entry)} className="edit-entry text-accent-primary hover:text-accent-primary/80 mr-2">
                         <i className="fas fa-pencil-alt"></i>
                       </button>
-                      <button onClick={() => deleteEntry(entry.id)} className="delete-entry text-warning hover:text-warning/80">
+                      <button onClick={() => deleteEntry(entry.id)} className="delete-entry text-red-500 hover:text-red/80">
                         <i className="fas fa-trash"></i>
                       </button>
                     </div>
