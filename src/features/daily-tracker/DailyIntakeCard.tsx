@@ -76,7 +76,7 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
         </div>
       </div>
 
-      <div className="bg-bg-primary rounded-xl p-4 mb-4">
+      <div className="bg-bg-tertiary rounded-xl p-4 mb-4">
         <div className="flex justify-between items-center mb-2">
           <div className="flex items-baseline">
             <span className="text-3xl font-bold text-text-primary">{dailyTotal}</span>
@@ -126,7 +126,7 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
             type="number"
             placeholder="Enter amount in ml"
             disabled={isCritical}
-            className="flex-1 p-3 border border-border-card bg-bg-primary rounded-lg focus:outline-none focus:border-accent-primary transition w-full disabled:opacity-50 text-text-primary placeholder:text-text-secondary"
+            className="flex-1 p-3 border border-border-card bg-bg-tertiary rounded-lg focus:outline-none focus:border-accent-primary transition w-full disabled:opacity-50 text-text-primary placeholder:text-text-secondary"
             value={customAmount}
             onChange={(e) => {
               setCustomAmount(e.target.value);
