@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ThemeProvider } from './app/theme-provider';
+import { eventBus } from './app/event-bus';
+import type { Achievement } from './core/entities/achievement';
 import Header from './shared/components/Header';
 import WarningBanner from './shared/components/WarningBanner';
 import Footer from './shared/components/Footer';
@@ -27,7 +29,20 @@ function App() {
     selectedAchievementDetail,
     isSelectedAchievementDetailUnlocked,
     hideAchievementDetailModal,
+    showAchievementModal,
   } = useModal();
+
+  useEffect(() => {
+    const handleAchievementUnlocked = (achievements: Achievement[]) => {
+      showAchievementModal(achievements, true);
+    };
+
+    eventBus.on('achievementUnlocked', handleAchievementUnlocked);
+
+    return () => {
+      eventBus.off('achievementUnlocked', handleAchievementUnlocked);
+    };
+  }, [showAchievementModal]);
 
   const {
     isCriticalModalOpen,

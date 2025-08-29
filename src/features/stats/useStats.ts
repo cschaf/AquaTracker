@@ -44,8 +44,11 @@ export const useStats = () => {
   useEffect(() => {
     loadData(); // initial load
     eventBus.on('intakeDataChanged', loadData); // subscribe to changes
+    eventBus.on('dataSync', loadData); // subscribe to data sync events
+
     return () => {
       eventBus.off('intakeDataChanged', loadData); // unsubscribe on cleanup
+      eventBus.off('dataSync', loadData); // unsubscribe on cleanup
     };
   }, [loadData]);
 
@@ -53,8 +56,7 @@ export const useStats = () => {
     const result = await importDataUseCase.execute(_file); // The fix is here
     alert(result.message);
     if (result.success) {
-      // The use case message says the page will reload, so we do it here.
-      window.location.reload();
+      eventBus.emit('dataSync', { status: 'success', operation: 'import' });
     }
   };
 

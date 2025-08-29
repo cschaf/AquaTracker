@@ -35,7 +35,7 @@ describe('UpdateQuickAddValuesUseCase', () => {
 
     // Assert
     expect(mockGateway.saveQuickAddValues).toHaveBeenCalledWith(validValues);
-    expect(eventBus.emit).toHaveBeenCalledWith('quickAddValuesChanged');
+    expect(eventBus.emit).toHaveBeenCalledWith('quickAddValuesChanged', undefined);
   });
 
   it('should throw an error for invalid format (not an array)', async () => {

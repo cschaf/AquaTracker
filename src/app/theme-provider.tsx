@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useGeneralSettings } from '../features/stats/useGeneralSettings';
 import { getInitialTheme } from './get-initial-theme';
+import { eventBus } from './event-bus';
 
 type Theme = 'light' | 'dark';
 
@@ -16,9 +17,29 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
 
   useEffect(() => {
+    if (settings?.theme && settings.theme !== theme) {
+      setTheme(settings.theme);
+    }
+  // We only want this to run when the settings are first loaded.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings]);
+
+  useEffect(() => {
     const root = window.document.documentElement;
     root.classList.remove('light', 'dark');
     root.classList.add(theme);
+
+    const handleSettingsChanged = (newSettings: { theme: Theme }) => {
+      if (newSettings.theme !== theme) {
+        setTheme(newSettings.theme);
+      }
+    };
+
+    eventBus.on('settingsChanged', handleSettingsChanged);
+
+    return () => {
+      eventBus.off('settingsChanged', handleSettingsChanged);
+    };
   }, [theme]);
 
   const toggleTheme = () => {
