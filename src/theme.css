@@ -14,6 +14,10 @@
   --color-achievement-gradient-to: oklch(0.95 0.1 165);
   --color-border-achievement: oklch(1 0 0);
   --color-bg-nav-active: oklch(0.9 0.05 257.5);
+  --color-weekly-gradient-from: oklch(0.655 0.137 257.5);
+  --color-weekly-gradient-to: oklch(0.6 0.15 257.5);
+  --color-streak-gradient-from: oklch(0.653 0.126 157.3);
+  --color-streak-gradient-to: oklch(0.6 0.14 157.3);
 }
 
 .dark {
