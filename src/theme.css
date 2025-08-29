@@ -21,12 +21,24 @@
 }
 
 .dark {
-  --color-bg-primary: oklch(20% 0.02 264);
-  --color-bg-secondary: oklch(25% 0.02 264);
-  --color-text-primary: oklch(95% 0.02 264);
-  --color-text-on-primary: oklch(100% 0 0);
-  --color-border-card: oklch(35% 0.02 264);
+  --color-bg-primary: oklch(0.203 0.014 260.5);
+  --color-bg-secondary: oklch(0.25 0.016 260.5);
+  --color-text-primary: oklch(0.93 0.006 260.5);
+  --color-text-secondary: oklch(0.72 0.01 260.5);
+  --color-text-on-primary: oklch(1 0 0);
+  --color-border-card: oklch(0.3 0.016 260.5);
+  --color-accent-primary: oklch(0.68 0.13 257.5);
+  --color-success: oklch(0.7 0.15 150);
+  --color-warning: oklch(0.8 0.15 85);
   --color-destructive: oklch(60% 0.22 15);
+  --color-achievement-gradient-from: oklch(0.3 0.1 150);
+  --color-achievement-gradient-to: oklch(0.35 0.1 165);
+  --color-border-achievement: oklch(1 0 0);
+  --color-bg-nav-active: oklch(0.3 0.016 260.5);
+  --color-weekly-gradient-from: oklch(0.68 0.13 257.5);
+  --color-weekly-gradient-to: oklch(0.6 0.13 257.5);
+  --color-streak-gradient-from: oklch(0.7 0.15 150);
+  --color-streak-gradient-to: oklch(0.6 0.15 150);
 }
 
 @layer base {
