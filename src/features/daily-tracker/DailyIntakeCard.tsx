@@ -109,7 +109,7 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
                 key={index}
                 onClick={() => addWaterEntry(value)}
                 disabled={isCritical}
-                className="bg-bg-secondary text-text-primary py-3 text-sm flex items-center justify-center"
+                className="bg-bg-tertiary text-text-primary py-3 text-sm flex items-center justify-center"
               >
                 <i className={`${getIconForValue(value)} text-lg mr-2`}></i>
                 <span>{value >= 1000 ? `${value / 1000}L` : `${value} ml`}</span>
