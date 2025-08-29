@@ -1,4 +1,5 @@
 import React from 'react';
+import GeneralSettings from '../features/stats/GeneralSettings';
 import QuickAddSettings from '../features/stats/QuickAddSettings';
 import ImportData from '../features/stats/ImportData';
 import ExportData from '../features/stats/ExportData';
@@ -9,6 +10,7 @@ const SettingsPage: React.FC = () => {
 
   return (
     <div className="space-y-8">
+      <GeneralSettings />
       <QuickAddSettings />
       <ImportData importData={importData} />
       <ExportData exportData={exportData} />
