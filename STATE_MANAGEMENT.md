@@ -46,18 +46,47 @@ UI state for specific features is encapsulated within custom hooks. This keeps c
 
 ## 3. Event Bus (Cross-Feature State Synchronization)
 
-A singleton `EventBus` is used to decouple different parts of the application and create a reactive system.
+To decouple different parts of the application, we use a type-safe singleton Event Bus powered by the `mitt` library. This creates a reactive system where one part of the app can respond to state changes in another without being directly coupled.
 
--   **Location**: `src/app/event-bus.ts`
+-   **Location**:
+    -   Event Bus instance: `src/app/event-bus.ts`
+    -   Event type definitions: `src/app/event.types.ts`
 
--   **Key Methods**: `eventBus.on()`, `eventBus.off()`, `eventBus.emit()`.
+-   **Key Concepts**:
+    -   **Strongly-Typed Events**: All events and their payloads are defined in the `ApplicationEvents` type in `src/app/event.types.ts`. This provides compile-time safety and autocompletion.
+    -   **Singleton Instance**: The `eventBus` is a single instance of a `mitt` emitter, exported from `src/app/event-bus.ts`.
+    -   **API**: The bus exposes the standard `mitt` API: `on(event, handler)`, `off(event, handler)`, and `emit(event, payload)`.
 
 -   **State Synchronization Flow**:
-    1.  After a core data change, a hook emits an event: `eventBus.emit('intakeDataChanged')`.
-    2.  Other hooks across different features listen for this event: `eventBus.on('intakeDataChanged', ...)`.
-    3.  The listener's callback function is triggered, which typically refetches data to keep the UI in sync.
+    1.  A feature hook or use case emits an event with a typed payload. For example, after an achievement is unlocked:
+        ```typescript
+        // In a hook like useDailyTracker.ts
+        const newlyUnlocked = await checkForNewAchievements.execute();
+        if (newlyUnlocked.length > 0) {
+          eventBus.emit('achievementUnlocked', newlyUnlocked);
+        }
+        ```
+    2.  Another part of the application, like a high-level component or another hook, listens for this event:
+        ```typescript
+        // In a component like App.tsx
+        useEffect(() => {
+          const handler = (achievements: Achievement[]) => {
+            showAchievementModal(achievements, true);
+          };
+          eventBus.on('achievementUnlocked', handler);
+          return () => eventBus.off('achievementUnlocked', handler);
+        }, [showAchievementModal]);
+        ```
+    3.  The listener's callback (`handler`) is triggered with the typed payload, allowing it to perform an action (like showing a modal or refetching data).
 
-**When to use**: When a state change in one feature needs to trigger a state update in another, otherwise unrelated, feature.
+-   **Key Application Events**:
+    -   `intakeDataChanged`: Fired when water intake is added, updated, or deleted. Listeners typically refetch data. Payload: `void`.
+    -   `achievementUnlocked`: Fired when one or more achievements are newly unlocked. Payload: `Achievement[]`.
+    -   `settingsChanged`: Fired when general settings (like the theme) are updated. Payload: `GeneralSettings`.
+    -   `dataSync`: Fired after a data import is successfully completed. Replaces a full page reload. Payload: `{ status: 'success', operation: 'import' | 'export' }`.
+    -   `quickAddValuesChanged`: Fired when the quick-add button values are changed. Payload: `void`.
+
+**When to use**: When a state change in one feature needs to trigger a side effect or a state update in another, otherwise unrelated, feature. It is the primary mechanism for cross-feature communication.
 
 ## 4. React Context and Providers (Global UI State)
 
