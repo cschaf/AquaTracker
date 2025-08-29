@@ -18,6 +18,7 @@
   --color-weekly-gradient-to: oklch(0.6 0.15 257.5);
   --color-streak-gradient-from: oklch(0.653 0.126 157.3);
   --color-streak-gradient-to: oklch(0.6 0.14 157.3);
+  --color-bg-tertiary: oklch(0.947 0.005 257.65);
 }
 
 .dark {
@@ -39,6 +40,7 @@
   --color-weekly-gradient-to: oklch(0.6 0.13 257.5);
   --color-streak-gradient-from: oklch(0.7 0.15 150);
   --color-streak-gradient-to: oklch(0.6 0.15 150);
+  --color-bg-tertiary: oklch(0.283 0.015 260.77);
 }
 
 @layer base {
