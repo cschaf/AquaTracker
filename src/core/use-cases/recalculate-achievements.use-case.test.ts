@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { RecalculateAchievementsUseCase } from './recalculate-achievements.use-case';
 import type { WaterIntakeGateway } from '../gateways/water-intake.gateway';
 import type { GoalGateway } from '../gateways/goal.gateway';
@@ -23,6 +23,17 @@ const createMockAchievementGateway = (unlockedIds: string[] = []): AchievementGa
 });
 
 describe('RecalculateAchievementsUseCase', () => {
+  const MOCK_DATE = '2024-01-02T12:00:00.000Z'; // A neutral timestamp (mid-day on a non-holiday)
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(MOCK_DATE));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('should return newly earned achievements', async () => {
     // Arrange
     const today = new Date().toISOString().split('T')[0];

@@ -1,6 +1,7 @@
 import { useUseCases } from '../../app/use-case-provider';
 import { useEffect, useState } from 'react';
 import type { GeneralSettings } from '../../core/entities/general-settings';
+import { eventBus } from '../../app/event-bus';
 
 export const useGeneralSettings = () => {
   const { getGeneralSettings, updateGeneralSettings } = useUseCases();
@@ -14,6 +15,7 @@ export const useGeneralSettings = () => {
   const updateSettings = (newSettings: GeneralSettings) => {
     updateGeneralSettings.execute(newSettings).then(() => {
       setSettings(newSettings);
+      eventBus.emit('settingsChanged', newSettings);
     });
   };
 

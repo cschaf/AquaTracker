@@ -21,6 +21,6 @@ export class UpdateQuickAddValuesUseCase {
     }
 
     await this.quickAddGateway.saveQuickAddValues(values);
-    eventBus.emit('quickAddValuesChanged');
+    eventBus.emit('quickAddValuesChanged', undefined);
   }
 }
