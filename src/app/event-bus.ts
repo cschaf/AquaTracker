@@ -1,5 +1,5 @@
 // src/app/event-bus.ts
-import mitt, { Emitter } from 'mitt';
+import mitt, { type Emitter } from 'mitt';
 import type { ApplicationEvents } from './event.types';
 
 // Create a new mitt emitter with the defined events
