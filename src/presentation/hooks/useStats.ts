@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useUseCases } from '../../di';
 import { eventBus } from '../lib/event-bus/event-bus';
-import type { Log, DailyGoal, Achievement, DomainError } from '../../domain';
+import type { Log, DailyGoal, Achievement } from '../../domain/entities';
+import type { DomainError } from '../../domain/errors';
 
 export const useStats = () => {
   const {

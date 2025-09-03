@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Log, Entry } from '../../../domain';
+import type { Log, Entry } from '../../../domain/entities';
 
 interface StatsOverviewProps {
   logs: Log[];

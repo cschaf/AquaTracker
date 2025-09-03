@@ -1,6 +1,6 @@
 import { useUseCases } from '../../di';
 import { useEffect, useState } from 'react';
-import type { GeneralSettings } from '../../domain';
+import type { GeneralSettings } from '../../domain/entities';
 import { eventBus } from '../lib/event-bus/event-bus'; // This will be moved later
 
 export const useGeneralSettings = () => {

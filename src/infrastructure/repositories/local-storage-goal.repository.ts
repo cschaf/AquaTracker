@@ -3,7 +3,8 @@
  * @licence MIT
  */
 
-import { GoalRepository, DailyGoal } from '../../domain';
+import type { GoalRepository } from '../../domain/repositories';
+import type { DailyGoal } from '../../domain/entities';
 import { getItem, setItem } from '../storage/local.storage';
 
 const WATER_TRACKER_GOAL_KEY = 'waterTrackerGoal';

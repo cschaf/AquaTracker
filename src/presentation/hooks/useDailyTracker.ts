@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useUseCases } from '../../di';
 import { eventBus } from '../lib/event-bus/event-bus'; // This will be moved later
-import type { DailySummary, DailyGoal } from '../../domain';
+import type { DailySummary } from '../../domain/usecases';
+import type { DailyGoal } from '../../domain/entities';
 
 export const useDailyTracker = () => {
   const {

@@ -3,7 +3,8 @@
  * @licence MIT
  */
 
-import { QuickAddRepository, QuickAddValues } from '../../domain';
+import type { QuickAddRepository } from '../../domain/repositories';
+import type { QuickAddValues } from '../../domain/entities';
 import { getItem, setItem } from '../storage/local.storage';
 
 const QUICK_ADD_VALUES_KEY = 'quickAddValues';

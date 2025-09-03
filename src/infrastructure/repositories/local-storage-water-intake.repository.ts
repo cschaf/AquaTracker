@@ -3,7 +3,8 @@
  * @licence MIT
  */
 
-import { WaterIntakeRepository, Log } from '../../domain';
+import type { WaterIntakeRepository } from '../../domain/repositories';
+import type { Log } from '../../domain/entities';
 import { getItem, setItem } from '../storage/local.storage';
 
 const WATER_TRACKER_DATA_KEY = 'waterTrackerData';

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useGeneralSettings } from '../hooks/useGeneralSettings';
 import { getInitialTheme } from './get-initial-theme';
-import { eventBus } from '../shared/event-bus/event-bus';
+import { eventBus } from '../lib/event-bus/event-bus';
 
 type Theme = 'light' | 'dark';
 

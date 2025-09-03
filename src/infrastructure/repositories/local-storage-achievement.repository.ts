@@ -3,7 +3,7 @@
  * @licence MIT
  */
 
-import { AchievementRepository } from '../../domain/repositories';
+import type { AchievementRepository } from '../../domain/repositories';
 import { getItem, setItem } from '../storage/local.storage';
 
 const UNLOCKED_ACHIEVEMENTS_KEY = 'unlockedAchievements';

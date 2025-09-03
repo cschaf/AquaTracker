@@ -1,20 +1,20 @@
 import { useState, useEffect } from 'react';
 import { ThemeProvider } from './theme/theme-provider';
-import { eventBus } from '../shared/event-bus/event-bus';
-import type { Achievement } from '../domain';
-import { Header } from './components/Header';
-import { WarningBanner } from './components/WarningBanner';
-import { Footer } from './components/Footer';
-import { AchievementModal } from './components/AchievementModal';
-import { AchievementDetailModal } from './components/AchievementDetailModal';
-import { CriticalWarningModal } from './components/CriticalWarningModal';
+import { eventBus } from './lib/event-bus/event-bus';
+import type { Achievement } from '../domain/entities';
+import Header from './components/Header';
+import WarningBanner from './components/WarningBanner';
+import Footer from './components/Footer';
+import AchievementModal from './components/AchievementModal';
+import AchievementDetailModal from './components/AchievementDetailModal';
+import CriticalWarningModal from './components/CriticalWarningModal';
 import { useModal } from './modal/modal-provider';
 import { useAppNotifications } from './hooks/useAppNotifications';
-import { BottomNavBar } from './components/BottomNavBar';
-import { MainPage } from './pages/MainPage';
-import { StatsPage } from './pages/StatsPage';
-import { AchievementsPage } from './pages/AchievementsPage';
-import { SettingsPage } from './pages/SettingsPage';
+import BottomNavBar from './components/BottomNavBar';
+import MainPage from './pages/MainPage';
+import StatsPage from './pages/StatsPage';
+import AchievementsPage from './pages/AchievementsPage';
+import SettingsPage from './pages/SettingsPage';
 
 type Page = 'main' | 'stats' | 'achievements' | 'settings';
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useUseCases } from '../../../di';
-import type { QuickAddValues } from '../../../domain';
+import type { QuickAddValues } from '../../../domain/entities';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 
@@ -43,7 +43,7 @@ const QuickAddSettings: React.FC = () => {
     <Card>
       <h3 className="text-xl font-bold text-text-primary mb-4">Quick Add Settings</h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {values && values.map((value, index) => (
+        {values && values.map((value: number, index: number) => (
           <div key={index}>
             <label htmlFor={`quick-add-${index}`} className="block text-sm font-medium text-text-secondary">
               Value {index + 1}

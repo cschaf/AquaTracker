@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import AchievementModal from './AchievementModal';
-import type { Achievement } from '../../../domain';
+import type { Achievement } from '../../domain/entities';
 
 const mockAchievements: Achievement[] = [
   { id: '1', name: 'First Achievement', description: 'Desc 1', icon: 'fas fa-star', trigger: { type: 'log_count', days: 1 } },

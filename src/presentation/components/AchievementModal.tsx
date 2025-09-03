@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Achievement } from '../../../domain';
+import type { Achievement } from '../../domain/entities';
 
 interface AchievementModalProps {
   isOpen: boolean;

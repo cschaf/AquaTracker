@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Achievement } from '../../../domain';
+import type { Achievement } from '../../../domain/entities';
 import { Card } from '../../components/Card';
 
 interface AchievementsProps {

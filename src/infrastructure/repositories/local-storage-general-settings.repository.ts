@@ -3,7 +3,8 @@
  * @licence MIT
  */
 
-import { GeneralSettingsRepository, GeneralSettings } from '../../domain';
+import type { GeneralSettingsRepository } from '../../domain/repositories';
+import type { GeneralSettings } from '../../domain/entities';
 import { getItem, setItem } from '../storage/local.storage';
 
 const STORAGE_KEY = 'general-settings';

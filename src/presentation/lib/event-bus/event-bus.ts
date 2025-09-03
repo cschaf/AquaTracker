@@ -11,7 +11,7 @@ type EventName = keyof EventMap;
  * A simple event emitter class.
  */
 class EventEmitter {
-  private listeners: { [K in EventName]?: Array<(payload: EventMap[K]) => void> } = {};
+  private listeners = new Map<EventName, Array<(payload: any) => void>>();
 
   /**
    * Subscribes to an event.
@@ -19,10 +19,10 @@ class EventEmitter {
    * @param callback - The function to call when the event is emitted.
    */
   on<K extends EventName>(event: K, callback: (payload: EventMap[K]) => void): void {
-    if (!this.listeners[event]) {
-      this.listeners[event] = [];
+    if (!this.listeners.has(event)) {
+      this.listeners.set(event, []);
     }
-    this.listeners[event]!.push(callback);
+    this.listeners.get(event)!.push(callback);
   }
 
   /**
@@ -31,12 +31,13 @@ class EventEmitter {
    * @param callback - The callback function to remove.
    */
   off<K extends EventName>(event: K, callback: (payload: EventMap[K]) => void): void {
-    if (!this.listeners[event]) {
+    if (!this.listeners.has(event)) {
       return;
     }
-    this.listeners[event] = this.listeners[event]!.filter(
+    const eventListeners = this.listeners.get(event)!.filter(
       (listener) => listener !== callback
     );
+    this.listeners.set(event, eventListeners);
   }
 
   /**
@@ -45,10 +46,10 @@ class EventEmitter {
    * @param payload - The data to pass to the listeners.
    */
   emit<K extends EventName>(event: K, payload: EventMap[K]): void {
-    if (!this.listeners[event]) {
+    if (!this.listeners.has(event)) {
       return;
     }
-    this.listeners[event]!.forEach((callback) => {
+    this.listeners.get(event)!.forEach((callback) => {
       try {
         callback(payload);
       } catch (error) {

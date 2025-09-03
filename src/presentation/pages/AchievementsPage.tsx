@@ -1,7 +1,7 @@
 import React from 'react';
 import Achievements from '../features/stats/Achievements';
 import { useStats } from '../hooks/useStats';
-import { useModal } from './modal/modal-provider';
+import { useModal } from '../modal/modal-provider';
 
 const AchievementsPage: React.FC = () => {
   const { allAchievements, unlockedAchievements, isLoading } = useStats();

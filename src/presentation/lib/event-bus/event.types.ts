@@ -3,7 +3,7 @@
  * @licence MIT
  */
 
-import type { Achievement, GeneralSettings } from '../../../domain';
+import type { Achievement, GeneralSettings } from '../../../domain/entities';
 
 /**
  * A map of all possible events and their corresponding payload types.

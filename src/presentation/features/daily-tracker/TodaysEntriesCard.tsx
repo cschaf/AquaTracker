@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Entry } from '../../../domain';
+import type { Entry } from '../../../domain/entities';
 import { Card } from '../../components/Card';
 
 interface TodaysEntriesCardProps {

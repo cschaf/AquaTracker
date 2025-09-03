@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useUseCases } from '../../../di';
-import type { QuickAddValues } from '../../../domain';
-import { eventBus } from '../../../shared/event-bus/event-bus';
+import type { QuickAddValues } from '../../../domain/entities';
+import { eventBus } from '../../lib/event-bus/event-bus';
 import { checkWaterIntake, INTAKE_STATUS } from '../../utils/intakeWarnings';
 import { Card } from '../../components/Card';
 import { Button } from '../../components/Button';
@@ -103,7 +103,7 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
         <p className="text-md font-semibold text-text-primary mb-2">Quick Add</p>
         <div className="grid grid-cols-3 gap-2 mb-4">
           {quickAddValues ? (
-            quickAddValues.map((value, index) => (
+            quickAddValues.map((value: number, index: number) => (
               <Button
                 key={index}
                 onClick={() => addWaterEntry(value)}
