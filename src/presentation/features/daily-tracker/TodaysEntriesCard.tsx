@@ -37,7 +37,7 @@ const TodaysEntriesCard: React.FC<TodaysEntriesCardProps> = ({ entries, deleteEn
     <Card>
       <div className="p-6">
         <h2 className="text-2xl font-bold text-text-primary mb-4">Today's Entries</h2>
-        <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+        <div className="space-y-3 max-h-96 overflow-y-auto pr-2" data-testid="todays-entries-list">
           {sortedEntries.length === 0 ? (
             <div className="text-center py-8 text-text-secondary">
               <i className="fas fa-glass-water text-4xl mb-3 text-accent-primary/50"></i>
@@ -45,7 +45,7 @@ const TodaysEntriesCard: React.FC<TodaysEntriesCardProps> = ({ entries, deleteEn
             </div>
           ) : (
             sortedEntries.map(entry => (
-              <div key={entry.id} className="entry-item bg-bg-tertiary p-4 rounded-xl flex items-center justify-between">
+              <div key={entry.id} className="entry-item bg-bg-tertiary p-4 rounded-xl flex items-center justify-between" data-testid={`entry-item-${entry.id}`}>
                 {editingId === entry.id ? (
                   <>
                     <div className="flex items-center flex-grow">
@@ -54,13 +54,14 @@ const TodaysEntriesCard: React.FC<TodaysEntriesCardProps> = ({ entries, deleteEn
                         value={editingAmount}
                         onChange={(e) => setEditingAmount(e.target.value)}
                         className="w-full p-2 border-2 border-border-card bg-bg-primary rounded-lg"
+                        data-testid="edit-entry-input"
                       />
                     </div>
                     <div className="flex">
-                      <button onClick={() => handleSave(entry.id)} className="text-success hover:text-success/80 mr-2">
+                      <button onClick={() => handleSave(entry.id)} className="text-success hover:text-success/80 mr-2" data-testid="save-entry-button">
                         <i className="fas fa-check"></i>
                       </button>
-                      <button onClick={handleCancel} className="text-warning hover:text-warning/80">
+                      <button onClick={handleCancel} className="text-warning hover:text-warning/80" data-testid="cancel-edit-button">
                         <i className="fas fa-times"></i>
                       </button>
                     </div>
@@ -77,10 +78,10 @@ const TodaysEntriesCard: React.FC<TodaysEntriesCardProps> = ({ entries, deleteEn
                       </div>
                     </div>
                     <div>
-                      <button onClick={() => handleEdit(entry)} className="edit-entry text-accent-primary hover:text-accent-primary/80 mr-2">
+                      <button onClick={() => handleEdit(entry)} className="edit-entry text-accent-primary hover:text-accent-primary/80 mr-2" data-testid="edit-entry-button">
                         <i className="fas fa-pencil-alt"></i>
                       </button>
-                      <button onClick={() => deleteEntry(entry.id)} className="delete-entry text-red-500 hover:text-red/80">
+                      <button onClick={() => deleteEntry(entry.id)} className="delete-entry text-red-500 hover:text-red/80" data-testid="delete-entry-button">
                         <i className="fas fa-trash"></i>
                       </button>
                     </div>

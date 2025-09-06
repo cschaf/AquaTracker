@@ -5,12 +5,12 @@
   "homepage": "https://aquatracker.schaflabs.com/",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port 3001",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "test": "vitest",
     "test:domain": "vitest --config vitest.config.domain.ts --run --coverage",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test --debug",
     "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"

@@ -87,6 +87,7 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
               className="w-24 text-lg font-bold text-text-primary text-right bg-transparent focus:outline-none"
               value={dailyGoal}
               onChange={(e) => setDailyGoal(parseInt(e.target.value))}
+              data-testid="goal-input"
             />
             <span className="text-lg text-text-secondary ml-1">ml Goal</span>
           </div>
@@ -101,7 +102,7 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
 
       <div>
         <p className="text-md font-semibold text-text-primary mb-2">Quick Add</p>
-        <div className="grid grid-cols-3 gap-2 mb-4">
+        <div className="grid grid-cols-3 gap-2 mb-4" data-testid="quick-add-buttons">
           {quickAddValues ? (
             quickAddValues.map((value: number, index: number) => (
               <Button
@@ -134,10 +135,12 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
               }
             }}
             onKeyPress={(e) => e.key === 'Enter' && handleAddCustom()}
+            data-testid="custom-amount-input"
           />
           <Button
             onClick={handleAddCustom}
             disabled={isCritical}
+            data-testid="custom-amount-add-button"
           >
             <i className="fas fa-plus mr-2"></i>Add
           </Button>
