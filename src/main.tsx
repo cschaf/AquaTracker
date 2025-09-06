@@ -10,12 +10,15 @@ import App from './presentation/App';
 import { UseCaseProvider } from './di';
 import { ModalProvider } from './presentation/modal/modal-provider';
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <UseCaseProvider>
-      <ModalProvider>
-        <App />
-      </ModalProvider>
-    </UseCaseProvider>
-  </StrictMode>,
-);
+// Render the app only if it's not in a test environment
+if (import.meta.env.MODE !== 'test') {
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <UseCaseProvider>
+        <ModalProvider>
+          <App />
+        </ModalProvider>
+      </UseCaseProvider>
+    </StrictMode>,
+  );
+}
