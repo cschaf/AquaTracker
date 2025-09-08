@@ -1,236 +1,192 @@
-# Testing Strategy for AquaTracker
+# AquaTracker Testing Strategy
 
-This document outlines the testing strategy for the AquaTracker application, enabled by the new Clean Architecture-inspired structure. The primary benefit of this architecture is **testability**, allowing us to test different layers of the application in isolation.
+This document outlines the comprehensive testing strategy for the AquaTracker application, which is structured following Clean Architecture principles. This architecture allows us to test each layer of the application in isolation, ensuring a robust and maintainable codebase.
 
-We use **Vitest** as our test runner, which is configured in this project.
+## 1. Running Tests
 
-## 1. Testing Core Logic (Use Cases)
+This project contains several test suites, each targeting a different layer of the application.
 
-The most critical part of our application is the core business logic, which is encapsulated in Use Cases (`src/core/use-cases/`). These can and should be tested thoroughly without needing a browser or any React-specific testing utilities.
+- **Run all unit and integration tests:**
+  ```bash
+  npm test
+  ```
+  This command runs all tests located in the `tests/` directory using the main `vitest.config.ts`.
+
+- **Run domain layer tests with coverage:**
+  ```bash
+  npm run test:domain
+  ```
+  This command specifically runs the tests for the domain layer and generates a coverage report. It uses the dedicated `vitest.config.domain.ts`.
+
+- **Run End-to-End (E2E) tests:**
+  ```bash
+  npm run test:e2e
+  ```
+  This command runs the Playwright E2E test suite, which starts the application's dev server and simulates real user interactions in a browser.
+
+## 2. Domain Layer Testing
+
+**Purpose:** To test the core business logic of the application in complete isolation from any UI or external dependencies. These are pure, fast-running unit tests.
+
+**Location:** `tests/domain/`
 
 **Key Principles:**
-- **Isolation:** Use cases are tested independently of the UI and database/storage.
-- **Mocking Gateways:** We provide mock (or "fake") implementations of our gateway interfaces to control the data the use case receives.
-- **Speed:** These are pure TypeScript/JavaScript tests that run very quickly in Node.js.
+- **Isolation:** Use cases, utility functions, and domain errors are tested independently.
+- **Mocking Repositories:** All repository interfaces are mocked to provide controlled data to the use cases. Mock implementations are located in `tests/domain/__mocks__/repositories`.
+- **High Coverage:** This layer should have the highest test coverage, as it contains the most critical business logic.
 
-### Example: Testing `AddWaterIntakeUseCase`
-
-Here is an example of how you would test that the `AddWaterIntakeUseCase` correctly adds a new entry.
-
+### Example: Testing a Use Case
 ```typescript
-// src/core/use-cases/add-water-intake.use-case.test.ts
-import { describe, it, expect, vi } from 'vitest';
-import { AddWaterIntakeUseCase } from './add-water-intake.use-case';
-import type { WaterIntakeGateway } from '../gateways/water-intake.gateway';
-import type { Log } from '../entities/water-intake';
-
-// 1. Create a mock gateway that implements the interface
-const createMockGateway = (initialLogs: Log[] = []): WaterIntakeGateway => {
-  let logs: Log[] = [...initialLogs];
-  return {
-    getLogs: vi.fn().mockResolvedValue(logs),
-    saveLogs: vi.fn().mockImplementation(async (updatedLogs: Log[]) => {
-      logs = updatedLogs;
-    }),
-  };
-};
+// tests/domain/usecases/add-water-intake.usecase.test.ts
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { AddWaterIntakeUseCase } from '../../../src/domain/usecases/add-water-intake.usecase';
+import { mockWaterIntakeRepository } from '../__mocks__/repositories/mock-water-intake.repository';
+// ...
 
 describe('AddWaterIntakeUseCase', () => {
+  let useCase: AddWaterIntakeUseCase;
+  let mockRepository: WaterIntakeRepository;
+
+  beforeEach(() => {
+    mockRepository = mockWaterIntakeRepository();
+    useCase = new AddWaterIntakeUseCase(mockRepository);
+  });
+
   it('should add a new entry to an existing log for today', async () => {
     // Arrange
-    const today = new Date().toISOString().split('T')[0];
-    const mockGateway = createMockGateway([
-      { date: today, entries: [{ id: '1', amount: 500, timestamp: Date.now() }] }
-    ]);
-    const useCase = new AddWaterIntakeUseCase(mockGateway);
+    const initialLogs: Log[] = [/* ... */];
+    (mockRepository.getLogs as any).mockResolvedValue(initialLogs);
 
     // Act
     await useCase.execute(250);
 
     // Assert
-    expect(mockGateway.saveLogs).toHaveBeenCalledTimes(1);
-    const savedLogs = (mockGateway.saveLogs as any).mock.calls[0][0];
-    expect(savedLogs[0].entries).toHaveLength(2);
-    expect(savedLogs[0].entries[1].amount).toBe(250);
-  });
-
-  it('should create a new log for today if one does not exist', async () => {
-    // Arrange
-    const mockGateway = createMockGateway([]); // No initial logs
-    const useCase = new AddWaterIntakeUseCase(mockGateway);
-
-    // Act
-    await useCase.execute(500);
-
-    // Assert
-    expect(mockGateway.saveLogs).toHaveBeenCalledTimes(1);
-    const savedLogs = (mockGateway.saveLogs as any).mock.calls[0][0];
-    expect(savedLogs).toHaveLength(1);
-    expect(savedLogs[0].entries[0].amount).toBe(500);
+    expect(mockRepository.saveLogs).toHaveBeenCalledTimes(1);
+    // ... more assertions
   });
 });
 ```
 
-## 2. Testing UI (React Components & Hooks)
+## 3. Infrastructure Layer Testing
 
-The UI layer, which includes React components and our feature-specific hooks (`useDailyTracker`, `useStats`), is tested using **React Testing Library**.
+**Purpose:** To test the implementation details of the infrastructure layer, such as how data is persisted and retrieved. These are integration tests that verify the connection between the domain layer's repository interfaces and the actual storage mechanism.
+
+**Location:** `tests/infrastructure/`
 
 **Key Principles:**
-- **User-Centric:** We test the UI from the user's perspective, interacting with it as they would.
-- **Mocking Use Cases:** We do not test the business logic again in our UI tests. Instead, we mock the entire use case layer. This isolates the UI, ensuring we are only testing rendering and event handling.
+- **Testing Implementations:** These tests focus on the concrete repository classes.
+- **Real Dependencies (Mocked Environment):** Tests run against a real (but mocked) `localStorage` instance provided by the `jsdom` environment in Vitest.
 
-### Example: Testing the `DailyTracker` Feature
+### Example: Testing a LocalStorage Repository
+```typescript
+// tests/infrastructure/repositories/local-storage-goal.repository.test.ts
+import { describe, it, expect, beforeEach } from 'vitest';
+import { LocalStorageGoalRepository } from '../../../src/infrastructure/repositories/local-storage-goal.repository';
 
-To test the `DailyTracker` component, we would mock the `useDailyTracker` hook it relies on, or even deeper, mock the `useUseCases` hook.
+const GOAL_KEY = 'waterTrackerGoal';
 
-```tsx
-// src/features/daily-tracker/DailyTracker.test.tsx
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
-import { DailyTracker } from './DailyTracker';
-import * as UseCaseProvider from '../../app/use-case-provider';
+describe('LocalStorageGoalRepository', () => {
+  let repository: LocalStorageGoalRepository;
 
-// Mock the entire use cases module
-vi.mock('../../app/use-case-provider', () => ({
-  useUseCases: () => ({
-    // Provide mock implementations of the use cases
-    addWaterIntake: { execute: vi.fn() },
-    // ... other use cases
-  })
-}));
+  beforeEach(() => {
+    repository = new LocalStorageGoalRepository();
+    localStorage.clear();
+  });
 
-describe('DailyTracker', () => {
-  it('should call the addWaterIntake use case when a quick add button is clicked', async () => {
-    // Arrange
-    render(<DailyTracker />);
-    const add250mlButton = screen.getByText('250 ml');
-    const { addWaterIntake } = UseCaseProvider.useUseCases();
+  it('should return the stored goal', async () => {
+    const storedGoal = 3000;
+    localStorage.setItem(GOAL_KEY, JSON.stringify(storedGoal));
 
-    // Act
-    fireEvent.click(add250mlButton);
-
-    // Assert
-    expect(addWaterIntake.execute).toHaveBeenCalledWith(250);
+    const goal = await repository.getDailyGoal();
+    expect(goal).toBe(storedGoal);
   });
 });
 ```
 
-By following this strategy, we can build a robust and reliable test suite that covers our application's logic and UI separately, leading to a more maintainable and stable codebase.
+## 4. Presentation Layer Testing
 
-## 3. TDD Workflow: Creating a New Use Case
+**Purpose:** To test the React components and hooks that make up the UI. These tests ensure that the UI behaves correctly from a user's perspective, without rendering to a real browser.
 
-For new developers, the best way to ensure your code is correct and maintainable is to follow a **Test-Driven Development (TDD)** workflow. TDD is a process where you write your tests *before* you write your implementation code. This might feel backward at first, but it has several key advantages:
+**Location:** `tests/presentation/`
 
--   **It forces you to think about requirements first.** You can't test a feature until you know what it's supposed to do.
--   **It guarantees 100% test coverage** for your new logic.
--   **It makes development faster in the long run** by catching bugs early and making your code easier to refactor.
+**Key Principles:**
+- **User-Centric:** Tests focus on what the user sees and does, using `@testing-library/react`.
+- **Mocking the Domain Layer:** The entire domain layer (use cases) is mocked at the dependency injection boundary. This isolates the UI and prevents re-testing business logic.
+- **Custom Render Utility:** A custom render function in `tests/presentation/test-utils.tsx` wraps every component in a mock `UseCaseProvider`, making it easy to provide mock use cases to any component under test.
 
-The TDD workflow follows a simple cycle: **Red, Green, Refactor**.
-
-1.  **Red**: Write a test that fails. This is because the feature you're testing doesn't exist yet.
-2.  **Green**: Write the *simplest possible* code to make the test pass. Don't worry about making it perfect.
-3.  **Refactor**: Clean up your code, remove duplication, and improve its design, all while making sure the test still passes.
-
-### Example: Creating a `ClearTodaysIntakeUseCase` with TDD
-
-Let's say we want to create a new feature that allows the user to clear all of today's water intake entries at once.
-
-#### Step 1: Write the Failing Test (Red)
-
-First, we create a new test file: `src/core/use-cases/clear-todays-intake.use-case.test.ts`. We will write a test for a use case that doesn't exist yet.
-
+### Example: Testing a Hook
 ```typescript
-// src/core/use-cases/clear-todays-intake.use-case.test.ts
-import { describe, it, expect, vi } from 'vitest';
-import { ClearTodaysIntakeUseCase } from './clear-todays-intake.use-case';
-import type { WaterIntakeGateway } from '../gateways/water-intake.gateway';
-import type { Log } from '../entities/water-intake';
+// tests/presentation/hooks/useDailyTracker.test.tsx
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
+import { useDailyTracker } from '../../../src/presentation/hooks/useDailyTracker';
+import { createMockUseCases } from '../test-utils';
+// ...
 
-// Mock the gateway, as we always do for use case tests
-const createMockGateway = (initialLogs: Log[] = []): WaterIntakeGateway => {
-  let logs: Log[] = [...initialLogs];
-  return {
-    getLogs: vi.fn().mockResolvedValue(logs),
-    saveLogs: vi.fn().mockImplementation(async (updatedLogs: Log[]) => {
-      logs = updatedLogs;
-    }),
-  };
-};
+describe('useDailyTracker', () => {
+  let mockUseCases = createMockUseCases();
 
-describe('ClearTodaysIntakeUseCase', () => {
-  it('should remove the log for today, but keep other days', async () => {
-    // Arrange
-    const today = new Date().toISOString().split('T')[0];
-    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-    const initialLogs: Log[] = [
-      { date: today, entries: [{ id: '1', amount: 500, timestamp: Date.now() }] },
-      { date: yesterday, entries: [{ id: '2', amount: 1000, timestamp: Date.now() }] },
-    ];
-    const mockGateway = createMockGateway(initialLogs);
-    const useCase = new ClearTodaysIntakeUseCase(mockGateway);
+  const wrapper = ({ children }) => (
+    <UseCaseContext.Provider value={mockUseCases}>{children}</UseCaseContext.Provider>
+  );
 
-    // Act
-    await useCase.execute();
+  it('should handle adding an entry', async () => {
+    const { result } = renderHook(() => useDailyTracker(), { wrapper });
 
-    // Assert
-    expect(mockGateway.saveLogs).toHaveBeenCalledTimes(1);
-    const savedLogs = (mockGateway.saveLogs as any).mock.calls[0][0];
-    expect(savedLogs).toHaveLength(1);
-    expect(savedLogs[0].date).toBe(yesterday);
+    await act(async () => {
+      await result.current.addEntry(500);
+    });
+
+    expect(mockUseCases.addWaterIntake.execute).toHaveBeenCalledWith(500);
   });
 });
 ```
 
-If we run `npm test` now, it will fail because `ClearTodaysIntakeUseCase` doesn't exist. This is our **Red** step.
-
-#### Step 2: Write the Code to Make it Pass (Green)
-
-Now, we create the use case file at `src/core/use-cases/clear-todays-intake.use-case.ts` and write the simplest code to make the test pass.
-
+### Example: Testing a Component
 ```typescript
-// src/core/use-cases/clear-todays-intake.use-case.ts
-import type { WaterIntakeGateway } from '../gateways/water-intake.gateway';
+// tests/presentation/components/Button.test.tsx
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent } from '../test-utils';
+import { Button } from '../../../src/presentation/components/Button';
 
-export class ClearTodaysIntakeUseCase {
-  private readonly waterIntakeGateway: WaterIntakeGateway;
+describe('Button', () => {
+  it('handles onClick events', () => {
+    const handleClick = vi.fn();
+    render(<Button onClick={handleClick}>Click Me</Button>);
 
-  constructor(waterIntakeGateway: WaterIntakeGateway) {
-    this.waterIntakeGateway = waterIntakeGateway;
-  }
+    fireEvent.click(screen.getByText('Click Me'));
 
-  async execute(): Promise<void> {
-    const logs = await this.waterIntakeGateway.getLogs();
-    const todayStr = new Date().toISOString().split('T')[0];
-
-    const updatedLogs = logs.filter(log => log.date !== todayStr);
-
-    await this.waterIntakeGateway.saveLogs(updatedLogs);
-  }
-}
+    expect(handleClick).toHaveBeenCalledTimes(1);
+  });
+});
 ```
 
-If we run `npm test` again, the test will now pass. This is our **Green** step.
+## 5. End-to-End (E2E) Testing
 
-#### Step 3: Refactor
+**Purpose:** To test the entire application stack from a real user's perspective. These tests run in a real browser, interacting with the application just as a user would.
 
-In this case, our code is already quite simple, so there's not much to refactor. However, if our implementation was more complex, this would be the time to clean it up, for example, by extracting a helper function or improving variable names, all while continuously re-running the test to ensure it still passes.
+**Location:** `e2e/`
 
-By following this TDD cycle, you can build robust, well-tested features with confidence.
+**Key Principles:**
+- **Real User Scenarios:** Tests follow critical user journeys from start to finish.
+- **Page Object Model (POM):** The tests use the Page Object Model pattern for maintainability. Page objects are located in `e2e/page-objects`.
+- **Reliable Selectors:** The application uses `data-testid` attributes on key elements to provide stable selectors for tests.
 
-## 4. End-to-End (E2E) Testing
+### Example: E2E Test
+```typescript
+// e2e/tests/features/daily-tracker.spec.ts
+import { test, expect } from '@playwright/test';
+import { MainPage } from '../../page-objects/MainPage';
 
-This project uses **Playwright** for end-to-end testing. E2E tests simulate real user interactions with the application in a browser environment, providing the highest level of confidence that the application is working as expected from a user's perspective.
+test.describe('Daily Tracker Feature', () => {
+  test('should allow a user to add a water intake entry', async ({ page }) => {
+    const mainPage = new MainPage(page);
+    await mainPage.goto();
 
-To run the E2E tests, follow these steps:
+    await mainPage.addCustomAmount(123);
 
-1.  **Install browser dependencies:**
-    Before running the tests for the first time, you need to install the necessary browser binaries for Playwright. Run the following command from the project root:
-    ```bash
-    npx playwright install
-    ```
-
-2.  **Run the E2E tests:**
-    Once the browsers are installed, you can run the full suite of E2E tests with this command:
-    ```bash
-    npm run test:e2e
-    ```
+    const newEntry = mainPage.todaysEntriesList.getByText(`123 ml`);
+    await expect(newEntry).toBeVisible();
+  });
+});
+```
