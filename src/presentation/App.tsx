@@ -70,7 +70,7 @@ function App() {
   // I will fix the imports inside those files too.
   return (
     <ThemeProvider>
-      <Toaster position="top-right" />
+      <Toaster position="bottom-center" />
       <div className="min-h-screen bg-bg-primary">
         <div className="container mx-auto px-4 py-8 max-w-6xl pb-24">
           <Header />
