@@ -17,6 +17,7 @@ AquaTracker is a web-based application designed to help you monitor and log your
 *   **Data Import/Export:** Backup your data by exporting it to a JSON file, and restore it later using the import feature.
 *   **Responsive Design:** The application is fully responsive and works on all devices, from desktops to mobile phones.
 *   **Excessive Intake Warnings:** The app provides warnings if your water intake reaches potentially unsafe levels.
+*   **Modern Notifications:** Uses toast notifications for a clean and modern user experience when providing feedback.
 
 ## How to Use
 
@@ -36,6 +37,7 @@ AquaTracker is a web-based application designed to help you monitor and log your
 *   **CSS3 & Tailwind CSS:** For styling and creating a modern, responsive user interface.
 *   **JavaScript (ES6+):** For the application logic, interactivity, and data management.
 *   **Font Awesome:** For icons used throughout the application.
+*   **React Hot Toast:** For displaying modern, non-intrusive toast notifications.
 *   **Browser `localStorage`:** For storing user data persistently in the browser.
 
 ## Project Structure

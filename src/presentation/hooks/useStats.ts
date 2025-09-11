@@ -3,6 +3,7 @@ import { useUseCases } from '../../di';
 import { eventBus } from '../lib/event-bus/event-bus';
 import type { Log, DailyGoal, Achievement } from '../../domain/entities';
 import type { DomainError } from '../../domain/errors';
+import { showSuccess, showError } from '../services/toast.service';
 
 export const useStats = () => {
   const {
@@ -64,7 +65,7 @@ export const useStats = () => {
       downloadAnchorNode.remove();
     } catch (e) {
       const error = e as DomainError;
-      alert(error.message); // Present domain error to user
+      showError(error.message); // Present domain error to user
     }
   };
 
@@ -77,15 +78,15 @@ export const useStats = () => {
           throw new Error('File content is empty.');
         }
         await importDataUseCase.execute(fileContent);
-        alert('Data imported successfully! The page will now reload to apply the changes.');
+        showSuccess('Data imported successfully! The page will now reload to apply the changes.');
         eventBus.emit('dataSync', { status: 'success', operation: 'import' });
       } catch (e) {
         const error = e as DomainError | Error;
-        alert(`Import failed: ${error.message}`);
+        showError(`Import failed: ${error.message}`);
       }
     };
     reader.onerror = () => {
-      alert('Error reading the file.');
+      showError('Error reading the file.');
     };
     reader.readAsText(file);
   };

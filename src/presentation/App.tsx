@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
+import { Toaster } from 'react-hot-toast';
 import { ThemeProvider } from './theme/theme-provider';
 import { eventBus } from './lib/event-bus/event-bus';
 import type { Achievement } from '../domain/entities';
 import Header from './components/Header';
-import WarningBanner from './components/WarningBanner';
 import Footer from './components/Footer';
 import AchievementModal from './components/AchievementModal';
 import AchievementDetailModal from './components/AchievementDetailModal';
@@ -70,10 +70,10 @@ function App() {
   // I will fix the imports inside those files too.
   return (
     <ThemeProvider>
+      <Toaster position="bottom-center" />
       <div className="min-h-screen bg-bg-primary">
         <div className="container mx-auto px-4 py-8 max-w-6xl pb-24">
           <Header />
-          <WarningBanner status={intakeStatus.status} message={intakeStatus.message} />
           <main>{renderPage()}</main>
           <Footer />
         </div>

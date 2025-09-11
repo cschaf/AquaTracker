@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { Entry } from '../../../domain/entities';
 import { Card } from '../../components/Card';
+import { showWarning } from '../../services/toast.service';
 
 interface TodaysEntriesCardProps {
   entries: Entry[];
@@ -24,9 +25,11 @@ const TodaysEntriesCard: React.FC<TodaysEntriesCardProps> = ({ entries, deleteEn
 
   const handleSave = (id: string) => {
     const newAmount = parseInt(editingAmount);
-    if (newAmount > 0) {
-      updateEntry(id, newAmount);
+    if (isNaN(newAmount) || newAmount <= 0) {
+      showWarning('Please enter a positive number.');
+      return;
     }
+    updateEntry(id, newAmount);
     setEditingId(null);
     setEditingAmount('');
   };

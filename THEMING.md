@@ -65,6 +65,31 @@ Here is a list of the available semantic color classes:
 
 You can find the full list of theme variables in `src/theme.css`.
 
+## Styling Notifications (Toasts)
+
+The application uses `react-hot-toast` to display toast notifications. The styling for these toasts is centralized in `src/presentation/services/toast.service.ts` and makes use of our theme's CSS variables to ensure consistency with the application's design system.
+
+For example, the `showError` toast is styled to use the `--color-warning` and `--color-text-on-primary` variables from our theme:
+
+```typescript
+// src/presentation/services/toast.service.ts
+
+export const showError = (message: string) => {
+  toast.error(message, {
+    style: {
+      background: 'var(--color-warning)',
+      color: 'var(--color-text-on-primary)',
+    },
+    iconTheme: {
+      primary: 'var(--color-text-on-primary)',
+      secondary: 'var(--color-warning)',
+    },
+  });
+};
+```
+
+This approach ensures that toasts automatically adapt to the current theme (e.g., light or dark mode) without any extra work. When you need to show a notification, you should use the functions provided by the `toast.service.ts` to maintain a consistent look and feel.
+
 ## Adding New Colors to a Theme
 
 To add a new color to the themes, you need to add a new CSS variable to the `@theme` block in `src/theme.css`. Make sure to add the variable for both the `light` and `dark` themes.

@@ -71,6 +71,7 @@ A guide for AI agents contributing to this project. This document combines high-
     - `camelCase` for functions/variables.
     - `PascalCase` for components, types, and interfaces.
     - `useCamelCase` for hooks.
+- **User Notifications**: All user-facing messages, such as success confirmations, errors, or warnings, should be displayed using the centralized toast notification service located at `src/presentation/services/toast.service.ts`. Avoid using native `alert()` or console logs for user feedback.
 
 ## Testing
 

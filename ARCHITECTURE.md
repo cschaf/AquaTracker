@@ -104,6 +104,7 @@ The `src/` directory is organized into our main architectural layers:
     *   `features`: Components that represent a specific feature of the application (e.g., the `daily-tracker`).
     *   `hooks`: Custom React hooks that contain UI logic and calls to use cases.
     *   `pages`: Top-level components that correspond to a route.
+    *   `services`: UI-specific services that encapsulate a piece of functionality used across the UI layer. For example, `toast.service.ts` wraps the `react-hot-toast` library to provide a consistent way of showing notifications.
 
 ### The `di` (Dependency Injection) Layer
 *   **Purpose**: To act as the "main" function of the application, wiring all the layers together.

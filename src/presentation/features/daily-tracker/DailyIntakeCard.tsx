@@ -6,6 +6,7 @@ import { checkWaterIntake, INTAKE_STATUS } from '../../utils/intakeWarnings';
 import { Card } from '../../components/Card';
 import { Button } from '../../components/Button';
 import { ProgressBar } from '../../components/ProgressBar';
+import { showWarning } from '../../services/toast.service';
 
 interface DailyIntakeCardProps {
   dailyGoal: number;
@@ -16,7 +17,6 @@ interface DailyIntakeCardProps {
 
 const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGoal, addWaterEntry, dailyTotal }) => {
   const [customAmount, setCustomAmount] = useState('');
-  const [error, setError] = useState<string | null>(null);
   const { getQuickAddValues } = useUseCases();
   const [quickAddValues, setQuickAddValues] = useState<QuickAddValues | null>(null);
 
@@ -41,16 +41,15 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
     const amount = parseInt(customAmount);
 
     if (isNaN(amount) || amount <= 0) {
-      setError('Please enter a positive number.');
+      showWarning('Please enter a positive number.');
       return;
     }
 
     if (amount > 5000) {
-      setError('Amount cannot be greater than 5000.');
+      showWarning('Amount cannot be greater than 5000.');
       return;
     }
 
-    setError(null);
     addWaterEntry(amount);
     setCustomAmount('');
   };
@@ -128,12 +127,7 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
             disabled={isCritical}
             className="flex-1 p-3 border border-border-card bg-bg-tertiary rounded-lg focus:outline-none focus:border-accent-primary transition w-full disabled:opacity-50 text-text-primary placeholder:text-text-secondary"
             value={customAmount}
-            onChange={(e) => {
-              setCustomAmount(e.target.value);
-              if (error) {
-                setError(null);
-              }
-            }}
+            onChange={(e) => setCustomAmount(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleAddCustom()}
             data-testid="custom-amount-input"
           />
@@ -145,7 +139,6 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
             <i className="fas fa-plus mr-2"></i>Add
           </Button>
         </div>
-        {error && <p className="text-warning text-sm mt-2">{error}</p>}
       </div>
     </Card>
   );

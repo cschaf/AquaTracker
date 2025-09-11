@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useUseCases } from '../../di';
 import { checkWaterIntake, INTAKE_STATUS } from '../utils/intakeWarnings';
 import { eventBus } from '../lib/event-bus/event-bus'; // This will be moved later
+import { showWarning } from '../services/toast.service';
 
 export const useAppNotifications = () => {
   const { getDailySummary } = useUseCases();
@@ -11,12 +12,20 @@ export const useAppNotifications = () => {
   const checkIntake = useCallback(async () => {
     const summary = await getDailySummary.execute();
     const currentIntakeStatus = checkWaterIntake(summary.total);
+
+    if (
+      currentIntakeStatus.status === INTAKE_STATUS.WARNING &&
+      intakeStatus.status !== INTAKE_STATUS.WARNING
+    ) {
+      showWarning(currentIntakeStatus.message);
+    }
+
     setIntakeStatus(currentIntakeStatus);
 
     if (currentIntakeStatus.status === INTAKE_STATUS.CRITICAL) {
       setIsCriticalModalOpen(true);
     }
-  }, [getDailySummary]);
+  }, [getDailySummary, intakeStatus.status]);
 
   useEffect(() => {
     checkIntake(); // Check on mount
