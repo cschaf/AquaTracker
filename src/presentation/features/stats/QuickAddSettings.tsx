@@ -3,6 +3,7 @@ import { useUseCases } from '../../../di';
 import type { QuickAddValues } from '../../../domain/entities';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
+import { showSuccess, showError } from '../../services/toast.service';
 
 const QuickAddSettings: React.FC = () => {
   const { getQuickAddValues, updateQuickAddValues } = useUseCases();
@@ -28,9 +29,9 @@ const QuickAddSettings: React.FC = () => {
     if (values) {
       try {
         await updateQuickAddValues.execute(values);
-        alert('Quick add values updated successfully!');
+        showSuccess('Quick add values updated successfully!');
       } catch (error: any) {
-        alert(error.message);
+        showError(error.message);
       }
     }
   };
