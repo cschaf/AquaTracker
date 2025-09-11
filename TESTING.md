@@ -161,6 +161,72 @@ describe('Button', () => {
 });
 ```
 
+### Testing Components with Toast Notifications
+
+When testing a component that triggers a toast notification, you should not test the toast's appearance itself. Instead, you should test that the correct function from our `toast.service.ts` is called with the expected message.
+
+This is achieved by mocking the `toast.service.ts` module.
+
+**Example: Testing a component that shows a success/error toast**
+
+```typescript
+// tests/presentation/features/stats/QuickAddSettings.test.tsx
+import { render, fireEvent, waitFor } from '@testing-library/react';
+import QuickAddSettings from '../../../../src/presentation/features/stats/QuickAddSettings';
+import { useUseCases } from '../../../../src/di';
+import * as toastService from '../../../../src/presentation/services/toast.service';
+import { vi } from 'vitest';
+
+// Mock the toast service
+vi.mock('../../../../src/presentation/services/toast.service');
+const mockedShowSuccess = toastService.showSuccess as jest.Mock;
+const mockedShowError = toastService.showError as jest.Mock;
+
+// Mock other dependencies like useUseCases
+vi.mock('../../../../src/di');
+const mockedUseUseCases = useUseCases as jest.Mock;
+
+
+describe('QuickAddSettings', () => {
+  it('should call showSuccess toast on successful save', async () => {
+    // Arrange
+    mockedUseUseCases.mockReturnValue({
+      getQuickAddValues: { execute: vi.fn().mockResolvedValue([100, 200, 300]) },
+      updateQuickAddValues: { execute: vi.fn().mockResolvedValue(undefined) },
+    });
+    const { getByText } = render(<QuickAddSettings />);
+    // ... wait for component to be ready
+
+    // Act
+    fireEvent.click(getByText('Save Changes'));
+
+    // Assert
+    await waitFor(() => {
+      expect(mockedShowSuccess).toHaveBeenCalledWith('Quick add values updated successfully!');
+    });
+  });
+
+  it('should call showError toast on failed save', async () => {
+    // Arrange
+    const errorMessage = 'Failed to save';
+    mockedUseUseCases.mockReturnValue({
+      getQuickAddValues: { execute: vi.fn().mockResolvedValue([100, 200, 300]) },
+      updateQuickAddValues: { execute: vi.fn().mockRejectedValue(new Error(errorMessage)) },
+    });
+    const { getByText } = render(<QuickAddSettings />);
+    // ... wait for component to be ready
+
+    // Act
+    fireEvent.click(getByText('Save Changes'));
+
+    // Assert
+    await waitFor(() => {
+      expect(mockedShowError).toHaveBeenCalledWith(errorMessage);
+    });
+  });
+});
+```
+
 ## 5. End-to-End (E2E) Testing
 
 **Purpose:** To test the entire application stack from a real user's perspective. These tests run in a real browser, interacting with the application just as a user would.
