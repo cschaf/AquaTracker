@@ -1,12 +1,18 @@
-import { IReminderRepository } from '../repositories/reminder.repository';
+import type { IReminderRepository } from '../repositories/reminder.repository';
 import { NotificationService } from '../../infrastructure/services/notification.service';
-import { ReminderDto } from '../dtos';
+import type { ReminderDto } from '../dtos';
 
 export class ToggleReminderStatusUseCase {
+  private readonly reminderRepository: IReminderRepository;
+  private readonly notificationService: typeof NotificationService;
+
   constructor(
-    private readonly reminderRepository: IReminderRepository,
-    private readonly notificationService: typeof NotificationService
-  ) {}
+    reminderRepository: IReminderRepository,
+    notificationService: typeof NotificationService
+  ) {
+    this.reminderRepository = reminderRepository;
+    this.notificationService = notificationService;
+  }
 
   async execute(id: string): Promise<ReminderDto> {
     const reminder = await this.reminderRepository.findById(id);
@@ -17,10 +23,15 @@ export class ToggleReminderStatusUseCase {
 
     if (reminder.isActive) {
       reminder.deactivate();
-      await this.notificationService.cancelNotification(reminder.id);
+      this.notificationService.cancelNotification(reminder.id);
     } else {
       reminder.activate();
-      await this.notificationService.scheduleNotification(reminder);
+      this.notificationService.scheduleNotification({
+        id: reminder.id,
+        title: reminder.title,
+        time: reminder.time,
+        body: `It's time for your ${reminder.time} reminder to drink water!`,
+      });
     }
 
     await this.reminderRepository.save(reminder);

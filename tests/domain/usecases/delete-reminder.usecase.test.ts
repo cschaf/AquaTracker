@@ -1,10 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DeleteReminderUseCase } from '../../../src/domain/usecases/delete-reminder.usecase';
-import { IReminderRepository } from '../../../src/domain/repositories/reminder.repository';
+import type { IReminderRepository } from '../../../src/domain/repositories/reminder.repository';
 import { NotificationService } from '../../../src/infrastructure/services/notification.service';
 
-// Mock dependencies
-vi.mock('../../../src/infrastructure/services/notification.service');
+// Mock the entire service
+vi.mock('../../../src/infrastructure/services/notification.service', () => ({
+  NotificationService: {
+    scheduleNotification: vi.fn(),
+    cancelNotification: vi.fn(),
+    requestPermission: vi.fn(),
+    getPermission: vi.fn(),
+  },
+}));
 
 const mockReminderRepository: IReminderRepository = {
   save: vi.fn(),
@@ -27,14 +34,10 @@ describe('DeleteReminderUseCase', () => {
   });
 
   it('should delete a reminder and cancel its notification', async () => {
-    // Arrange
     (mockReminderRepository.delete as vi.Mock).mockResolvedValue(undefined);
-    (NotificationService.cancelNotification as vi.Mock).mockResolvedValue(undefined);
 
-    // Act
     const result = await deleteReminderUseCase.execute(reminderId);
 
-    // Assert
     expect(mockReminderRepository.delete).toHaveBeenCalledWith(reminderId);
     expect(NotificationService.cancelNotification).toHaveBeenCalledWith(reminderId);
     expect(result).toBe(true);
@@ -46,7 +49,6 @@ describe('DeleteReminderUseCase', () => {
     const result = await deleteReminderUseCase.execute(reminderId);
 
     expect(result).toBe(false);
-    // Notification should not be cancelled if repo fails
     expect(NotificationService.cancelNotification).not.toHaveBeenCalled();
   });
 });

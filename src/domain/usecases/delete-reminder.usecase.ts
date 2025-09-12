@@ -1,11 +1,17 @@
-import { IReminderRepository } from '../repositories/reminder.repository';
+import type { IReminderRepository } from '../repositories/reminder.repository';
 import { NotificationService } from '../../infrastructure/services/notification.service';
 
 export class DeleteReminderUseCase {
+  private readonly reminderRepository: IReminderRepository;
+  private readonly notificationService: typeof NotificationService;
+
   constructor(
-    private readonly reminderRepository: IReminderRepository,
-    private readonly notificationService: typeof NotificationService
-  ) {}
+    reminderRepository: IReminderRepository,
+    notificationService: typeof NotificationService
+  ) {
+    this.reminderRepository = reminderRepository;
+    this.notificationService = notificationService;
+  }
 
   async execute(id: string): Promise<boolean> {
     try {

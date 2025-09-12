@@ -1,9 +1,13 @@
-import { IReminderRepository } from '../repositories/reminder.repository';
-import { ReminderDto } from '../dtos';
-import { Reminder } from '../entities/reminder.entity';
+import type { IReminderRepository } from '../repositories/reminder.repository';
+import type { ReminderDto } from '../dtos';
+import type { Reminder } from '../entities/reminder.entity';
 
 export class GetAllRemindersUseCase {
-  constructor(private readonly reminderRepository: IReminderRepository) {}
+  private readonly reminderRepository: IReminderRepository;
+
+  constructor(reminderRepository: IReminderRepository) {
+    this.reminderRepository = reminderRepository;
+  }
 
   private toDto(reminder: Reminder): ReminderDto {
     return {

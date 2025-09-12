@@ -24,7 +24,6 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hot-toast": "^2.6.0",
-    "react-pwa-push-notifications": "^1.0.0",
     "tailwindcss": "^4.1.12"
   },
   "devDependencies": {

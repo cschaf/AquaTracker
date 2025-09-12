@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card } from './Card';
 import { Button } from './Button';
-import { CreateReminderDto } from '../../domain/dtos';
+import type { CreateReminderDto } from '../../domain/dtos';
 
 interface CreateReminderFormProps {
   onSubmit: (dto: CreateReminderDto) => Promise<void>;

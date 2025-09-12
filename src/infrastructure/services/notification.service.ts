@@ -1,58 +1,66 @@
-import Push from 'react-pwa-push-notifications';
-import { Reminder } from '../../domain/entities/reminder.entity';
+const timeoutMap = new Map<string, number>();
 
-const scheduleNotification = async (reminder: Reminder) => {
-  try {
-    const { title, time } = reminder;
-    const [hours, minutes] = time.split(':').map(Number);
+interface ScheduleOptions {
+  id: string;
+  title: string;
+  time: string; // HH:MM
+  body: string;
+}
 
-    // Note: This schedules for the *next* occurrence of this time.
-    // The library handles calculating the delay.
-    await Push.create(title, {
-      body: `It's time for your ${time} reminder to drink water!`,
-      icon: '/icons/icon-192-192.png',
-      tag: reminder.id, // Use reminder ID as tag to update/cancel it
-      // timeout: 12000, // Notification will be dismissed automatically
-      // onClick: () => {
-      //   window.focus();
-      //   // Maybe navigate to the app's reminder page
-      // },
-      schedule: {
-        hour: hours,
-        minute: minutes,
-        repeats: true, // Daily notifications
-      }
-    });
-  } catch (error) {
-    console.error('Failed to schedule notification:', error);
+const scheduleNotification = (options: ScheduleOptions) => {
+  // First, clear any existing notification with the same ID
+  cancelNotification(options.id);
+
+  const [hours, minutes] = options.time.split(':').map(Number);
+  const now = new Date();
+
+  const notificationTime = new Date();
+  notificationTime.setHours(hours, minutes, 0, 0);
+
+  // If the time is already past for today, schedule it for tomorrow
+  if (notificationTime.getTime() <= now.getTime()) {
+    notificationTime.setDate(notificationTime.getDate() + 1);
   }
+
+  const delay = notificationTime.getTime() - now.getTime();
+
+  const timeoutId = window.setTimeout(() => {
+    new Notification(options.title, {
+      body: options.body,
+      icon: '/icons/icon-192-192.png',
+      tag: options.id,
+    });
+    // Re-schedule for the next day
+    scheduleNotification(options);
+  }, delay);
+
+  timeoutMap.set(options.id, timeoutId);
 };
 
-const cancelNotification = async (reminderId: string) => {
-  try {
-    await Push.clear(reminderId);
-  } catch (error) {
-    console.error('Failed to cancel notification:', error);
+const cancelNotification = (reminderId: string) => {
+  const timeoutId = timeoutMap.get(reminderId);
+  if (timeoutId) {
+    clearTimeout(timeoutId);
+    timeoutMap.delete(reminderId);
   }
 };
 
 const requestPermission = async (): Promise<NotificationPermission> => {
-  try {
-    const permission = await Push.Permission.request();
-    return permission;
-  } catch (error) {
-    console.error('Failed to request notification permission:', error);
-    return 'denied';
+  // Safari uses a callback-based permission system, while others use Promises.
+  // This check handles both.
+  if ('Notification' in window && Notification.permission !== 'denied') {
+    return Notification.requestPermission();
   }
+  return Promise.resolve(Notification.permission || 'default');
 };
 
-const hasPermission = (): boolean => {
-    return Push.Permission.has();
+const getPermission = (): NotificationPermission => {
+    return Notification.permission;
 }
 
 export const NotificationService = {
   requestPermission,
+  getPermission,
   scheduleNotification,
   cancelNotification,
-  hasPermission
 };

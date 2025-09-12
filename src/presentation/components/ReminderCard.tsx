@@ -1,5 +1,5 @@
 import React from 'react';
-import { ReminderDto } from '../../domain/dtos';
+import type { ReminderDto } from '../../domain/dtos';
 import { Card } from './Card';
 
 interface ReminderCardProps {

@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useUseCases } from '../../di';
-import { ReminderDto, CreateReminderDto } from '../../domain/dtos';
+import type { ReminderDto, CreateReminderDto } from '../../domain/dtos';
 import { showSuccess, showError } from '../services/toast.service';
 
 export const useReminders = () => {

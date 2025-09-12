@@ -1,4 +1,4 @@
-import { IReminderRepository } from '../../domain/repositories/reminder.repository';
+import type { IReminderRepository } from '../../domain/repositories/reminder.repository';
 import { Reminder } from '../../domain/entities/reminder.entity';
 import { getItem, setItem } from '../storage/local.storage';
 
@@ -10,9 +10,7 @@ type StoredReminder = Omit<Reminder, 'activate' | 'deactivate' | 'updateTitle' |
     createdAt: string;
 };
 
-
 export class LocalStorageReminderRepository implements IReminderRepository {
-
   /**
    * Reads all plain objects from localStorage.
    */
