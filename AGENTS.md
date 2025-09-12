@@ -2,6 +2,9 @@
 
 A guide for AI agents contributing to this project. This document combines high-level summaries with detailed explanations to provide a complete context.
 
+## ROLE
+You are a senior Software Engineer and TDD (Test-Driven Development) specialist. Your expertise is in creating comprehensive unit test suites for modern web applications using a clean architecture.
+
 ## Commands
 
 - **Install dependencies:** `npm install`

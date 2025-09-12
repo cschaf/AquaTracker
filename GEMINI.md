@@ -1,185 +1,106 @@
-# ROLE
+# AGENTS.md for Aquatracker
 
+A guide for AI agents contributing to this project. This document combines high-level summaries with detailed explanations to provide a complete context.
+
+## ROLE
 You are a senior Software Engineer and TDD (Test-Driven Development) specialist. Your expertise is in creating comprehensive unit test suites for modern web applications using a clean architecture.
 
-# Gemini Development Guide for AquaTracker
+## Commands
 
-Welcome, developer! This guide will walk you through the process of adding a new feature to the AquaTracker application. We follow a **Clean Architecture** and a **Test-Driven Development (TDD)** workflow to ensure our code is maintainable, scalable, and robust.
+- **Install dependencies:** `npm install`
+- **Run dev server:** `npm run dev`
+- **Run all tests:** `npm test`
+- **Run tests for a single file:** `npm test -- <path/to/file.test.tsx>`
+- **Lint all files:** `npm run lint`
+- **Format all files:** `npm run format`
 
-## 1. Understanding the Architecture
+*Note: Always run lint and tests for the files you change before committing.*
 
-First, a quick refresher on our project structure from the `README.md`:
+## Project Overview
 
--   `src/core`: The heart of the application. Contains all business logic, entities, and interfaces to the outside world (gateways). It has no dependencies on any specific framework.
--   `src/app`: The bridge between the core logic and the UI framework (React). It handles dependency injection.
--   `src/features`: The React components that make up the UI.
--   `src/infrastructure`: The concrete implementations of the gateways defined in the core (e.g., `localStorage` access).
--   `src/shared`: Reusable components, hooks, and utilities.
+- **Purpose:** A web app for aquarium enthusiasts to monitor water quality (pH, temperature, nitrates, etc.).
+- **Technology Stack:**
+    - **Frontend:** React 18.x with TypeScript
+    - **Styling:** TailwindCSS 4.1
+    - **State Management:** `mitt` event bus for global state, supplemented by React Context API + Custom Hooks for local/scoped state.
+    - **Testing:** Jest + React Testing Library
+    - **Build Tool:** Vite
 
-The key principle is **separation of concerns**. The core business logic knows nothing about React, and the React components know nothing about how the data is stored.
+## Architecture
 
-## 2. The Workflow: Adding a New Feature
+- **Philosophy:** The project strictly follows **Clean Architecture** principles to ensure a separation of concerns, testability, and independence from external frameworks. Dependencies must only point inwards: `Presentation` -> `Application` -> `Domain`.
 
-We will walk through adding a new feature: **allowing the user to edit their daily goal**.
+- **Project Structure Details:**
+    ```
+    /src
+    ├── application/    # Application Logic (Use Cases)
+    │   ├── use-cases/  # Individual use case files (e.g., addWaterReading.ts)
+    │   └── dtos/       # Data Transfer Objects for inter-layer communication.
+    ├── domain/         # Core Business Logic (Entities, Value Objects)
+    │   ├── entities/       # Business objects with identity (e.g., Aquarium.ts)
+    │   ├── value-objects/  # Objects without identity (e.g., PHLevel.ts)
+    │   └── repositories/   # Repository interfaces (e.g., IAquariumRepository.ts)
+    ├── infrastructure/ # Implementations of external concerns
+    │   ├── api/        # API client implementation (e.g., fetch-based repository)
+    │   └── services/   # Browser-specific services (e.g., localStorage)
+    └── presentation/   # UI Layer (React Components, Hooks, Styles)
+        ├── components/ # Reusable "dumb" components
+        ├── hooks/      # Custom React hooks encapsulating view logic
+        ├── pages/      # Page-level components, composition root
+        └── styles/     # Global styles and Tailwind config
+    ```
 
-The process will be:
-1.  Define and test the core business logic (the use case).
-2.  Implement the UI component (the React part).
-3.  Connect the UI to the use case.
-4.  Test the UI component.
+- **Data Flow Example: Adding a Water Reading**
+    1.  **`presentation`**: A user fills a form in `AddReadingForm.tsx`. On submit, a handler calls a custom hook.
+    2.  **`presentation` (Hook)**: `useWaterReadings.ts` calls the `addWaterReading` use case from the `application` layer, passing a validated DTO.
+    3.  **`application`**: `addWaterReading.ts` use case creates a `WaterReading` domain entity and calls `aquariumRepository.save(reading)`.
+    4.  **`infrastructure`**: `AquariumApiRepository.ts` (implementing `IAquariumRepository`) makes a `POST` request to the backend API.
 
----
+## Code Style & Conventions
 
-### Part 1: The Core Logic (Use Case) with TDD
+- **Language:** TypeScript with `strict: true` enabled in `tsconfig.json`.
+- **Components:** Functional components with hooks only.
+    - **Good Example (`Button.tsx`):**
+        ```typescript
+        interface ButtonProps {
+          label: string;
+          onClick: () => void;
+        }
+        export const Button = ({ label, onClick }: ButtonProps) => { /* ... */ };
+        ```
+- **Styling:** Use TailwindCSS utility classes directly in `className`. All theme values (colors, fonts, etc.) are in `tailwind.config.js`. Do not write separate CSS files.
+- **Formatting & Linting:** Use Prettier and ESLint. Run `npm run format` and `npm run lint` before committing.
+- **Naming:**
+    - `camelCase` for functions/variables.
+    - `PascalCase` for components, types, and interfaces.
+    - `useCamelCase` for hooks.
+- **User Notifications**: All user-facing messages, such as success confirmations, errors, or warnings, should be displayed using the centralized toast notification service located at `src/presentation/services/toast.service.ts`. Avoid using native `alert()` or console logs for user feedback.
 
-We always start with the core logic. We will follow the **Red-Green-Refactor** TDD cycle.
+## Testing
 
-#### Step 1.1: Write a Failing Test (Red)
+- **Methodology:** Test-Driven Development (TDD). Write a failing test first, then write the code to make it pass, then refactor.
+- **File Location:** Tests are colocated with source files (`*.test.tsx`).
+- **Mocks:** Use `jest.mock()` to mock dependencies from outer layers. For example, when testing a component, mock the application-layer use case it calls.
+    - **Good Example (`useAquariumData.test.ts`):**
+        ```typescript
+        import { getAquarium } from '../../application/use-cases/getAquarium';
+        jest.mock('../../application/use-cases/getAquarium');
+        // Your test can now control the mock implementation of getAquarium
+        ```
+- **Focus:** Test user behavior (e.g., "when the user clicks the save button, the form is cleared") rather than implementation details.
 
-We need an `EditDailyGoalUseCase`. Before we create it, we create its test file: `src/core/use-cases/edit-daily-goal.use-case.test.ts`.
+## Git Workflow
 
-```typescript
-// src/core/use-cases/edit-daily-goal.use-case.test.ts
-import { describe, it, expect, vi } from 'vitest';
-import { EditDailyGoalUseCase } from './edit-daily-goal.use-case';
-import type { GoalGateway } from '../gateways/goal.gateway';
+- **Branch Naming:** `feature/<ticket-id>-short-description` (e.g., `feature/aqua-123-add-ph-chart`).
+- **Commit Messages:** Follow the [Conventional Commits](https://www.conventionalcommits.org/) specification (e.g., `feat(dashboard): add new water quality chart`).
+- **PRs:** Ensure all tests and lint checks pass before creating a pull request. Provide a clear description of the changes.
 
-// 1. Mock the dependency (the gateway)
-const createMockGateway = (): GoalGateway => ({
-  getDailyGoal: vi.fn(),
-  saveDailyGoal: vi.fn(),
-});
+## Security
 
-describe('EditDailyGoalUseCase', () => {
-  it('should save the updated daily goal via the gateway', async () => {
-    // Arrange
-    const mockGateway = createMockGateway();
-    const useCase = new EditDailyGoalUseCase(mockGateway);
-    const newGoal = 2500;
+- **Input Validation:** All external data (API responses, user input) must be validated with `zod` in the `application` layer before being used.
+- **DOM:** Do not use `dangerouslySetInnerHTML`. React's default data binding protects against most XSS attacks.
 
-    // Act
-    await useCase.execute(newGoal);
+## When Stuck
 
-    // Assert
-    expect(mockGateway.saveDailyGoal).toHaveBeenCalledTimes(1);
-    expect(mockGateway.saveDailyGoal).toHaveBeenCalledWith(newGoal);
-  });
-});
-```
-
-Running `npm test` now will fail because `EditDailyGoalUseCase` does not exist. This is the **Red** step.
-
-#### Step 1.2: Make the Test Pass (Green)
-
-Now, we create the use case file at `src/core/use-cases/edit-daily-goal.use-case.ts` and write the *minimum* amount of code to make the test pass.
-
-```typescript
-// src/core/use-cases/edit-daily-goal.use-case.ts
-import type { GoalGateway } from '../gateways/goal.gateway';
-
-export class EditDailyGoalUseCase {
-  private readonly goalGateway: GoalGateway;
-
-  constructor(goalGateway: GoalGateway) {
-    this.goalGateway = goalGateway;
-  }
-
-  async execute(newGoal: number): Promise<void> {
-    await this.goalGateway.saveDailyGoal(newGoal);
-  }
-}
-```
-
-Running `npm test` again will result in all tests passing. This is the **Green** step.
-
-#### Step 1.3: Refactor
-
-Our code is very simple, so no refactoring is needed. If the logic were more complex, we would now improve the code's structure without changing its behavior, relying on our test to ensure we don't break anything.
-
----
-
-### Part 2: The UI Layer (React)
-
-Now that our business logic is implemented and tested, we can build the UI for it.
-
-Let's create a new component in `src/features/daily-tracker/EditGoalForm.tsx`.
-
-```tsx
-// src/features/daily-tracker/EditGoalForm.tsx
-import React, { useState } from 'react';
-import { useUseCases } from '../../app/use-case-provider';
-
-export const EditGoalForm = ({ currentGoal, onGoalUpdated }: { currentGoal: number, onGoalUpdated: () => void }) => {
-  const [goal, setGoal] = useState(currentGoal);
-  const { editDailyGoal } = useUseCases(); // This use case doesn't exist yet in the provider
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (goal > 0) {
-      await editDailyGoal.execute(goal);
-      onGoalUpdated();
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        New Daily Goal:
-        <input
-          type="number"
-          value={goal}
-          onChange={(e) => setGoal(Number(e.target.value))}
-        />
-      </label>
-      <button type="submit">Save Goal</button>
-    </form>
-  );
-};
-```
-
-*Note: For this to work, we would also need to add `EditDailyGoalUseCase` to our dependency injection setup in `src/app/dependencies.ts` and `src/app/use-case-provider.tsx`, but we will skip that for this guide.*
-
----
-
-### Part 3: UI Testing
-
-We test the UI in isolation from the business logic. We don't care if the `editDailyGoal` use case *actually* works (we already tested that); we only care that our component *calls* it when the user clicks the button.
-
-Create a new test file: `src/features/daily-tracker/EditGoalForm.test.tsx`.
-
-```tsx
-// src/features/daily-tracker/EditGoalForm.test.tsx
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
-import { EditGoalForm } from './EditGoalForm';
-import * as UseCaseProvider from '../../app/use-case-provider';
-
-// 1. Mock the use cases hook
-const mockEditDailyGoal = { execute: vi.fn() };
-vi.mock('../../app/use-case-provider', () => ({
-  useUseCases: () => ({
-    editDailyGoal: mockEditDailyGoal,
-  }),
-}));
-
-describe('EditGoalForm', () => {
-  it('should call the editDailyGoal use case with the new goal amount on submit', async () => {
-    // Arrange
-    const handleGoalUpdated = vi.fn();
-    render(<EditGoalForm currentGoal={2000} onGoalUpdated={handleGoalUpdated} />);
-    const input = screen.getByLabelText(/new daily goal/i);
-    const button = screen.getByText(/save goal/i);
-
-    // Act
-    fireEvent.change(input, { target: { value: '3000' } });
-    fireEvent.click(button);
-
-    // Assert
-    // We expect the execute function on our MOCKED use case to be called.
-    expect(mockEditDailyGoal.execute).toHaveBeenCalledTimes(1);
-    expect(mockEditDailyGoal.execute).toHaveBeenCalledWith(3000);
-  });
-});
-```
-
-By following this workflow, you can build features that are robust, well-tested, and easy to maintain.
+- If you are unsure how to proceed, ask a clarifying question rather than making a speculative change.
+- For complex tasks, propose a high-level plan before writing code.

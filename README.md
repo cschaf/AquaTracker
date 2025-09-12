@@ -65,7 +65,7 @@ Our testing strategy is based on the principles of the Clean Architecture:
 1.  **Core Logic (Use Cases) is Tested in Isolation:** We write pure TypeScript/JavaScript tests for our use cases. We use mock implementations of our gateways to ensure that we are only testing the business logic itself, without any dependencies on the UI or database.
 2.  **UI Components are Tested from the User's Perspective:** We test our React components by interacting with them as a user would. We mock the use cases that the components depend on, ensuring that our UI tests are not concerned with the underlying business logic.
 
-For a detailed guide on our testing strategy, how to run tests, and how to write new tests using a Test-Driven Development (TDD) workflow, please see the **[TESTING.md](TESTING.md)** file.
+For a detailed guide on our testing strategy, how to run tests, and how to write new tests using a Test-Driven Development (TDD) workflow, please see the **[TESTING.md](doc/TESTING.md)** file.
 
 ### End-to-End (E2E) Testing
 
