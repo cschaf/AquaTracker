@@ -3,21 +3,19 @@
  * @licence MIT
  */
 
-import {
-  LocalStorageAchievementRepository,
-  LocalStorageGeneralSettingsRepository,
-  LocalStorageGoalRepository,
-  LocalStorageQuickAddRepository,
-  LocalStorageReminderRepository,
-  LocalStorageWaterIntakeRepository,
-} from '../infrastructure/repositories';
+import { IdbWaterIntakeRepository } from '../infrastructure/repositories/idb-water-intake.repository';
+import { IdbGoalRepository } from '../infrastructure/repositories/idb-goal.repository';
+import { IdbQuickAddRepository } from '../infrastructure/repositories/idb-quick-add.repository';
+import { IdbGeneralSettingsRepository } from '../infrastructure/repositories/idb-general-settings.repository';
+import { IdbAchievementRepository } from '../infrastructure/repositories/idb-achievement.repository';
+import { IdbReminderRepository } from '../infrastructure/repositories/idb-reminder.repository';
 
 /**
  * A container for singleton instances of all repositories.
  */
-export const achievementRepository = new LocalStorageAchievementRepository();
-export const generalSettingsRepository = new LocalStorageGeneralSettingsRepository();
-export const goalRepository = new LocalStorageGoalRepository();
-export const quickAddRepository = new LocalStorageQuickAddRepository();
-export const waterIntakeRepository = new LocalStorageWaterIntakeRepository();
-export const reminderRepository = new LocalStorageReminderRepository();
+export const achievementRepository = new IdbAchievementRepository();
+export const generalSettingsRepository = new IdbGeneralSettingsRepository();
+export const goalRepository = new IdbGoalRepository();
+export const quickAddRepository = new IdbQuickAddRepository();
+export const waterIntakeRepository = new IdbWaterIntakeRepository();
+export const reminderRepository = new IdbReminderRepository();

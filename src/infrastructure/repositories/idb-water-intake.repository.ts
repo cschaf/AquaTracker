@@ -1,33 +1,33 @@
 /**
- * @file Contains the localStorage implementation of the WaterIntakeRepository.
+ * @file Contains the IndexedDB implementation of the WaterIntakeRepository.
  * @licence MIT
  */
 
 import type { WaterIntakeRepository } from '../../domain/repositories';
 import type { Log } from '../../domain/entities';
-import { getItem, setItem } from '../storage/local.storage';
+import { get, set } from 'idb-keyval';
 
 const WATER_TRACKER_DATA_KEY = 'waterTrackerData';
 
 /**
- * A repository for managing water intake log data persistence using localStorage.
+ * A repository for managing water intake log data persistence using IndexedDB.
  */
-export class LocalStorageWaterIntakeRepository implements WaterIntakeRepository {
+export class IdbWaterIntakeRepository implements WaterIntakeRepository {
   /**
-   * Retrieves all water intake logs from localStorage.
+   * Retrieves all water intake logs from IndexedDB.
    * @returns A promise that resolves to an array of Log objects. Returns an empty array if none are found.
    */
   async getLogs(): Promise<Log[]> {
-    const logs = getItem<Log[]>(WATER_TRACKER_DATA_KEY);
+    const logs = await get<Log[]>(WATER_TRACKER_DATA_KEY);
     return logs || [];
   }
 
   /**
-   * Saves the entire collection of water intake logs to localStorage.
+   * Saves the entire collection of water intake logs to IndexedDB.
    * @param logs - The array of Log objects to save.
    * @returns A promise that resolves when the operation is complete.
    */
   async saveLogs(logs: Log[]): Promise<void> {
-    setItem(WATER_TRACKER_DATA_KEY, logs);
+    await set(WATER_TRACKER_DATA_KEY, logs);
   }
 }
