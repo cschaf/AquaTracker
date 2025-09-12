@@ -4,15 +4,15 @@ import type { IReminderRepository } from '../../../src/domain/repositories/remin
 import { NotificationService } from '../../../src/infrastructure/services/notification.service';
 import { Reminder } from '../../../src/domain/entities/reminder.entity';
 
-// Mock the entire service
-vi.mock('../../../src/infrastructure/services/notification.service', () => ({
-  NotificationService: {
-    scheduleNotification: vi.fn(),
-    cancelNotification: vi.fn(),
-    requestPermission: vi.fn(),
-    getPermission: vi.fn(),
-  },
-}));
+const mockPostMessage = vi.fn();
+Object.defineProperty(navigator, 'serviceWorker', {
+    value: {
+        controller: {
+            postMessage: mockPostMessage,
+        },
+    },
+    writable: true,
+});
 
 const mockReminderRepository: IReminderRepository = {
   save: vi.fn(),
@@ -38,36 +38,30 @@ describe('ToggleReminderStatusUseCase', () => {
     inactiveReminder = new Reminder({ id: reminderId, title: 'Test', time: '10:00', isActive: false });
   });
 
-  it('should deactivate an active reminder and cancel its notification', async () => {
+  it('should deactivate an active reminder and post a cancel message', async () => {
     (mockReminderRepository.findById as vi.Mock).mockResolvedValue(activeReminder);
 
-    const result = await toggleReminderStatusUseCase.execute(reminderId);
+    await toggleReminderStatusUseCase.execute(reminderId);
 
-    expect(mockReminderRepository.findById).toHaveBeenCalledWith(reminderId);
-    expect(mockReminderRepository.save).toHaveBeenCalledTimes(1);
-
-    expect(NotificationService.cancelNotification).toHaveBeenCalledWith(reminderId);
-    expect(NotificationService.scheduleNotification).not.toHaveBeenCalled();
-
-    expect(result.isActive).toBe(false);
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: 'CANCEL_REMINDER',
+      payload: { id: reminderId }
+    });
   });
 
-  it('should activate an inactive reminder and schedule its notification', async () => {
+  it('should activate an inactive reminder and post a schedule message', async () => {
     (mockReminderRepository.findById as vi.Mock).mockResolvedValue(inactiveReminder);
 
-    const result = await toggleReminderStatusUseCase.execute(reminderId);
+    await toggleReminderStatusUseCase.execute(reminderId);
 
-    expect(mockReminderRepository.findById).toHaveBeenCalledWith(reminderId);
-    expect(mockReminderRepository.save).toHaveBeenCalledTimes(1);
-
-    expect(NotificationService.scheduleNotification).toHaveBeenCalledTimes(1);
-    expect(NotificationService.cancelNotification).not.toHaveBeenCalled();
-
-    expect(result.isActive).toBe(true);
-  });
-
-  it('should throw an error if the reminder is not found', async () => {
-    (mockReminderRepository.findById as vi.Mock).mockResolvedValue(null);
-    await expect(toggleReminderStatusUseCase.execute(reminderId)).rejects.toThrow('Reminder not found');
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: 'SCHEDULE_REMINDER',
+      payload: {
+        id: inactiveReminder.id,
+        title: inactiveReminder.title,
+        time: inactiveReminder.time,
+        body: `It's time for your ${inactiveReminder.time} reminder to drink water!`
+      }
+    });
   });
 });

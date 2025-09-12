@@ -40,7 +40,7 @@ export const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onDelete, 
         <ToggleSwitch checked={reminder.isActive} onChange={() => onToggle(reminder.id)} />
         <button
           onClick={() => onDelete(reminder.id)}
-          className="p-2 text-gray-500 rounded-full hover:bg-gray-200 hover:text-destructive focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-destructive"
+          className="p-2 text-text-secondary rounded-full transition-colors duration-200 hover:bg-destructive/10 hover:text-[var(--color-destructive)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-destructive)]"
           aria-label={`Delete reminder ${reminder.title}`}
         >
           {/* Trash Icon */}

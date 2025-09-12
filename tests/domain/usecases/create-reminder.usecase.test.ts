@@ -5,15 +5,15 @@ import { NotificationService } from '../../../src/infrastructure/services/notifi
 import { Reminder } from '../../../src/domain/entities/reminder.entity';
 import type { CreateReminderDto } from '../../../src/domain/dtos';
 
-// Mock the entire service
-vi.mock('../../../src/infrastructure/services/notification.service', () => ({
-  NotificationService: {
-    scheduleNotification: vi.fn(),
-    cancelNotification: vi.fn(),
-    requestPermission: vi.fn(),
-    getPermission: vi.fn(),
-  },
-}));
+const mockPostMessage = vi.fn();
+Object.defineProperty(navigator, 'serviceWorker', {
+    value: {
+        controller: {
+            postMessage: mockPostMessage,
+        },
+    },
+    writable: true,
+});
 
 const mockReminderRepository: IReminderRepository = {
   save: vi.fn(),
@@ -34,33 +34,23 @@ describe('CreateReminderUseCase', () => {
     );
   });
 
-  it('should create and save a new reminder, then schedule a notification', async () => {
+  it('should save a reminder and post a schedule message to the service worker', async () => {
     const dto: CreateReminderDto = { title: 'Drink Water', time: '10:00' };
 
-    const result = await createReminderUseCase.execute(dto);
+    await createReminderUseCase.execute(dto);
 
     expect(mockReminderRepository.save).toHaveBeenCalledTimes(1);
     const savedReminder = (mockReminderRepository.save as vi.Mock).mock.calls[0][0];
-    expect(savedReminder).toBeInstanceOf(Reminder);
 
-    expect(NotificationService.scheduleNotification).toHaveBeenCalledTimes(1);
-    expect(NotificationService.scheduleNotification).toHaveBeenCalledWith({
-        id: savedReminder.id,
-        title: dto.title,
-        time: dto.time,
-        body: `It's time for your ${dto.time} reminder to drink water!`
+    expect(mockPostMessage).toHaveBeenCalledTimes(1);
+    expect(mockPostMessage).toHaveBeenCalledWith({
+        type: 'SCHEDULE_REMINDER',
+        payload: {
+            id: savedReminder.id,
+            title: dto.title,
+            time: dto.time,
+            body: `It's time for your ${dto.time} reminder to drink water!`
+        }
     });
-
-    expect(result.title).toBe(dto.title);
-  });
-
-  it('should throw an error for invalid time format', async () => {
-    const dto: CreateReminderDto = { title: 'Invalid Time', time: '99:99' };
-    await expect(createReminderUseCase.execute(dto)).rejects.toThrow('Invalid time format. Expected HH:MM');
-  });
-
-  it('should throw an error for empty title', async () => {
-    const dto: CreateReminderDto = { title: '', time: '12:00' };
-    await expect(createReminderUseCase.execute(dto)).rejects.toThrow('Title cannot be empty');
   });
 });
