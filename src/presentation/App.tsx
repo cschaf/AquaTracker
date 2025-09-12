@@ -15,8 +15,9 @@ import MainPage from './pages/MainPage';
 import StatsPage from './pages/StatsPage';
 import AchievementsPage from './pages/AchievementsPage';
 import SettingsPage from './pages/SettingsPage';
+import { RemindersPage } from './pages/RemindersPage';
 
-type Page = 'main' | 'stats' | 'achievements' | 'settings';
+type Page = 'main' | 'stats' | 'achievements' | 'settings' | 'reminders';
 
 function App() {
   const [activePage, setActivePage] = useState<Page>('main');
@@ -60,6 +61,8 @@ function App() {
         return <AchievementsPage />;
       case 'settings':
         return <SettingsPage />;
+      case 'reminders':
+        return <RemindersPage />;
       default:
         return <MainPage />;
     }

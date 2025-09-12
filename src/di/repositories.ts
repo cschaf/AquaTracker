@@ -8,6 +8,7 @@ import {
   LocalStorageGeneralSettingsRepository,
   LocalStorageGoalRepository,
   LocalStorageQuickAddRepository,
+  LocalStorageReminderRepository,
   LocalStorageWaterIntakeRepository,
 } from '../infrastructure/repositories';
 
@@ -19,3 +20,4 @@ export const generalSettingsRepository = new LocalStorageGeneralSettingsReposito
 export const goalRepository = new LocalStorageGoalRepository();
 export const quickAddRepository = new LocalStorageQuickAddRepository();
 export const waterIntakeRepository = new LocalStorageWaterIntakeRepository();
+export const reminderRepository = new LocalStorageReminderRepository();
