@@ -5,7 +5,7 @@
   "homepage": "https://aquatracker.schaflabs.com/",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 3001",
+    "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "test": "vitest",
