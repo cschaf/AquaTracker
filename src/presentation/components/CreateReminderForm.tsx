@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card } from './Card';
 import { Button } from './Button';
 import type { CreateReminderDto } from '../../domain/dtos';
+import { showError } from '../services/toast.service';
 
 interface CreateReminderFormProps {
   onSubmit: (dto: CreateReminderDto) => Promise<void>;
@@ -11,19 +12,18 @@ interface CreateReminderFormProps {
 export const CreateReminderForm: React.FC<CreateReminderFormProps> = ({ onSubmit, isLoading }) => {
   const [title, setTitle] = useState('');
   const [time, setTime] = useState('09:00');
-  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
-      setError('Title cannot be empty.');
+      showError('Title cannot be empty.');
       return;
     }
     if (!time) {
-      setError('Time must be set.');
+      showError('Time must be set.');
       return;
     }
-    setError('');
+
     await onSubmit({ title, time });
     // Reset form after submission
     setTitle('');
@@ -34,8 +34,6 @@ export const CreateReminderForm: React.FC<CreateReminderFormProps> = ({ onSubmit
     <Card>
       <form onSubmit={handleSubmit} className="space-y-4">
         <h2 className="text-xl font-bold text-center text-text-primary">New Reminder</h2>
-
-        {error && <p className="text-sm text-center text-destructive">{error}</p>}
 
         <div>
           <label htmlFor="reminder-title" className="block mb-1 text-sm font-medium text-text-secondary">
