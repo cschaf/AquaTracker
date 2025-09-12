@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Achievement } from '../../../domain/entities';
-import { Card } from '../../components/Card';
+import { Card } from '../../components/Card.tsx';
 
 interface AchievementsProps {
   unlockedAchievements: string[];

@@ -49,12 +49,12 @@ describe('Toast Service', () => {
             // Assert
             expect(toast.error).toHaveBeenCalledWith(message, {
                 style: {
-                    background: 'var(--color-warning)',
+                    background: 'var(--color-destructive)',
                     color: 'var(--color-text-on-primary)',
                 },
                 iconTheme: {
                     primary: 'var(--color-text-on-primary)',
-                    secondary: 'var(--color-warning)',
+                    secondary: 'var(--color-destructive)',
                 },
             });
         });

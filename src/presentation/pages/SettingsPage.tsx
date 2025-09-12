@@ -1,8 +1,8 @@
 import React from 'react';
-import GeneralSettings from '../features/stats/GeneralSettings';
+import GeneralSettings from '../features/settings/GeneralSettings.tsx';
 import QuickAddSettings from '../features/stats/QuickAddSettings';
-import ImportData from '../features/stats/ImportData';
-import ExportData from '../features/stats/ExportData';
+import ImportData from '../features/settings/ImportData.tsx';
+import ExportData from '../features/settings/ExportData.tsx';
 import { useStats } from '../hooks/useStats';
 
 const SettingsPage: React.FC = () => {

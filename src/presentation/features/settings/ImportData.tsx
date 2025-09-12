@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { Button } from '../../components/Button';
-import { Card } from '../../components/Card';
+import { Button } from '../../components/Button.tsx';
+import { Card } from '../../components/Card.tsx';
 
 interface ImportDataProps {
   importData: (file: File) => void;

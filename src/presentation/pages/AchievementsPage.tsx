@@ -1,5 +1,5 @@
 import React from 'react';
-import Achievements from '../features/stats/Achievements';
+import Achievements from '../features/achievements/Achievements.tsx';
 import { useStats } from '../hooks/useStats';
 import { useModal } from '../modal/modal-provider';
 
