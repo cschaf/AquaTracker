@@ -93,6 +93,14 @@ The `src/` directory is organized into our main architectural layers:
 *   **Subdirectories**:
     *   `repositories`: The concrete classes that implement the repository interfaces (e.g., `LocalStorageWaterIntakeRepository`).
     *   `storage`: Wrappers for storage APIs like `localStorage`.
+    *   `services`: Cross-cutting infrastructure concerns that don't fit the repository pattern. For example, a service that interacts with the browser's Notification API.
+
+### Service Worker (`sw.ts`)
+The application includes a service worker to provide Progressive Web App (PWA) features. A key infrastructure concern handled by the service worker is robust, persistent notifications.
+
+*   **Communication**: The main application thread communicates with the service worker using `navigator.serviceWorker.controller.postMessage()`.
+*   **Storage**: The service worker **cannot** access `localStorage`. It uses `IndexedDB` for its own data persistence needs (e.g., storing a queue of scheduled reminders). The `idb-keyval` library is used to simplify IndexedDB operations.
+*   **Lifecycle**: The service worker logic is event-driven. It listens for `message` events from the app to schedule or cancel notifications. It uses its `activate` and `fetch` lifecycle events as opportunities to check if any reminders are due and display them using `self.registration.showNotification()`. This makes the reminder system work even if the app tab is not active.
 
 ### The `presentation` Layer
 *   **Purpose**: To display information to the user and handle user interaction.
