@@ -14,6 +14,7 @@ interface ReminderPayload {
   title: string;
   time: string;
   body: string;
+  isActive: boolean;
 }
 
 const checkReminders = async () => {
@@ -21,12 +22,13 @@ const checkReminders = async () => {
   const now = new Date();
 
   for (const reminder of reminders) {
-    const [hours, minutes] = reminder.time.split(':').map(Number);
-    const reminderTimeToday = new Date();
-    reminderTimeToday.setHours(hours, minutes, 0, 0);
+    if (!reminder.isActive) {
+      continue;
+    }
 
-    const timeDiff = now.getTime() - reminderTimeToday.getTime();
-    if (timeDiff > 0 && timeDiff < 5 * 60 * 1000) {
+    const [hours, minutes] = reminder.time.split(':').map(Number);
+
+    if (now.getHours() === hours && now.getMinutes() === minutes) {
       const shownNotifications = await self.registration.getNotifications({ tag: reminder.id });
       if (shownNotifications.length === 0) {
         self.registration.showNotification(reminder.title, {
