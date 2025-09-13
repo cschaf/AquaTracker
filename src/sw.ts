@@ -7,7 +7,7 @@ declare const self: ServiceWorkerGlobalScope;
 
 precacheAndRoute(self.__WB_MANIFEST);
 
-const REMINDERS_KEY = 'aquatracker_reminders_sw';
+const REMINDERS_KEY = 'reminders';
 
 interface ReminderPayload {
   id: string;
