@@ -10,6 +10,7 @@ import AchievementDetailModal from './components/AchievementDetailModal';
 import CriticalWarningModal from './components/CriticalWarningModal';
 import { useModal } from './modal/modal-provider';
 import { useAppNotifications } from './hooks/useAppNotifications';
+import { useNotificationPermission } from './hooks/useNotificationPermission';
 import BottomNavBar from './components/BottomNavBar';
 import MainPage from './pages/MainPage';
 import StatsPage from './pages/StatsPage';
@@ -32,6 +33,7 @@ function App() {
     hideAchievementDetailModal,
     showAchievementModal,
   } = useModal();
+  const { permission } = useNotificationPermission();
 
   useEffect(() => {
     const handleAchievementUnlocked = (achievements: Achievement[]) => {
@@ -41,6 +43,11 @@ function App() {
     eventBus.on('achievementUnlocked', handleAchievementUnlocked);
 
     const registerPeriodicSync = async () => {
+      if (permission !== 'granted') {
+        console.log('Periodic sync not registered: permission not granted.');
+        return;
+      }
+
       if ('serviceWorker' in navigator) {
         const registration = await navigator.serviceWorker.ready;
         if (registration && 'periodicSync' in registration) {
@@ -61,7 +68,7 @@ function App() {
     return () => {
       eventBus.off('achievementUnlocked', handleAchievementUnlocked);
     };
-  }, [showAchievementModal]);
+  }, [showAchievementModal, permission]);
 
   const {
     isCriticalModalOpen,
