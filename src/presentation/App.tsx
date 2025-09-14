@@ -43,8 +43,9 @@ function App() {
     eventBus.on('achievementUnlocked', handleAchievementUnlocked);
 
     const registerPeriodicSync = async () => {
+      console.log(`[App.tsx] Running registerPeriodicSync effect with permission: ${permission}`);
       if (permission !== 'granted') {
-        console.log('Periodic sync not registered: permission not granted.');
+        console.log('[App.tsx] Periodic sync not registered: permission not granted.');
         return;
       }
 
