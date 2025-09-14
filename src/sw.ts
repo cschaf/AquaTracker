@@ -98,7 +98,7 @@ self.addEventListener('fetch', (event) => {
 // The 'periodicsync' event is the ideal way to run tasks in the background at regular intervals.
 // We register this in the main application, and the browser will trigger this event
 // periodically, even if the app tab is closed.
-self.addEventListener('periodicsync', (event) => {
+self.addEventListener('periodicsync', (event: PeriodicSyncEvent) => {
   if (event.tag === 'check-reminders') {
     event.waitUntil(checkReminders());
   }
