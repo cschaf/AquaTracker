@@ -40,6 +40,24 @@ function App() {
 
     eventBus.on('achievementUnlocked', handleAchievementUnlocked);
 
+    const registerPeriodicSync = async () => {
+      if ('serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.ready;
+        if (registration && 'periodicSync' in registration) {
+          try {
+            await registration.periodicSync.register('check-reminders', {
+              minInterval: 60 * 60 * 1000, // 1 hour
+            });
+            console.log('Periodic reminder check registered!');
+          } catch (error) {
+            console.error('Periodic reminder check could not be registered!', error);
+          }
+        }
+      }
+    };
+
+    registerPeriodicSync();
+
     return () => {
       eventBus.off('achievementUnlocked', handleAchievementUnlocked);
     };
