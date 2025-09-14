@@ -11,6 +11,7 @@ import CriticalWarningModal from './components/CriticalWarningModal';
 import { useModal } from './modal/modal-provider';
 import { useAppNotifications } from './hooks/useAppNotifications';
 import { useNotificationPermission } from './hooks/useNotificationPermission';
+import { NotificationService } from '../infrastructure/services/notification.service';
 import BottomNavBar from './components/BottomNavBar';
 import MainPage from './pages/MainPage';
 import StatsPage from './pages/StatsPage';
@@ -42,29 +43,11 @@ function App() {
 
     eventBus.on('achievementUnlocked', handleAchievementUnlocked);
 
-    const registerPeriodicSync = async () => {
-      console.log(`[App.tsx] Running registerPeriodicSync effect with permission: ${permission}`);
-      if (permission !== 'granted') {
-        console.log('[App.tsx] Periodic sync not registered: permission not granted.');
-        return;
-      }
-
-      if ('serviceWorker' in navigator) {
-        const registration = await navigator.serviceWorker.ready;
-        if (registration && 'periodicSync' in registration) {
-          try {
-            await registration.periodicSync.register('check-reminders', {
-              minInterval: 60 * 60 * 1000, // 1 hour
-            });
-            console.log('Periodic reminder check registered!');
-          } catch (error) {
-            console.error('Periodic reminder check could not be registered!', error);
-          }
-        }
-      }
-    };
-
-    registerPeriodicSync();
+    // This effect runs when the app loads or when notification permission changes.
+    // It ensures that if permission has *already* been granted, we register the sync.
+    if (permission === 'granted') {
+      NotificationService.registerPeriodicSync();
+    }
 
     return () => {
       eventBus.off('achievementUnlocked', handleAchievementUnlocked);
