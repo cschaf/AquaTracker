@@ -61,6 +61,11 @@ self.addEventListener('message', async (event) => {
     return;
   }
 
+  if (event.data && event.data.type === 'CHECK_REMINDERS') {
+    checkReminders();
+    return;
+  }
+
   if (event.data && event.data.type === 'SCHEDULE_REMINDER') {
     const newReminder = event.data.payload;
     const reminders = (await get<ReminderPayload[]>(REMINDERS_KEY)) || [];

@@ -46,6 +46,17 @@ function App() {
   // Periodic sync registration is now handled in NotificationSettings.tsx
   // to ensure it is always tied to a direct user interaction.
 
+  // Set up a frequent interval to check for reminders when the app is active.
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({ type: 'CHECK_REMINDERS' });
+      }
+    }, 20 * 1000); // Check every 20 seconds
+
+    return () => clearInterval(intervalId); // Cleanup on unmount
+  }, []);
+
   const {
     isCriticalModalOpen,
     setIsCriticalModalOpen,
