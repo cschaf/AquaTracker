@@ -40,19 +40,33 @@ function App() {
     const handleAchievementUnlocked = (achievements: Achievement[]) => {
       showAchievementModal(achievements, true);
     };
-
     eventBus.on('achievementUnlocked', handleAchievementUnlocked);
-
-    // This effect runs when the app loads or when notification permission changes.
-    // It ensures that if permission has *already* been granted, we register the sync.
-    if (permission === 'granted') {
-      NotificationService.registerPeriodicSync();
-    }
-
     return () => {
       eventBus.off('achievementUnlocked', handleAchievementUnlocked);
     };
-  }, [showAchievementModal, permission]);
+  }, [showAchievementModal]);
+
+  // Effect for handling periodic sync registration
+  useEffect(() => {
+    const registerSyncOnInteraction = () => {
+      NotificationService.registerPeriodicSync();
+    };
+
+    if (permission === 'granted') {
+      // If permission is already granted, we wait for the first user interaction
+      // to register the sync. This is a common strategy to comply with browser
+      // security policies that prevent background registrations on page load.
+      window.addEventListener('click', registerSyncOnInteraction, { once: true });
+      window.addEventListener('keydown', registerSyncOnInteraction, { once: true });
+    }
+
+    // Cleanup function to remove listeners if the component unmounts
+    // or if the permission state changes before an interaction.
+    return () => {
+      window.removeEventListener('click', registerSyncOnInteraction);
+      window.removeEventListener('keydown', registerSyncOnInteraction);
+    };
+  }, [permission]);
 
   const {
     isCriticalModalOpen,
