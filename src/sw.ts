@@ -22,38 +22,30 @@ interface ReminderPayload {
  * This function is the core of the reminder logic in the service worker.
  */
 const checkReminders = async () => {
-  // 1. Retrieve all reminders from IndexedDB.
-  //    This uses the same 'reminders' key as the main application, ensuring data consistency.
   const reminders = (await get<ReminderPayload[]>(REMINDERS_KEY)) || [];
-  if (reminders.length > 0) {
-    console.log(`[SW] Checking for reminders at ${new Date().toLocaleTimeString()}`);
-  }
 
   for (const reminder of reminders) {
-    // 2. Skip any reminders that are not marked as active.
     if (!reminder.isActive) {
       continue;
     }
 
-    // 3. Compare the current time with the reminder's scheduled time.
     const now = new Date();
     const [hours, minutes] = reminder.time.split(':').map(Number);
 
-    // Check if the current hour and minute match the reminder's time.
-    // This provides a 60-second window for the notification to trigger.
     if (now.getHours() === hours && now.getMinutes() === minutes) {
-      // 4. Prevent duplicate notifications.
-      //    Check if a notification with the same tag (the reminder's ID) has already been shown.
-      //    This is important because the 'fetch' event can trigger this check multiple times per minute.
       const shownNotifications = await self.registration.getNotifications({ tag: reminder.id });
       if (shownNotifications.length === 0) {
-        console.log(`[SW] Triggering notification for reminder: ${reminder.title}`);
-        // 5. If all conditions are met, show the notification.
-        self.registration.showNotification(reminder.title, {
-          body: reminder.body,
-          icon: '/icons/icon-192-192.png',
-          tag: reminder.id, // Using the reminder ID as a tag allows us to check for existing notifications.
-        });
+        try {
+          console.log(`[SW] Attempting to show notification for: ${reminder.title}`);
+          await self.registration.showNotification(reminder.title, {
+            body: reminder.body,
+            icon: '/icons/icon-192-192.png',
+            tag: reminder.id,
+          });
+          console.log(`[SW] Notification for ${reminder.id} successfully shown.`);
+        } catch (error) {
+          console.error(`[SW] Error showing notification for ${reminder.id}:`, error);
+        }
       }
     }
   }
