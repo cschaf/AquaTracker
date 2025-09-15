@@ -10,8 +10,6 @@ import AchievementDetailModal from './components/AchievementDetailModal';
 import CriticalWarningModal from './components/CriticalWarningModal';
 import { useModal } from './modal/modal-provider';
 import { useAppNotifications } from './hooks/useAppNotifications';
-import { useNotificationPermission } from './hooks/useNotificationPermission';
-import { NotificationService } from '../infrastructure/services/notification.service';
 import BottomNavBar from './components/BottomNavBar';
 import MainPage from './pages/MainPage';
 import StatsPage from './pages/StatsPage';
@@ -34,7 +32,6 @@ function App() {
     hideAchievementDetailModal,
     showAchievementModal,
   } = useModal();
-  const { permission } = useNotificationPermission();
 
   useEffect(() => {
     const handleAchievementUnlocked = (achievements: Achievement[]) => {
@@ -46,27 +43,8 @@ function App() {
     };
   }, [showAchievementModal]);
 
-  // Effect for handling periodic sync registration
-  useEffect(() => {
-    const registerSyncOnInteraction = () => {
-      NotificationService.registerPeriodicSync();
-    };
-
-    if (permission === 'granted') {
-      // If permission is already granted, we wait for the first user interaction
-      // to register the sync. This is a common strategy to comply with browser
-      // security policies that prevent background registrations on page load.
-      window.addEventListener('click', registerSyncOnInteraction, { once: true });
-      window.addEventListener('keydown', registerSyncOnInteraction, { once: true });
-    }
-
-    // Cleanup function to remove listeners if the component unmounts
-    // or if the permission state changes before an interaction.
-    return () => {
-      window.removeEventListener('click', registerSyncOnInteraction);
-      window.removeEventListener('keydown', registerSyncOnInteraction);
-    };
-  }, [permission]);
+  // Periodic sync registration is now handled in NotificationSettings.tsx
+  // to ensure it is always tied to a direct user interaction.
 
   const {
     isCriticalModalOpen,
