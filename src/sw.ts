@@ -25,6 +25,9 @@ const checkReminders = async () => {
   // 1. Retrieve all reminders from IndexedDB.
   //    This uses the same 'reminders' key as the main application, ensuring data consistency.
   const reminders = (await get<ReminderPayload[]>(REMINDERS_KEY)) || [];
+  if (reminders.length > 0) {
+    console.log(`[SW] Checking for reminders at ${new Date().toLocaleTimeString()}`);
+  }
 
   for (const reminder of reminders) {
     // 2. Skip any reminders that are not marked as active.
@@ -44,6 +47,7 @@ const checkReminders = async () => {
       //    This is important because the 'fetch' event can trigger this check multiple times per minute.
       const shownNotifications = await self.registration.getNotifications({ tag: reminder.id });
       if (shownNotifications.length === 0) {
+        console.log(`[SW] Triggering notification for reminder: ${reminder.title}`);
         // 5. If all conditions are met, show the notification.
         self.registration.showNotification(reminder.title, {
           body: reminder.body,
