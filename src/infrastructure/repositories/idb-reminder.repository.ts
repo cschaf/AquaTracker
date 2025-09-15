@@ -14,6 +14,7 @@ export class IdbReminderRepository implements IReminderRepository {
   }
 
   private _rehydrate(plainReminder: StoredReminder): Reminder {
+    console.log('[IdbReminderRepo] Rehydrating:', plainReminder);
     return new Reminder({
         ...plainReminder,
         createdAt: new Date(plainReminder.createdAt),
@@ -22,6 +23,7 @@ export class IdbReminderRepository implements IReminderRepository {
 
   async findAll(): Promise<Reminder[]> {
     const plainReminders = await this._getAllPlain();
+    console.log('[IdbReminderRepo] Found plain reminders:', plainReminders);
     return plainReminders.map(this._rehydrate);
   }
 
@@ -45,6 +47,7 @@ export class IdbReminderRepository implements IReminderRepository {
     } else {
       plainReminders.push(reminderToStore);
     }
+    console.log('[IdbReminderRepo] Saving reminders:', plainReminders);
     await set(REMINDERS_KEY, plainReminders);
   }
 
