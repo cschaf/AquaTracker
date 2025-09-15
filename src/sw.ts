@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 
 import { precacheAndRoute } from 'workbox-precaching';
-import { get, set } from 'idb-keyval';
+import { get } from 'idb-keyval';
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -55,7 +55,7 @@ const checkReminders = async () => {
   }
 };
 
-self.addEventListener('message', async (event) => {
+self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
     return;
@@ -66,24 +66,9 @@ self.addEventListener('message', async (event) => {
     return;
   }
 
-  if (event.data && event.data.type === 'SCHEDULE_REMINDER') {
-    const newReminder = event.data.payload;
-    const reminders = (await get<ReminderPayload[]>(REMINDERS_KEY)) || [];
-    const existingIndex = reminders.findIndex(r => r.id === newReminder.id);
-    if (existingIndex > -1) {
-      reminders[existingIndex] = newReminder;
-    } else {
-      reminders.push(newReminder);
-    }
-    await set(REMINDERS_KEY, reminders);
-  }
-
-  if (event.data && event.data.type === 'CANCEL_REMINDER') {
-    const { id } = event.data.payload;
-    let reminders = (await get<ReminderPayload[]>(REMINDERS_KEY)) || [];
-    reminders = reminders.filter(r => r.id !== id);
-    await set(REMINDERS_KEY, reminders);
-  }
+  // The main application is now the single source of truth for the reminder list.
+  // The service worker's only job is to read that list and show notifications.
+  // The SCHEDULE_REMINDER and CANCEL_REMINDER logic was redundant and caused data corruption.
 });
 
 // The 'activate' event is fired when the service worker is first installed and activated.
