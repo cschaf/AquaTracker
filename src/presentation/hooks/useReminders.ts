@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useUseCases } from '../../di';
-import type { ReminderDto, CreateReminderDto } from '../../domain/dtos';
+import type { ReminderDto, CreateReminderDto, UpdateReminderDto } from '../../domain/dtos';
 import { showSuccess, showError } from '../services/toast.service';
 
 export const useReminders = () => {
@@ -8,7 +8,8 @@ export const useReminders = () => {
     getAllReminders,
     createReminder,
     deleteReminder,
-    toggleReminderStatus
+    toggleReminderStatus,
+    updateReminder,
   } = useUseCases();
 
   const [reminders, setReminders] = useState<ReminderDto[]>([]);
@@ -79,6 +80,21 @@ export const useReminders = () => {
     }
   }, [toggleReminderStatus, refreshReminders]);
 
+  const editReminder = useCallback(async (dto: UpdateReminderDto) => {
+    try {
+      setLoading(true);
+      await updateReminder.execute(dto);
+      showSuccess('Reminder updated successfully!');
+      await refreshReminders();
+    } catch (e) {
+      const errorMessage = e instanceof Error ? e.message : 'Failed to update reminder.';
+      showError(errorMessage);
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, [updateReminder, refreshReminders]);
+
   return {
     reminders,
     loading,
@@ -86,5 +102,6 @@ export const useReminders = () => {
     addReminder,
     removeReminder,
     toggleReminder,
+    editReminder,
   };
 };

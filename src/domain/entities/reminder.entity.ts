@@ -21,9 +21,6 @@ export class Reminder {
     if (!TIME_REGEX.test(props.time)) {
       throw new Error('Invalid time format. Expected HH:MM');
     }
-    if (!props.title) {
-        throw new Error('Title cannot be empty');
-    }
 
     this.id = props.id || generateRandomId();
     this.title = props.title;
