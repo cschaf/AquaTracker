@@ -34,7 +34,6 @@ import {
   reminderRepository,
   waterIntakeRepository,
 } from './repositories';
-import { NotificationService } from '../infrastructure/services';
 
 /**
  * A container for singleton instances of all use cases,
@@ -68,12 +67,11 @@ export const useCases = {
   importData: new ImportDataUseCase(waterIntakeRepository, goalRepository),
 
   // Reminder Use Cases
-  createReminder: new CreateReminderUseCase(reminderRepository, NotificationService),
+  createReminder: new CreateReminderUseCase(reminderRepository),
   getAllReminders: new GetAllRemindersUseCase(reminderRepository),
-  deleteReminder: new DeleteReminderUseCase(reminderRepository, NotificationService),
+  deleteReminder: new DeleteReminderUseCase(reminderRepository),
   toggleReminderStatus: new ToggleReminderStatusUseCase(
     reminderRepository,
-    NotificationService,
   ),
 };
 

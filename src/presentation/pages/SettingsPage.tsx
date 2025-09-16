@@ -1,6 +1,5 @@
 import React from 'react';
 import GeneralSettings from '../features/settings/GeneralSettings.tsx';
-import NotificationSettings from '../features/settings/NotificationSettings.tsx';
 import QuickAddSettings from '../features/stats/QuickAddSettings';
 import ImportData from '../features/settings/ImportData.tsx';
 import ExportData from '../features/settings/ExportData.tsx';
@@ -12,7 +11,6 @@ const SettingsPage: React.FC = () => {
   return (
     <div className="space-y-8">
       <GeneralSettings />
-      <NotificationSettings />
       <QuickAddSettings />
       <ImportData importData={importData} />
       <ExportData exportData={exportData} />
