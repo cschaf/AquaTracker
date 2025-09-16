@@ -15,8 +15,9 @@ import MainPage from './pages/MainPage';
 import StatsPage from './pages/StatsPage';
 import AchievementsPage from './pages/AchievementsPage';
 import SettingsPage from './pages/SettingsPage';
+import { RemindersPage } from './pages/RemindersPage';
 
-type Page = 'main' | 'stats' | 'achievements' | 'settings';
+type Page = 'main' | 'stats' | 'achievements' | 'settings' | 'reminders';
 
 function App() {
   const [activePage, setActivePage] = useState<Page>('main');
@@ -36,13 +37,25 @@ function App() {
     const handleAchievementUnlocked = (achievements: Achievement[]) => {
       showAchievementModal(achievements, true);
     };
-
     eventBus.on('achievementUnlocked', handleAchievementUnlocked);
-
     return () => {
       eventBus.off('achievementUnlocked', handleAchievementUnlocked);
     };
   }, [showAchievementModal]);
+
+  // Periodic sync registration is now handled in NotificationSettings.tsx
+  // to ensure it is always tied to a direct user interaction.
+
+  // Set up a frequent interval to check for reminders when the app is active.
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({ type: 'CHECK_REMINDERS' });
+      }
+    }, 20 * 1000); // Check every 20 seconds
+
+    return () => clearInterval(intervalId); // Cleanup on unmount
+  }, []);
 
   const {
     isCriticalModalOpen,
@@ -60,6 +73,8 @@ function App() {
         return <AchievementsPage />;
       case 'settings':
         return <SettingsPage />;
+      case 'reminders':
+        return <RemindersPage />;
       default:
         return <MainPage />;
     }

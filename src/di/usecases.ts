@@ -20,6 +20,10 @@ import {
   UpdateGeneralSettingsUseCase,
   UpdateQuickAddValuesUseCase,
   UpdateWaterIntakeUseCase,
+  CreateReminderUseCase,
+  GetAllRemindersUseCase,
+  DeleteReminderUseCase,
+  ToggleReminderStatusUseCase,
 } from '../domain/usecases';
 
 import {
@@ -27,8 +31,10 @@ import {
   generalSettingsRepository,
   goalRepository,
   quickAddRepository,
+  reminderRepository,
   waterIntakeRepository,
 } from './repositories';
+import { NotificationService } from '../infrastructure/services';
 
 /**
  * A container for singleton instances of all use cases,
@@ -60,6 +66,15 @@ export const useCases = {
 
   exportData: new ExportDataUseCase(waterIntakeRepository, goalRepository),
   importData: new ImportDataUseCase(waterIntakeRepository, goalRepository),
+
+  // Reminder Use Cases
+  createReminder: new CreateReminderUseCase(reminderRepository, NotificationService),
+  getAllReminders: new GetAllRemindersUseCase(reminderRepository),
+  deleteReminder: new DeleteReminderUseCase(reminderRepository, NotificationService),
+  toggleReminderStatus: new ToggleReminderStatusUseCase(
+    reminderRepository,
+    NotificationService,
+  ),
 };
 
 export type UseCases = typeof useCases;

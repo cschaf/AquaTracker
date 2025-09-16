@@ -3,8 +3,9 @@
  * @licence MIT
  */
 
-export * from './local-storage-achievement.repository';
-export * from './local-storage-general-settings.repository';
-export * from './local-storage-goal.repository';
-export * from './local-storage-quick-add.repository';
-export * from './local-storage-water-intake.repository';
+export * from './idb-achievement.repository';
+export * from './idb-general-settings.repository';
+export * from './idb-goal.repository';
+export * from './idb-quick-add.repository';
+export * from './idb-reminder.repository';
+export * from './idb-water-intake.repository';

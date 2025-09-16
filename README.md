@@ -6,6 +6,7 @@ AquaTracker is a web-based application designed to help you monitor and log your
 
 ## Features
 
+*   **Reminders System:** Set daily, persistent reminders to drink water. Notifications are handled by a service worker, ensuring they work even when the app is in the background.
 *   **Daily Goal Setting:** Set a personal daily water intake goal to stay motivated.
 *   **Quick and Custom Logging:** Log your water intake with predefined quick-add buttons (250ml, 500ml, 1L) or enter a custom amount.
 *   **Real-time Progress Tracking:** Visualize your daily progress with an animated water level and percentage display.
@@ -38,7 +39,7 @@ AquaTracker is a web-based application designed to help you monitor and log your
 *   **JavaScript (ES6+):** For the application logic, interactivity, and data management.
 *   **Font Awesome:** For icons used throughout the application.
 *   **React Hot Toast:** For displaying modern, non-intrusive toast notifications.
-*   **Browser `localStorage`:** For storing user data persistently in the browser.
+*   **Browser `localStorage` & `IndexedDB`:** For storing user data and reminders persistently in the browser.
 
 ## Project Structure
 
