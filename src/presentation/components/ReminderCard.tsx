@@ -32,7 +32,7 @@ const ToggleSwitch: React.FC<{ checked: boolean; onChange: () => void }> = ({ ch
 
 export const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onDelete, onToggle, onEdit }) => {
   return (
-    <Card className="flex items-center justify-between space-x-4">
+    <Card className="flex items-center justify-between space-x-4 bg-tertiary">
       <div className="flex flex-col">
         <p className="text-lg font-semibold text-text-primary">{reminder.title}</p>
         <p className="text-2xl font-bold text-accent-primary">{reminder.time}</p>
