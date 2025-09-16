@@ -31,8 +31,6 @@ export const RemindersPage: React.FC = () => {
 
   return (
     <div className="container px-4 py-8 mx-auto">
-      <h1 className="mb-6 text-4xl font-bold text-center text-text-primary">Water Reminders</h1>
-
       <div className="max-w-md mx-auto space-y-6">
         <div className="flex justify-end">
           <Button onClick={() => setCreateModalOpen(true)}>

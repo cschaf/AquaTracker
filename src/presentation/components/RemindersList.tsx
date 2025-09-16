@@ -12,7 +12,7 @@ interface RemindersListProps {
 }
 
 export const RemindersList: React.FC<RemindersListProps> = ({ reminders, isLoading, onDelete, onToggle, onEdit }) => {
-  const renderContent = () => {
+  const renderList = () => {
     if (isLoading && reminders.length === 0) {
       return <p className="text-center text-text-secondary">Loading reminders...</p>;
     }
@@ -41,5 +41,12 @@ export const RemindersList: React.FC<RemindersListProps> = ({ reminders, isLoadi
     );
   };
 
-  return <Card>{renderContent()}</Card>;
+  return (
+    <Card>
+      <div className="p-6">
+        <h2 className="text-2xl font-bold text-text-primary mb-4">Water Reminders</h2>
+        {renderList()}
+      </div>
+    </Card>
+  );
 };
