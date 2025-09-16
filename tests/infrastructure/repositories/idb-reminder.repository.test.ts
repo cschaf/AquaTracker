@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { IdbReminderRepository } from '../../../src/infrastructure/repositories/idb-reminder.repository';
+import { IdbReminderRepository } from '../../../src/infrastructure/data/idb-reminder.repository';
 import { Reminder } from '../../../src/domain/entities/reminder.entity';
 import { get, set } from 'idb-keyval';
 

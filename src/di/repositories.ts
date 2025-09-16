@@ -8,7 +8,7 @@ import { IdbGoalRepository } from '../infrastructure/repositories/idb-goal.repos
 import { IdbQuickAddRepository } from '../infrastructure/repositories/idb-quick-add.repository';
 import { IdbGeneralSettingsRepository } from '../infrastructure/repositories/idb-general-settings.repository';
 import { IdbAchievementRepository } from '../infrastructure/repositories/idb-achievement.repository';
-import { IdbReminderRepository } from '../infrastructure/repositories/idb-reminder.repository';
+import { IdbReminderRepository } from '../infrastructure/data/idb-reminder.repository';
 import { IdbUiStateRepository } from '../infrastructure/repositories/idb-ui-state.repository';
 
 /**
