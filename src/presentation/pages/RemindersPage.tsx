@@ -5,6 +5,7 @@ import { EditReminderModal } from '../components/EditReminderModal';
 import { CreateReminderModal } from '../components/CreateReminderModal';
 import type { ReminderDto, UpdateReminderDto, CreateReminderDto } from '../../domain/dtos';
 import { Button } from '../components/Button';
+import { Card } from '../components/Card';
 
 
 export const RemindersPage: React.FC = () => {
@@ -32,11 +33,11 @@ export const RemindersPage: React.FC = () => {
   return (
     <div className="container px-4 py-8 mx-auto">
       <div className="max-w-md mx-auto space-y-6">
-        <div className="flex justify-end">
-          <Button onClick={() => setCreateModalOpen(true)}>
+        <Card>
+          <Button onClick={() => setCreateModalOpen(true)} className="w-full">
             New Reminder
           </Button>
-        </div>
+        </Card>
         <RemindersList
           reminders={reminders}
           isLoading={loading}
