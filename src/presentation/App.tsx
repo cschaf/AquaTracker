@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { ThemeProvider } from './theme/theme-provider';
 import { eventBus } from './lib/event-bus/event-bus';
@@ -20,6 +20,7 @@ import { RemindersPage } from './pages/RemindersPage';
 
 function App() {
   const [activePage, setActivePage] = useState<Page>('main');
+  const isInitialMount = useRef(true);
 
   useEffect(() => {
     const loadActivePage = async () => {
@@ -32,6 +33,10 @@ function App() {
   }, []);
 
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
     useCases.setActivePage.execute(activePage);
   }, [activePage]);
 
