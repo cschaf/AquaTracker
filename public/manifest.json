@@ -49,5 +49,9 @@
     }
   ],
   "screenshots": [
+  ],
+  "permissions": [
+    "notifications",
+    "periodic-background-sync"
   ]
 }

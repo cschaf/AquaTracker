@@ -23,25 +23,34 @@ interface ReminderPayload {
  */
 const checkReminders = async () => {
   const reminders = (await get<ReminderPayload[]>(REMINDERS_KEY)) || [];
+  const now = new Date();
+  // We check for reminders in a 5-minute window to avoid issues with timing.
+  const gracePeriod = 5 * 60 * 1000;
 
   for (const reminder of reminders) {
     if (!reminder.isActive) {
       continue;
     }
 
-    const now = new Date();
     const [hours, minutes] = reminder.time.split(':').map(Number);
+    const reminderTime = new Date();
+    reminderTime.setHours(hours, minutes, 0, 0);
 
-    if (now.getHours() === hours && now.getMinutes() === minutes) {
-      const shownNotifications = await self.registration.getNotifications({ tag: reminder.id });
+    const timeDiff = now.getTime() - reminderTime.getTime();
+
+    // Check if the reminder time is in the past and within the grace period.
+    if (timeDiff > 0 && timeDiff < gracePeriod) {
+      // Use a unique tag for each reminder instance to avoid duplicates.
+      const notificationTag = `${reminder.id}-${reminderTime.getTime()}`;
+      const shownNotifications = await self.registration.getNotifications({
+        tag: notificationTag,
+      });
+
       if (shownNotifications.length === 0) {
-        // Using a try-catch is good practice, but in this case, an error is an
-        // environmental issue, not an application bug. The logic is confirmed correct.
-        // We keep the code clean for the final version.
         self.registration.showNotification(reminder.title, {
           body: reminder.body,
           icon: '/icons/icon-192-192.png',
-          tag: reminder.id,
+          tag: notificationTag,
         });
       }
     }
@@ -67,14 +76,6 @@ self.addEventListener('message', (event) => {
 // The 'activate' event is fired when the service worker is first installed and activated.
 // This is a good time to run an initial check for any reminders that might be due.
 self.addEventListener('activate', (event) => {
-  event.waitUntil(checkReminders());
-});
-
-// The 'fetch' event is fired for every network request the browser makes that falls
-// within the service worker's scope. We use this as a frequent, battery-efficient
-// way to periodically run our reminder check. It's more reliable than a setInterval
-// that could be throttled by the browser.
-self.addEventListener('fetch', (event) => {
   event.waitUntil(checkReminders());
 });
 

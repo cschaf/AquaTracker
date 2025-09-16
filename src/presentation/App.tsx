@@ -10,6 +10,7 @@ import AchievementDetailModal from './components/AchievementDetailModal';
 import CriticalWarningModal from './components/CriticalWarningModal';
 import { useModal } from './modal/modal-provider';
 import { useAppNotifications } from './hooks/useAppNotifications';
+import { NotificationService } from '../infrastructure/services/notification.service';
 import BottomNavBar from './components/BottomNavBar';
 import MainPage from './pages/MainPage';
 import StatsPage from './pages/StatsPage';
@@ -43,18 +44,11 @@ function App() {
     };
   }, [showAchievementModal]);
 
-  // Periodic sync registration is now handled in NotificationSettings.tsx
-  // to ensure it is always tied to a direct user interaction.
-
-  // Set up a frequent interval to check for reminders when the app is active.
+  // Register periodic sync for notifications on app startup.
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage({ type: 'CHECK_REMINDERS' });
-      }
-    }, 20 * 1000); // Check every 20 seconds
-
-    return () => clearInterval(intervalId); // Cleanup on unmount
+    if (NotificationService.getPermission() === 'granted') {
+      NotificationService.registerPeriodicSync();
+    }
   }, []);
 
   const {

@@ -42,7 +42,7 @@ const registerPeriodicSync = async () => {
     if (registration && 'periodicSync' in registration) {
       try {
         await registration.periodicSync.register('check-reminders', {
-          minInterval: 60 * 60 * 1000, // 1 hour
+          minInterval: 5 * 60 * 1000, // 5 minutes
         });
         console.log('Periodic reminder check registered!');
       } catch (error) {

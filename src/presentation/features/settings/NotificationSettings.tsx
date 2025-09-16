@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNotificationPermission } from '../../hooks/useNotificationPermission';
 import { Card } from '../../components/Card';
 import { Button } from '../../components/Button';
@@ -6,6 +6,12 @@ import { NotificationService } from '../../../infrastructure/services/notificati
 
 const NotificationSettings: React.FC = () => {
   const { permission, requestPermission } = useNotificationPermission();
+
+  useEffect(() => {
+    if (permission === 'granted') {
+      NotificationService.registerPeriodicSync();
+    }
+  }, [permission]);
 
   const handleRequestPermission = async () => {
     const status = await requestPermission();
