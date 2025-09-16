@@ -34,8 +34,8 @@ export const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onDelete, 
   return (
     <Card className="flex items-center justify-between space-x-4">
       <div className="flex flex-col">
-        <p className="text-lg font-semibold text-text-primary">{reminder.title}</p>
-        <p className="text-2xl font-bold text-accent-primary">{reminder.time}</p>
+        <p className="text-lg font-semibold text-accent-primary">{reminder.title}</p>
+        <p className="text-2xl font-bold text-text-primary">{reminder.time}</p>
       </div>
       <div className="flex items-center space-x-2">
         <ToggleSwitch checked={reminder.isActive} onChange={() => onToggle(reminder.id)} />

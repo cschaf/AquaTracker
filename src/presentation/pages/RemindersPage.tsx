@@ -1,26 +1,32 @@
 import React, { useState } from 'react';
 import { useReminders } from '../hooks/useReminders';
-import { CreateReminderForm } from '../components/CreateReminderForm';
 import { RemindersList } from '../components/RemindersList';
 import { EditReminderModal } from '../components/EditReminderModal';
-import type { ReminderDto, UpdateReminderDto } from '../../domain/dtos';
+import { CreateReminderModal } from '../components/CreateReminderModal';
+import type { ReminderDto, UpdateReminderDto, CreateReminderDto } from '../../domain/dtos';
+import { Button } from '../components/Button';
 
 
 export const RemindersPage: React.FC = () => {
   const { reminders, loading, addReminder, removeReminder, toggleReminder, editReminder } = useReminders();
   const [editingReminder, setEditingReminder] = useState<ReminderDto | null>(null);
+  const [isCreateModalOpen, setCreateModalOpen] = useState(false);
 
   const handleEdit = (reminder: ReminderDto) => {
     setEditingReminder(reminder);
   };
 
-  const handleCloseModal = () => {
+  const handleCloseEditModal = () => {
     setEditingReminder(null);
   };
 
   const handleSave = async (dto: UpdateReminderDto) => {
     await editReminder(dto);
-    handleCloseModal();
+    handleCloseEditModal();
+  };
+
+  const handleCreate = async (dto: CreateReminderDto) => {
+    await addReminder(dto);
   };
 
   return (
@@ -28,7 +34,11 @@ export const RemindersPage: React.FC = () => {
       <h1 className="mb-6 text-4xl font-bold text-center text-text-primary">Water Reminders</h1>
 
       <div className="max-w-md mx-auto space-y-6">
-        <CreateReminderForm onSubmit={addReminder} isLoading={loading} />
+        <div className="flex justify-end">
+          <Button onClick={() => setCreateModalOpen(true)}>
+            New Reminder
+          </Button>
+        </div>
         <RemindersList
           reminders={reminders}
           isLoading={loading}
@@ -41,7 +51,14 @@ export const RemindersPage: React.FC = () => {
       <EditReminderModal
         reminder={editingReminder}
         onSave={handleSave}
-        onClose={handleCloseModal}
+        onClose={handleCloseEditModal}
+        isLoading={loading}
+      />
+
+      <CreateReminderModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onSubmit={handleCreate}
         isLoading={loading}
       />
     </div>
