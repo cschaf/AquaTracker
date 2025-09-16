@@ -15,10 +15,6 @@ export const CreateReminderForm: React.FC<CreateReminderFormProps> = ({ onSubmit
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) {
-      showError('Title cannot be empty.');
-      return;
-    }
     if (!time) {
       showError('Time must be set.');
       return;
