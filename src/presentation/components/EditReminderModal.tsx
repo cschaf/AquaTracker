@@ -45,7 +45,7 @@ export const EditReminderModal: React.FC<EditReminderModalProps> = ({ reminder, 
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2 border rounded-md bg-bg-primary border-border-card focus:outline-none focus:ring-2 focus:ring-accent-primary"
+              className="w-full px-3 py-2 text-text-primary placeholder:text-text-secondary border rounded-md bg-bg-primary border-border-card focus:outline-none focus:ring-2 focus:ring-accent-primary"
               placeholder="e.g., Morning hydration"
             />
           </div>
@@ -59,7 +59,7 @@ export const EditReminderModal: React.FC<EditReminderModalProps> = ({ reminder, 
               type="time"
               value={time}
               onChange={(e) => setTime(e.target.value)}
-              className="w-full px-3 py-2 border rounded-md bg-bg-primary border-border-card focus:outline-none focus:ring-2 focus:ring-accent-primary"
+              className="w-full px-3 py-2 text-text-primary placeholder:text-text-secondary border rounded-md bg-bg-primary border-border-card focus:outline-none focus:ring-2 focus:ring-accent-primary"
             />
           </div>
 
