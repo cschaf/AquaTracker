@@ -44,6 +44,7 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ activePage, setActivePage }
           {navItems.map(({ page, label, icon }) => (
             <button
               key={page}
+              data-testid={`nav-${page}`}
               onClick={() => setActivePage(page)}
               className={`flex flex-col items-center justify-center w-full pt-3 pb-2 text-sm transition-colors duration-200 ${
                 activePage === page
@@ -54,7 +55,7 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ activePage, setActivePage }
               <div className={`p-2 rounded-full transition-colors duration-200 ${activePage === page ? 'bg-bg-nav-active' : ''}`}>
                 {icon}
               </div>
-              <span className="mt-1">{label}</span>
+              {activePage === page && <span className="mt-1">{label}</span>}
             </button>
           ))}
         </div>
