@@ -10,7 +10,6 @@ import AchievementDetailModal from './components/AchievementDetailModal';
 import CriticalWarningModal from './components/CriticalWarningModal';
 import { useModal } from './modal/modal-provider';
 import { useAppNotifications } from './hooks/useAppNotifications';
-import { NotificationService } from '../infrastructure/services/notification.service';
 import BottomNavBar from './components/BottomNavBar';
 import MainPage from './pages/MainPage';
 import StatsPage from './pages/StatsPage';
@@ -43,13 +42,6 @@ function App() {
       eventBus.off('achievementUnlocked', handleAchievementUnlocked);
     };
   }, [showAchievementModal]);
-
-  // Register periodic sync for notifications on app startup.
-  useEffect(() => {
-    if (NotificationService.getPermission() === 'granted') {
-      NotificationService.registerPeriodicSync();
-    }
-  }, []);
 
   const {
     isCriticalModalOpen,
