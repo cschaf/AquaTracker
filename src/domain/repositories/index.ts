@@ -9,3 +9,4 @@ export * from './goal.repository';
 export * from './quick-add.repository';
 export * from './water-intake.repository';
 export * from './reminder.repository';
+export * from './ui-state.repository';
