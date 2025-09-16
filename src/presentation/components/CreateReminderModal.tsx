@@ -33,7 +33,7 @@ export const CreateReminderModal: React.FC<CreateReminderModalProps> = ({ isOpen
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.5)]">
       <Card className="w-full max-w-md">
         <form onSubmit={handleSubmit} className="space-y-4">
           <h2 className="text-xl font-bold text-center text-text-primary">New Reminder</h2>
