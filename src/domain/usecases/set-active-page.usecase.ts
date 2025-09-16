@@ -2,7 +2,11 @@ import type { UiStateRepository } from '../repositories';
 import type { Page } from '../entities';
 
 export class SetActivePageUseCase {
-  constructor(private readonly uiStateRepository: UiStateRepository) {}
+  private readonly uiStateRepository: UiStateRepository;
+
+  constructor(uiStateRepository: UiStateRepository) {
+    this.uiStateRepository = uiStateRepository;
+  }
 
   async execute(page: Page): Promise<void> {
     await this.uiStateRepository.setActivePage(page);
