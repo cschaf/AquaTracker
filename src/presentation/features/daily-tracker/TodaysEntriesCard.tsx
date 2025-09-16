@@ -80,12 +80,26 @@ const TodaysEntriesCard: React.FC<TodaysEntriesCardProps> = ({ entries, deleteEn
                         <p className="text-sm text-text-secondary">{new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                       </div>
                     </div>
-                    <div>
-                      <button onClick={() => handleEdit(entry)} className="edit-entry text-accent-primary hover:text-accent-primary/80 mr-2" data-testid="edit-entry-button">
-                        <i className="fas fa-pencil-alt"></i>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => handleEdit(entry)}
+                        className="p-2 text-text-secondary rounded-full transition-colors duration-200 hover:bg-accent-primary/10 hover:text-accent-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-primary"
+                        aria-label={`Edit entry ${entry.amount}ml`}
+                        data-testid="edit-entry-button"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
                       </button>
-                      <button onClick={() => deleteEntry(entry.id)} className="delete-entry text-red-500 hover:text-red/80" data-testid="delete-entry-button">
-                        <i className="fas fa-trash"></i>
+                      <button
+                        onClick={() => deleteEntry(entry.id)}
+                        className="p-2 text-text-secondary rounded-full transition-colors duration-200 hover:bg-destructive/10 hover:text-[var(--color-destructive)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-destructive)]"
+                        aria-label={`Delete entry ${entry.amount}ml`}
+                        data-testid="delete-entry-button"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
                       </button>
                     </div>
                   </>
