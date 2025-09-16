@@ -28,11 +28,16 @@ import {
 import { UpdateReminderUseCase } from '../domain/usecases/update-reminder.usecase';
 
 import {
+  GetActivePageUseCase,
+  SetActivePageUseCase,
+} from '../domain/usecases';
+import {
   achievementRepository,
   generalSettingsRepository,
   goalRepository,
   quickAddRepository,
   reminderRepository,
+  uiStateRepository,
   waterIntakeRepository,
 } from './repositories';
 
@@ -41,6 +46,9 @@ import {
  * with their dependencies (repositories) injected.
  */
 export const useCases = {
+  getActivePage: new GetActivePageUseCase(uiStateRepository),
+  setActivePage: new SetActivePageUseCase(uiStateRepository),
+
   addWaterIntake: new AddWaterIntakeUseCase(waterIntakeRepository),
   deleteWaterIntake: new DeleteWaterIntakeUseCase(waterIntakeRepository),
   updateWaterIntake: new UpdateWaterIntakeUseCase(waterIntakeRepository),

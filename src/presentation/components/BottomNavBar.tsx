@@ -1,6 +1,6 @@
 import React from 'react';
 
-type Page = 'main' | 'stats' | 'achievements' | 'settings' | 'reminders';
+import type { Page } from '../../domain/entities';
 
 interface BottomNavBarProps {
   activePage: Page;

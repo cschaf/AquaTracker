@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { ThemeProvider } from './theme/theme-provider';
 import { eventBus } from './lib/event-bus/event-bus';
-import type { Achievement } from '../domain/entities';
+import type { Achievement, Page } from '../domain/entities';
+import { useCases } from '../di/usecases';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import AchievementModal from './components/AchievementModal';
@@ -17,10 +18,23 @@ import AchievementsPage from './pages/AchievementsPage';
 import SettingsPage from './pages/SettingsPage';
 import { RemindersPage } from './pages/RemindersPage';
 
-type Page = 'main' | 'stats' | 'achievements' | 'settings' | 'reminders';
-
 function App() {
   const [activePage, setActivePage] = useState<Page>('main');
+
+  useEffect(() => {
+    const loadActivePage = async () => {
+      const savedPage = await useCases.getActivePage.execute();
+      if (savedPage) {
+        setActivePage(savedPage);
+      }
+    };
+    loadActivePage();
+  }, []);
+
+  useEffect(() => {
+    useCases.setActivePage.execute(activePage);
+  }, [activePage]);
+
   const {
     isAchievementModalOpen,
     selectedAchievements,
