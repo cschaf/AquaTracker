@@ -3,7 +3,11 @@ import { DomainError } from '../errors/domain.error';
 import type { ReminderDto, UpdateReminderDto } from '../dtos';
 
 export class UpdateReminderUseCase {
-  constructor(private readonly reminderRepository: IReminderRepository) {}
+  private readonly reminderRepository: IReminderRepository;
+
+  constructor(reminderRepository: IReminderRepository) {
+    this.reminderRepository = reminderRepository;
+  }
 
   async execute(dto: UpdateReminderDto): Promise<ReminderDto> {
     const reminder = await this.reminderRepository.findById(dto.id);
