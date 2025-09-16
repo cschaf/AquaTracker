@@ -7,9 +7,10 @@ interface RemindersListProps {
   isLoading: boolean;
   onDelete: (id: string) => void;
   onToggle: (id: string) => void;
+  onEdit: (reminder: ReminderDto) => void;
 }
 
-export const RemindersList: React.FC<RemindersListProps> = ({ reminders, isLoading, onDelete, onToggle }) => {
+export const RemindersList: React.FC<RemindersListProps> = ({ reminders, isLoading, onDelete, onToggle, onEdit }) => {
   if (isLoading && reminders.length === 0) {
     return <p className="text-center text-text-secondary">Loading reminders...</p>;
   }
@@ -31,6 +32,7 @@ export const RemindersList: React.FC<RemindersListProps> = ({ reminders, isLoadi
           reminder={reminder}
           onDelete={onDelete}
           onToggle={onToggle}
+          onEdit={onEdit}
         />
       ))}
     </div>

@@ -25,6 +25,7 @@ import {
   DeleteReminderUseCase,
   ToggleReminderStatusUseCase,
 } from '../domain/usecases';
+import { UpdateReminderUseCase } from '../domain/usecases/update-reminder.usecase';
 
 import {
   achievementRepository,
@@ -73,6 +74,7 @@ export const useCases = {
   toggleReminderStatus: new ToggleReminderStatusUseCase(
     reminderRepository,
   ),
+  updateReminder: new UpdateReminderUseCase(reminderRepository),
 };
 
 export type UseCases = typeof useCases;

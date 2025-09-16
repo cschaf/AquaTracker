@@ -1,10 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useReminders } from '../hooks/useReminders';
 import { CreateReminderForm } from '../components/CreateReminderForm';
 import { RemindersList } from '../components/RemindersList';
+import { EditReminderModal } from '../components/EditReminderModal';
+import type { ReminderDto, UpdateReminderDto } from '../../domain/dtos';
+
 
 export const RemindersPage: React.FC = () => {
-  const { reminders, loading, addReminder, removeReminder, toggleReminder } = useReminders();
+  const { reminders, loading, addReminder, removeReminder, toggleReminder, editReminder } = useReminders();
+  const [editingReminder, setEditingReminder] = useState<ReminderDto | null>(null);
+
+  const handleEdit = (reminder: ReminderDto) => {
+    setEditingReminder(reminder);
+  };
+
+  const handleCloseModal = () => {
+    setEditingReminder(null);
+  };
+
+  const handleSave = async (dto: UpdateReminderDto) => {
+    await editReminder(dto);
+    handleCloseModal();
+  };
 
   return (
     <div className="container px-4 py-8 mx-auto">
@@ -17,8 +34,16 @@ export const RemindersPage: React.FC = () => {
           isLoading={loading}
           onDelete={removeReminder}
           onToggle={toggleReminder}
+          onEdit={handleEdit}
         />
       </div>
+
+      <EditReminderModal
+        reminder={editingReminder}
+        onSave={handleSave}
+        onClose={handleCloseModal}
+        isLoading={loading}
+      />
     </div>
   );
 };
