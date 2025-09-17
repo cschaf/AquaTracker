@@ -65,13 +65,12 @@ const scheduleNotifications = async () => {
 
       // Schedule the notification.
       const timerId = self.setTimeout(() => {
-        const notificationUrl = `${self.location.origin}/reminders?id=${reminder.id}`;
         self.registration.showNotification('AquaTracker Reminder', {
           body: reminder.title,
           icon: '/icons/icon-192-192.png',
           tag: reminder.id, // Use reminder ID as tag to prevent duplicate notifications.
           data: {
-            url: notificationUrl, // Pass URL to open on click.
+            url: self.location.origin, // Pass URL to open on click.
           },
         });
       }, timeDifference);
