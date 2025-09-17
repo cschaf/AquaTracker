@@ -12,24 +12,50 @@ import { registerSW } from 'virtual:pwa-register';
  */
 export function setupServiceWorker() {
   const updateSW = registerSW({
-    /**
-     * This callback is triggered when a new version of the service worker
-     * is available and waiting to be installed.
-     */
     onNeedRefresh() {
-      // Show a confirmation dialog to the user.
       if (confirm('New content is available. Do you want to reload?')) {
-        // If the user agrees, call the update function to apply the new
-        // service worker and reload the page.
         updateSW(true);
       }
     },
-    /**
-     * This callback is triggered when the service worker has precached all
-     * assets and the application is ready to work offline.
-     */
     onOfflineReady() {
       console.log('Application is ready to work offline.');
+      setupPeriodicSync();
     },
   });
+}
+
+interface PeriodicSyncManager {
+  register(tag: string, options?: { minInterval: number }): Promise<void>;
+  getTags(): Promise<string[]>;
+  unregister(tag: string): Promise<void>;
+}
+
+interface ServiceWorkerRegistrationWithPeriodicSync extends ServiceWorkerRegistration {
+  readonly periodicSync: PeriodicSyncManager;
+}
+
+async function setupPeriodicSync() {
+  const registration = await navigator.serviceWorker.ready;
+  const swRegistration = registration as ServiceWorkerRegistrationWithPeriodicSync;
+
+  if ('periodicSync' in swRegistration) {
+    const status = await navigator.permissions.query({
+      name: 'periodic-background-sync' as any,
+    });
+
+    if (status.state === 'granted') {
+      try {
+        await swRegistration.periodicSync.register('UPDATE_REMINDERS', {
+          minInterval: 12 * 60 * 60 * 1000, // 12 hours
+        });
+        console.log('Periodic background sync registered for reminders.');
+      } catch (error) {
+        console.error('Failed to register periodic background sync:', error);
+      }
+    } else {
+      console.log('Periodic background sync permission not granted.');
+    }
+  } else {
+    console.log('Periodic background sync is not supported.');
+  }
 }

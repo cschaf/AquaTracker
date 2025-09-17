@@ -42,7 +42,6 @@ let activeTimers: number[] = [];
  * current reminder data in IndexedDB.
  */
 const scheduleNotifications = async () => {
-  // Clear any previously scheduled timers to avoid duplicates.
   activeTimers.forEach(clearTimeout);
   activeTimers = [];
 
@@ -54,30 +53,29 @@ const scheduleNotifications = async () => {
       const now = new Date();
       const [hours, minutes] = reminder.time.split(':').map(Number);
 
-      // Calculate the next occurrence of the reminder time.
       const nextNotificationTime = new Date();
       nextNotificationTime.setHours(hours, minutes, 0, 0);
 
-      // If the time has already passed for today, schedule it for tomorrow.
       if (nextNotificationTime.getTime() < now.getTime()) {
         nextNotificationTime.setDate(nextNotificationTime.getDate() + 1);
       }
 
       const timeDifference = nextNotificationTime.getTime() - now.getTime();
+      const twentyFourHours = 24 * 60 * 60 * 1000;
 
-      // Schedule the notification.
-      const timerId = self.setTimeout(() => {
-        self.registration.showNotification('AquaTracker Reminder', {
-          body: reminder.title,
-          icon: '/icons/icon-192-192.png',
-          tag: reminder.id, // Use reminder ID as tag to prevent duplicate notifications.
-          data: {
-            url: __APP_URL__, // Pass URL to open on click.
-          },
-        });
-      }, timeDifference);
-
-      activeTimers.push(timerId);
+      if (timeDifference > 0 && timeDifference < twentyFourHours) {
+        const timerId = self.setTimeout(() => {
+          self.registration.showNotification('AquaTracker Reminder', {
+            body: reminder.title,
+            icon: '/icons/icon-192-192.png',
+            tag: reminder.id,
+            data: {
+              url: __APP_URL__,
+            },
+          });
+        }, timeDifference);
+        activeTimers.push(timerId);
+      }
     });
   } catch (error) {
     console.error('Error scheduling notifications:', error);
@@ -102,6 +100,17 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'UPDATE_REMINDERS') {
     scheduleNotifications();
+  }
+});
+
+interface PeriodicSyncEvent extends ExtendableEvent {
+  tag: string;
+}
+
+self.addEventListener('periodicsync', (event) => {
+  const periodicSyncEvent = event as PeriodicSyncEvent;
+  if (periodicSyncEvent.tag === 'UPDATE_REMINDERS') {
+    periodicSyncEvent.waitUntil(scheduleNotifications());
   }
 });
 
