@@ -25,6 +25,8 @@ self.skipWaiting();
 // Their URLs are injected into the manifest variable below.
 precacheAndRoute(self.__WB_MANIFEST);
 
+declare const __APP_URL__: string;
+
 // --- Notification Logic ---
 
 // Instantiate the repository to access reminder data from IndexedDB.
@@ -53,7 +55,7 @@ const scheduleNotifications = async () => {
       const [hours, minutes] = reminder.time.split(':').map(Number);
 
       // Calculate the next occurrence of the reminder time.
-      let nextNotificationTime = new Date();
+      const nextNotificationTime = new Date();
       nextNotificationTime.setHours(hours, minutes, 0, 0);
 
       // If the time has already passed for today, schedule it for tomorrow.
@@ -70,7 +72,7 @@ const scheduleNotifications = async () => {
           icon: '/icons/icon-192-192.png',
           tag: reminder.id, // Use reminder ID as tag to prevent duplicate notifications.
           data: {
-            url: self.location.origin, // Pass URL to open on click.
+            url: __APP_URL__, // Pass URL to open on click.
           },
         });
       }, timeDifference);
