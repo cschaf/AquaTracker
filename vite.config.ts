@@ -10,18 +10,24 @@ interface VitestConfigExport extends UserConfig {
 }
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), VitePWA({
-    registerType: 'autoUpdate',
-    strategies: 'injectManifest',
-    srcDir: 'src',
-    filename: 'sw.ts',
-    includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
-    devOptions: {
-      enabled: true, // PWA in development mode aktivieren
-      type: 'module'
-    }
-  })],
-  base: "/",
+  plugins: [
+    // The VitePWA plugin must be placed before other plugins to ensure it can
+    // correctly handle the service worker file in the development server.
+    VitePWA({
+      registerType: 'autoUpdate',
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      devOptions: {
+        enabled: true,
+        type: 'module',
+      },
+    }),
+    react(),
+    tailwindcss(),
+  ],
+  base: '/',
 
   build: {
     outDir: 'dist'

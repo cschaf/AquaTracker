@@ -3,6 +3,12 @@ import { useUseCases } from '../../di';
 import type { ReminderDto, CreateReminderDto, UpdateReminderDto } from '../../domain/dtos';
 import { showSuccess, showError } from '../services/toast.service';
 
+const notifyServiceWorker = () => {
+  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({ type: 'UPDATE_REMINDERS' });
+  }
+};
+
 export const useReminders = () => {
   const {
     getAllReminders,
@@ -43,6 +49,7 @@ export const useReminders = () => {
       await createReminder.execute(dto);
       showSuccess('Reminder created successfully!');
       await refreshReminders();
+      notifyServiceWorker();
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : 'Failed to create reminder.';
       showError(errorMessage);
@@ -58,6 +65,7 @@ export const useReminders = () => {
       await deleteReminder.execute(id);
       showSuccess('Reminder deleted.');
       await refreshReminders();
+      notifyServiceWorker();
     } catch (e) {
        const errorMessage = e instanceof Error ? e.message : 'Failed to delete reminder.';
        showError(errorMessage);
@@ -73,6 +81,7 @@ export const useReminders = () => {
       await toggleReminderStatus.execute(id);
       await refreshReminders();
       showSuccess('Reminder status updated.');
+      notifyServiceWorker();
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : 'Failed to update reminder status.';
       showError(errorMessage);
@@ -86,6 +95,7 @@ export const useReminders = () => {
       await updateReminder.execute(dto);
       showSuccess('Reminder updated successfully!');
       await refreshReminders();
+      notifyServiceWorker();
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : 'Failed to update reminder.';
       showError(errorMessage);

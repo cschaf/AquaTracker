@@ -95,12 +95,23 @@ The `src/` directory is organized into our main architectural layers:
     *   `storage`: Wrappers for storage APIs like `localStorage`.
     *   `services`: Cross-cutting infrastructure concerns that don't fit the repository pattern. For example, a service that interacts with the browser's Notification API.
 
-### Service Worker (`sw.ts`)
-The application includes a service worker to provide Progressive Web App (PWA) features. A key infrastructure concern handled by the service worker is robust, persistent notifications.
+### Service Worker Architecture (`sw.ts`)
+The application includes a service worker to provide robust, background-friendly reminder notifications. This is a critical part of the infrastructure that allows the app to engage users even when it's not active.
 
-*   **Communication**: The main application thread communicates with the service worker using `navigator.serviceWorker.controller.postMessage()`.
-*   **Storage**: The service worker **cannot** access `localStorage`. It uses `IndexedDB` for its own data persistence needs (e.g., storing a queue of scheduled reminders). The `idb-keyval` library is used to simplify IndexedDB operations.
-*   **Lifecycle**: The service worker logic is event-driven. It listens for `message` events from the app to schedule or cancel notifications. It uses its `activate` and `fetch` lifecycle events as opportunities to check if any reminders are due and display them using `self.registration.showNotification()`. This makes the reminder system work even if the app tab is not active.
+*   **Registration**: The service worker is registered using the `vite-plugin-pwa` library, which provides a virtual module (`virtual:pwa-register`) to handle the registration and update flow. This is initiated in `App.tsx` via the `setupServiceWorker` helper.
+
+*   **Shared Data Layer**: A key architectural decision is that the service worker **shares the exact same data layer** as the main application. The `IdbReminderRepository` is located in a shared directory (`src/infrastructure/data`) and is imported directly by both the main application's DI container and the `sw.ts` file. This ensures data consistency and avoids logic duplication.
+
+*   **Communication Flow**:
+    1.  When a user creates, updates, or deletes a reminder in the UI, the `useReminders` hook calls the appropriate use case.
+    2.  After the database operation is complete, the hook calls `navigator.serviceWorker.controller.postMessage({ type: 'UPDATE_REMINDERS' })`.
+    3.  The service worker listens for this `message` event and triggers its `scheduleNotifications` function to recalculate all notification timers based on the new data.
+
+*   **Notification Lifecycle**:
+    1.  **Scheduling**: The `scheduleNotifications` function fetches all active reminders using the shared repository. For each reminder, it calculates the milliseconds until the next due time and uses `self.setTimeout` to schedule a future notification.
+    2.  **Activation**: When the service worker activates (e.g., on browser start), it immediately calls `scheduleNotifications` to ensure all timers are set.
+    3.  **Display**: When a timer fires, the service worker calls `self.registration.showNotification()` to display the notification to the user.
+    4.  **Interaction**: The service worker listens for the `notificationclick` event. When a user clicks a notification, the service worker focuses the application's tab (or opens a new one) and navigates to the reminders page.
 
 ### The `presentation` Layer
 *   **Purpose**: To display information to the user and handle user interaction.
