@@ -10,18 +10,22 @@ interface VitestConfigExport extends UserConfig {
 }
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), VitePWA({
-    registerType: 'autoUpdate',
-    strategies: 'injectManifest',
-    srcDir: 'src',
-    filename: 'sw.ts',
-    includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
-    devOptions: {
-      enabled: true,
-      type: 'classic',
-    }
-  })],
-  base: "/",
+  plugins: [
+    VitePWA({
+      registerType: 'autoUpdate',
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      devOptions: {
+        enabled: true,
+        type: 'module',
+      },
+    }),
+    react(),
+    tailwindcss(),
+  ],
+  base: '/',
 
   build: {
     outDir: 'dist'
