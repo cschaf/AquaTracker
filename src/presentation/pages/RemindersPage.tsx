@@ -14,16 +14,20 @@ export const RemindersPage: React.FC = () => {
   const [editingReminder, setEditingReminder] = useState<ReminderDto | null>(null);
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
 
+  // On component mount, check and request notification permissions.
   useEffect(() => {
+    // Check if the browser supports notifications.
     if (!('Notification' in window)) {
       showInfo('This browser does not support desktop notification');
       return;
     }
 
+    // If permission has not been asked yet, request it.
     if (Notification.permission === 'default') {
       Notification.requestPermission();
     }
 
+    // If permission has been denied, inform the user.
     if (Notification.permission === 'denied') {
       showInfo('Notification permission has been denied. Please enable it in your browser settings.');
     }

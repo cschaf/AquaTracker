@@ -11,6 +11,8 @@ interface VitestConfigExport extends UserConfig {
 
 export default defineConfig({
   plugins: [
+    // The VitePWA plugin must be placed before other plugins to ensure it can
+    // correctly handle the service worker file in the development server.
     VitePWA({
       registerType: 'autoUpdate',
       strategies: 'injectManifest',
