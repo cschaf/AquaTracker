@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Toaster } from 'react-hot-toast';
-import { registerServiceWorker } from '../service-worker-registration';
+import { setupServiceWorker } from '../service-worker-registration';
 import { ThemeProvider } from './theme/theme-provider';
 import { eventBus } from './lib/event-bus/event-bus';
 import type { Achievement, Page } from '../domain/entities';
@@ -24,7 +24,7 @@ function App() {
   const isInitialMount = useRef(true);
 
   useEffect(() => {
-    registerServiceWorker();
+    setupServiceWorker();
   }, []);
 
   useEffect(() => {

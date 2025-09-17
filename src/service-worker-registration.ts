@@ -1,22 +1,15 @@
-import { Workbox } from 'workbox-window';
+import { registerSW } from 'virtual:pwa-register';
 
-export function registerServiceWorker() {
-  if ('serviceWorker' in navigator) {
-    const wb = new Workbox('/sw.js', { scope: '/' });
-
-    wb.addEventListener('waiting', () => {
-      const updateAccepted = window.confirm(
-        'A new version of the application is available. Reload to update?'
-      );
-      if (updateAccepted) {
-        wb.messageSkipWaiting();
+export function setupServiceWorker() {
+  const updateSW = registerSW({
+    onNeedRefresh() {
+      // Show a prompt to the user and if they accept, call updateSW()
+      if (confirm('New content is available. Do you want to reload?')) {
+        updateSW(true); // Passing true will reload the page
       }
-    });
-
-    wb.addEventListener('controlling', () => {
-      window.location.reload();
-    });
-
-    wb.register();
-  }
+    },
+    onOfflineReady() {
+      console.log('Application is ready to work offline.');
+    },
+  });
 }
