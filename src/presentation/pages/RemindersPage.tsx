@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useReminders } from '../hooks/useReminders';
+import { showInfo } from '../services/toast.service';
 import { RemindersList } from '../components/RemindersList';
 import { EditReminderModal } from '../components/EditReminderModal';
 import { CreateReminderModal } from '../components/CreateReminderModal';
@@ -12,6 +13,21 @@ export const RemindersPage: React.FC = () => {
   const { reminders, loading, addReminder, removeReminder, toggleReminder, editReminder } = useReminders();
   const [editingReminder, setEditingReminder] = useState<ReminderDto | null>(null);
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!('Notification' in window)) {
+      showInfo('This browser does not support desktop notification');
+      return;
+    }
+
+    if (Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+
+    if (Notification.permission === 'denied') {
+      showInfo('Notification permission has been denied. Please enable it in your browser settings.');
+    }
+  }, []);
 
   const handleEdit = (reminder: ReminderDto) => {
     setEditingReminder(reminder);
