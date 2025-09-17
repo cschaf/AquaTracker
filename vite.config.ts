@@ -23,6 +23,7 @@ export default defineConfig({
         enabled: true,
         type: 'module',
       },
+      injectManifest: {},
     }),
     react(),
     tailwindcss(),
