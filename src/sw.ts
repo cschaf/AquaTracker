@@ -35,7 +35,7 @@ const scheduleNotifications = async () => {
 
       const timeDifference = nextNotificationTime.getTime() - now.getTime();
 
-      const timerId = setTimeout(() => {
+      const timerId = self.setTimeout(() => {
         self.registration.showNotification('AquaTracker Reminder', {
           body: reminder.title,
           icon: '/icons/icon-192-192.png',
