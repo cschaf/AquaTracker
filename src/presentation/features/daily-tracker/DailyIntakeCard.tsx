@@ -42,6 +42,15 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
   const intakeStatus = checkWaterIntake(dailyTotal).status;
   const isCritical = intakeStatus === INTAKE_STATUS.CRITICAL;
 
+  const handleGoalValidation = () => {
+    const newGoal = parseInt(goalInputValue, 10);
+    if (!isNaN(newGoal)) {
+      setDailyGoal(newGoal);
+    } else {
+      setGoalInputValue(dailyGoal.toString());
+    }
+  };
+
   const handleAddCustom = () => {
     const amount = parseInt(customAmount);
 
@@ -103,13 +112,11 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
                   setGoalInputValue(value);
                 }
               }}
-              onBlur={() => {
-                const newGoal = parseInt(goalInputValue, 10);
-                if (!isNaN(newGoal)) {
-                  setDailyGoal(newGoal);
-                } else {
-                  // If input is invalid or empty, reset to the original goal
-                  setGoalInputValue(dailyGoal.toString());
+              onBlur={handleGoalValidation}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleGoalValidation();
+                  (e.target as HTMLInputElement).blur();
                 }
               }}
               data-testid="goal-input"
