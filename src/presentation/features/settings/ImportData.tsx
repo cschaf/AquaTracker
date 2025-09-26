@@ -24,10 +24,10 @@ const ImportData: React.FC<ImportDataProps> = ({ importData }) => {
 
   return (
     <Card>
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-text-primary mb-4">Import Your Data</h2>
+      <div>
+        <h2 className="text-xl font-bold text-text-primary mb-4">Import Your Data</h2>
         <p className="text-text-secondary mb-6">Import a previously exported JSON file to restore your data.</p>
-        <div className="flex flex-col items-center space-y-4">
+        <div className="flex flex-col items-start space-y-4">
           <input
             type="file"
             accept=".json"
