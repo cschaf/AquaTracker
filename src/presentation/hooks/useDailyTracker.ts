@@ -75,22 +75,23 @@ export const useDailyTracker = () => {
     eventBus.emit('intakeDataChanged', undefined);
   }, [updateWaterIntake, recalculateAchievements]);
 
-  const handleSetGoal = useCallback(async (newGoal: number) => {
+  const handleSetGoal = useCallback(async (newGoal: number): Promise<boolean> => {
     if (isNaN(newGoal)) {
       showWarning('Please enter a valid number.');
-      return;
+      return false;
     }
     if (newGoal < 100) {
       showWarning('Goal cannot be less than 100.');
-      return;
+      return false;
     }
     if (newGoal > 9999) {
       showWarning('Goal cannot be greater than 9999.');
-      return;
+      return false;
     }
     await setDailyGoal.execute(newGoal);
     setGoal(newGoal);
     eventBus.emit('intakeDataChanged', undefined);
+    return true;
   }, [setDailyGoal]);
 
   return {

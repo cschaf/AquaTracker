@@ -10,7 +10,7 @@ import { showWarning } from '../../services/toast.service';
 
 interface DailyIntakeCardProps {
   dailyGoal: number;
-  setDailyGoal: (goal: number) => void;
+  setDailyGoal: (goal: number) => Promise<boolean>;
   addWaterEntry: (amount: number) => void;
   dailyTotal: number;
 }
@@ -42,11 +42,15 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
   const intakeStatus = checkWaterIntake(dailyTotal).status;
   const isCritical = intakeStatus === INTAKE_STATUS.CRITICAL;
 
-  const handleGoalValidation = () => {
+  const handleGoalValidation = async () => {
     const newGoal = parseInt(goalInputValue, 10);
-    if (!isNaN(newGoal)) {
-      setDailyGoal(newGoal);
-    } else {
+    if (isNaN(newGoal)) {
+      setGoalInputValue(dailyGoal.toString());
+      return;
+    }
+
+    const success = await setDailyGoal(newGoal);
+    if (!success) {
       setGoalInputValue(dailyGoal.toString());
     }
   };
