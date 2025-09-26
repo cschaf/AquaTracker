@@ -20,3 +20,7 @@ Before submitting any code, you **must** perform the following checks to ensure 
     ```
 
 Ensuring the build passes is critical, as it catches TypeScript errors and other issues that might not be apparent during development. A successful build is required for all pull requests.
+
+## UI/UX Guidelines
+
+- **Button Placement**: For consistency, primary action buttons (e.g., "Save", "Confirm") should always be aligned to the right side of their container. If there is a secondary, less-important action (e.g., "Cancel"), it should be placed to the left of the primary button.
