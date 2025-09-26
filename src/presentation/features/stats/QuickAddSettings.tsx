@@ -60,7 +60,7 @@ const QuickAddSettings: React.FC = () => {
           </div>
         ))}
       </div>
-      <div className="mt-6">
+      <div className="mt-6 flex justify-end">
         <Button onClick={handleSave}>
           Save Changes
         </Button>
