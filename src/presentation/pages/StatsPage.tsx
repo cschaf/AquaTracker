@@ -1,5 +1,5 @@
 import React from 'react';
-import WeeklyChart from '../features/stats/WeeklyChart';
+import StatsChart from '../features/stats/StatsChart';
 import StatsOverview from '../features/stats/StatsOverview';
 import DailyLogList from '../features/stats/DailyLogList';
 import { useStats } from '../hooks/useStats';
@@ -13,7 +13,7 @@ const StatsPage: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      <WeeklyChart logs={logs} dailyGoal={dailyGoal} />
+      <StatsChart logs={logs} dailyGoal={dailyGoal} />
       <StatsOverview logs={logs} dailyGoal={dailyGoal} />
       <DailyLogList logs={logs} />
     </div>
