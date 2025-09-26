@@ -56,6 +56,16 @@ You are a senior Software Engineer and TDD (Test-Driven Development) specialist.
     3.  **`application`**: `addWaterReading.ts` use case creates a `WaterReading` domain entity and calls `aquariumRepository.save(reading)`.
     4.  **`infrastructure`**: `AquariumApiRepository.ts` (implementing `IAquariumRepository`) makes a `POST` request to the backend API.
 
+- **Service Worker and Background Notifications**
+    - **Overview:** The application uses a service worker (`src/sw.ts`) to manage background notifications for reminders. This allows notifications to be delivered even when the app is closed or the device is offline.
+    - **Technology:** The implementation relies on the **Periodic Background Sync API**.
+    - **Logic:**
+        1.  The `service-worker-registration.ts` file registers for a periodic sync event (`UPDATE_REMINDERS`) that runs approximately every 12 hours.
+        2.  The `scheduleNotifications` function in the service worker is the core of the logic. It fetches all active reminders from `IndexedDB`.
+        3.  For each reminder, it checks the `lastNotified` timestamp to see if a notification was missed. If so, it fires the notification immediately.
+        4.  It then calculates the next notification time and uses `setTimeout` to schedule it.
+    - **Data Persistence:** The `lastNotified` date is added to the `Reminder` entity and stored in `IndexedDB` via the `IdbReminderRepository`. This state is crucial for the service worker to function correctly across sessions.
+
 ## Code Style & Conventions
 
 - **Language:** TypeScript with `strict: true` enabled in `tsconfig.json`.
