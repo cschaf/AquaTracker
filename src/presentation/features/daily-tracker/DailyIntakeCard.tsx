@@ -17,8 +17,13 @@ interface DailyIntakeCardProps {
 
 const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGoal, addWaterEntry, dailyTotal }) => {
   const [customAmount, setCustomAmount] = useState('');
+  const [goalInputValue, setGoalInputValue] = useState(dailyGoal.toString());
   const { getQuickAddValues } = useUseCases();
   const [quickAddValues, setQuickAddValues] = useState<QuickAddValues | null>(null);
+
+  useEffect(() => {
+    setGoalInputValue(dailyGoal.toString());
+  }, [dailyGoal]);
 
   const fetchQuickAddValues = useCallback(() => {
     getQuickAddValues.execute().then(setQuickAddValues);
@@ -91,11 +96,20 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
               inputMode="numeric"
               pattern="[0-9]*"
               className="w-24 text-lg font-bold text-text-primary text-right bg-transparent focus:outline-none"
-              value={dailyGoal}
+              value={goalInputValue}
               onChange={(e) => {
                 const value = e.target.value;
                 if (/^\d*$/.test(value)) {
-                  setDailyGoal(parseInt(value, 10) || 0);
+                  setGoalInputValue(value);
+                }
+              }}
+              onBlur={() => {
+                const newGoal = parseInt(goalInputValue, 10);
+                if (!isNaN(newGoal)) {
+                  setDailyGoal(newGoal);
+                } else {
+                  // If input is invalid or empty, reset to the original goal
+                  setGoalInputValue(dailyGoal.toString());
                 }
               }}
               data-testid="goal-input"
