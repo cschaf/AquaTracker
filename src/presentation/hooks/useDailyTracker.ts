@@ -76,10 +76,6 @@ export const useDailyTracker = () => {
   }, [updateWaterIntake, recalculateAchievements]);
 
   const handleSetGoal = useCallback(async (newGoal: number) => {
-    setGoal(newGoal); // Optimistic UI update
-
-    if (newGoal === 0) return; // User cleared the input, don't validate/save yet
-
     if (isNaN(newGoal)) {
       showWarning('Please enter a valid number.');
       return;
@@ -93,6 +89,7 @@ export const useDailyTracker = () => {
       return;
     }
     await setDailyGoal.execute(newGoal);
+    setGoal(newGoal);
     eventBus.emit('intakeDataChanged', undefined);
   }, [setDailyGoal]);
 
