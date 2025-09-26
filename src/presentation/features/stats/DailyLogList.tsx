@@ -19,7 +19,7 @@ const DailyLogList: React.FC<DailyLogListProps> = ({ logs }) => {
     <Card className="!p-0">
       <div className="p-4 flex justify-between items-center">
         <h2 className="text-xl font-bold text-text-primary">Daily Intake Log</h2>
-        <i className="fas fa-list-alt text-2xl text-primary opacity-80"></i>
+        <i className="fas fa-list-alt text-2xl text-accent-primary opacity-80"></i>
       </div>
       <div className="p-4 pt-0">
         {dailyLogs.length === 0 ? (
@@ -27,7 +27,7 @@ const DailyLogList: React.FC<DailyLogListProps> = ({ logs }) => {
         ) : (
           <ul className="space-y-3 max-h-96 overflow-y-auto">
             {dailyLogs.map((log) => (
-              <li key={log.date} className="flex items-center justify-between p-4 bg-background rounded-xl shadow-sm">
+              <li key={log.date} className="flex items-center justify-between p-4 bg-bg-tertiary rounded-xl shadow-sm">
                 <div>
                   <p className="font-semibold text-text-primary">
                     {new Date(`${log.date}T00:00:00`).toLocaleDateString(undefined, {
@@ -38,7 +38,7 @@ const DailyLogList: React.FC<DailyLogListProps> = ({ logs }) => {
                   </p>
                   <p className="text-sm text-text-secondary">{log.entryCount} {log.entryCount === 1 ? 'entry' : 'entries'}</p>
                 </div>
-                <p className="text-lg font-bold text-primary">{log.totalIntake.toLocaleString()} ml</p>
+                <p className="text-lg font-bold text-accent-primary">{log.totalIntake.toLocaleString()} ml</p>
               </li>
             ))}
           </ul>
