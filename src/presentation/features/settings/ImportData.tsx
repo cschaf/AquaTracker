@@ -35,12 +35,14 @@ const ImportData: React.FC<ImportDataProps> = ({ importData }) => {
             ref={fileInputRef}
             className="w-full max-w-xs text-sm text-text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-bg-tertiary file:text-accent-primary hover:file:bg-bg-nav-active cursor-pointer"
           />
-          <Button
-            onClick={handleImportClick}
-            disabled={!selectedFile}
-          >
-            <i className="fas fa-file-import mr-2"></i>Import from JSON
-          </Button>
+          <div className="w-full flex justify-end">
+            <Button
+              onClick={handleImportClick}
+              disabled={!selectedFile}
+            >
+              <i className="fas fa-file-import mr-2"></i>Import from JSON
+            </Button>
+          </div>
         </div>
       </div>
     </Card>
