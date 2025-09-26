@@ -85,6 +85,7 @@ You are a senior Software Engineer and TDD (Test-Driven Development) specialist.
     - `PascalCase` for components, types, and interfaces.
     - `useCamelCase` for hooks.
 - **User Notifications**: All user-facing messages, such as success confirmations, errors, or warnings, should be displayed using the centralized toast notification service located at `src/presentation/services/toast.service.ts`. Avoid using native `alert()` or console logs for user feedback.
+- **Button Placement**: For consistency, primary action buttons (e.g., "Save", "Confirm") should be aligned to the right of their container. If a secondary action (e.g., "Cancel") is present, it should be placed to the left of the primary button.
 
 ## Testing
 
