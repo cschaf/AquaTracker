@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useUseCases } from '../../di';
+import { showWarning } from '../services/toast.service';
 import { eventBus } from '../lib/event-bus/event-bus'; // This will be moved later
 import type { DailySummary } from '../../domain/usecases';
 import type { DailyGoal } from '../../domain/entities';
@@ -75,8 +76,23 @@ export const useDailyTracker = () => {
   }, [updateWaterIntake, recalculateAchievements]);
 
   const handleSetGoal = useCallback(async (newGoal: number) => {
+    setGoal(newGoal); // Optimistic UI update
+
+    if (newGoal === 0) return; // User cleared the input, don't validate/save yet
+
+    if (isNaN(newGoal)) {
+      showWarning('Please enter a valid number.');
+      return;
+    }
+    if (newGoal < 100) {
+      showWarning('Goal cannot be less than 100.');
+      return;
+    }
+    if (newGoal > 9999) {
+      showWarning('Goal cannot be greater than 9999.');
+      return;
+    }
     await setDailyGoal.execute(newGoal);
-    setGoal(newGoal); // Optimistic update
     eventBus.emit('intakeDataChanged', undefined);
   }, [setDailyGoal]);
 

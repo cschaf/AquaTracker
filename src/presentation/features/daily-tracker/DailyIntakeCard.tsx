@@ -40,13 +40,18 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
   const handleAddCustom = () => {
     const amount = parseInt(customAmount);
 
-    if (isNaN(amount) || amount <= 0) {
-      showWarning('Please enter a positive number.');
+    if (isNaN(amount)) {
+      showWarning('Please enter a valid number.');
       return;
     }
 
-    if (amount > 5000) {
-      showWarning('Amount cannot be greater than 5000.');
+    if (amount < 100) {
+      showWarning('Amount cannot be less than 100.');
+      return;
+    }
+
+    if (amount > 9999) {
+      showWarning('Amount cannot be greater than 9999.');
       return;
     }
 
@@ -82,10 +87,17 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
           </div>
           <div className="flex items-baseline">
             <input
-              type="number"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
               className="w-24 text-lg font-bold text-text-primary text-right bg-transparent focus:outline-none"
               value={dailyGoal}
-              onChange={(e) => setDailyGoal(parseInt(e.target.value))}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (/^\d*$/.test(value)) {
+                  setDailyGoal(parseInt(value, 10) || 0);
+                }
+              }}
               data-testid="goal-input"
             />
             <span className="text-lg text-text-secondary ml-1">ml Goal</span>
@@ -122,12 +134,19 @@ const DailyIntakeCard: React.FC<DailyIntakeCardProps> = ({ dailyGoal, setDailyGo
         <p className="text-md font-semibold text-text-primary mb-2">Custom Amount</p>
         <div className="flex gap-2">
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             placeholder="Enter amount in ml"
             disabled={isCritical}
             className="flex-1 p-3 border border-border-card bg-bg-tertiary rounded-lg focus:outline-none focus:border-accent-primary transition w-full disabled:opacity-50 text-text-primary placeholder:text-text-secondary"
             value={customAmount}
-            onChange={(e) => setCustomAmount(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d*$/.test(value)) {
+                setCustomAmount(value);
+              }
+            }}
             onKeyPress={(e) => e.key === 'Enter' && handleAddCustom()}
             data-testid="custom-amount-input"
           />
