@@ -11,15 +11,22 @@ import { registerSW } from 'virtual:pwa-register';
  * service worker registration.
  */
 export function setupServiceWorker() {
-  const updateSW = registerSW({
+  registerSW({
+    onRegisteredSW(swUrl, registration) {
+      if (registration) {
+        console.log('Service worker registered.');
+        setupPeriodicSync(registration);
+      }
+    },
     onNeedRefresh() {
       if (confirm('New content is available. Do you want to reload?')) {
-        updateSW(true);
+        // The update function is passed as the second argument to onNeedRefresh
+        // but we can get it from the registration object as well.
+        registration && registration.update();
       }
     },
     onOfflineReady() {
       console.log('Application is ready to work offline.');
-      setupPeriodicSync();
     },
   });
 }
@@ -34,10 +41,8 @@ interface ServiceWorkerRegistrationWithPeriodicSync extends ServiceWorkerRegistr
   readonly periodicSync: PeriodicSyncManager;
 }
 
-async function setupPeriodicSync() {
-  const registration = await navigator.serviceWorker.ready;
+async function setupPeriodicSync(registration: ServiceWorkerRegistration) {
   const swRegistration = registration as ServiceWorkerRegistrationWithPeriodicSync;
-
   if ('periodicSync' in swRegistration) {
     const status = await navigator.permissions.query({
       name: 'periodic-background-sync' as any,

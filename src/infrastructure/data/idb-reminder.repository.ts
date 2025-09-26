@@ -11,6 +11,7 @@ interface StoredReminder {
   time: string;
   createdAt: string; // Stored as an ISO string
   isActive: boolean;
+  lastNotified: string | null; // Stored as an ISO string
 }
 
 export class IdbReminderRepository implements IReminderRepository {
@@ -20,8 +21,9 @@ export class IdbReminderRepository implements IReminderRepository {
 
   private _rehydrate(plainReminder: StoredReminder): Reminder {
     return new Reminder({
-        ...plainReminder,
-        createdAt: new Date(plainReminder.createdAt),
+      ...plainReminder,
+      createdAt: new Date(plainReminder.createdAt),
+      lastNotified: plainReminder.lastNotified ? new Date(plainReminder.lastNotified) : undefined,
     });
   }
 
@@ -32,21 +34,22 @@ export class IdbReminderRepository implements IReminderRepository {
 
   async findById(id: string): Promise<Reminder | null> {
     const plainReminders = await this._getAllPlain();
-    const plainReminder = plainReminders.find(r => r.id === id);
+    const plainReminder = plainReminders.find((r) => r.id === id);
     return plainReminder ? this._rehydrate(plainReminder) : null;
   }
 
   async save(reminder: Reminder): Promise<void> {
     const plainReminders = await this._getAllPlain();
-    const index = plainReminders.findIndex(r => r.id === reminder.id);
+    const index = plainReminders.findIndex((r) => r.id === reminder.id);
 
     // Convert class instance to a plain object for storage
     const reminderToStore: StoredReminder = {
-        id: reminder.id,
-        title: reminder.title,
-        time: reminder.time,
-        isActive: reminder.isActive,
-        createdAt: reminder.createdAt.toISOString(),
+      id: reminder.id,
+      title: reminder.title,
+      time: reminder.time,
+      isActive: reminder.isActive,
+      createdAt: reminder.createdAt.toISOString(),
+      lastNotified: reminder.lastNotified ? reminder.lastNotified.toISOString() : null,
     };
 
     if (index > -1) {

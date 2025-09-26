@@ -8,6 +8,7 @@ interface ReminderProps {
   time: string;
   createdAt?: Date;
   isActive?: boolean;
+  lastNotified?: Date;
 }
 
 export class Reminder {
@@ -16,6 +17,7 @@ export class Reminder {
   public time: string;
   public readonly createdAt: Date;
   public isActive: boolean;
+  public lastNotified: Date | null;
 
   constructor(props: ReminderProps) {
     if (!TIME_REGEX.test(props.time)) {
@@ -27,6 +29,11 @@ export class Reminder {
     this.time = props.time;
     this.createdAt = props.createdAt || new Date();
     this.isActive = props.isActive === undefined ? true : props.isActive;
+    this.lastNotified = props.lastNotified || null;
+  }
+
+  public setLastNotified(date: Date): void {
+    this.lastNotified = date;
   }
 
   public activate(): void {
