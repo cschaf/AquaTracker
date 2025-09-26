@@ -103,7 +103,7 @@ You are a senior Software Engineer and TDD (Test-Driven Development) specialist.
 
 - **Branch Naming:** `feature/<ticket-id>-short-description` (e.g., `feature/aqua-123-add-ph-chart`).
 - **Commit Messages:** Follow the [Conventional Commits](https://www.conventionalcommits.org/) specification (e.g., `feat(dashboard): add new water quality chart`).
-- **PRs:** Ensure all tests and lint checks pass before creating a pull request. Provide a clear description of the changes.
+- **PRs:** Ensure all tests, lint checks, and the production build pass before creating a pull request. Run `npm run build` to catch any type-related or build-specific errors. Provide a clear description of the changes.
 
 ## Security
 

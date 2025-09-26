@@ -11,8 +11,8 @@ import { registerSW } from 'virtual:pwa-register';
  * service worker registration.
  */
 export function setupServiceWorker() {
-  registerSW({
-    onRegisteredSW(swUrl, registration) {
+  const updateSW = registerSW({
+    onRegisteredSW(_swUrl, registration) {
       if (registration) {
         console.log('Service worker registered.');
         setupPeriodicSync(registration);
@@ -20,9 +20,7 @@ export function setupServiceWorker() {
     },
     onNeedRefresh() {
       if (confirm('New content is available. Do you want to reload?')) {
-        // The update function is passed as the second argument to onNeedRefresh
-        // but we can get it from the registration object as well.
-        registration && registration.update();
+        updateSW(true);
       }
     },
     onOfflineReady() {
