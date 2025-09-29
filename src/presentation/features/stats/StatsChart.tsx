@@ -170,7 +170,7 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs }) => {
                   )}
                   <div
                     className="w-full rounded-lg transition-colors"
-                    style={{ height: barHeight, backgroundColor: isHovered ? 'var(--color-success)' : 'var(--color-bg-secondary)' }}
+                    style={{ height: barHeight, backgroundColor: isHovered ? 'var(--color-success)' : 'var(--color-bg-tertiary)' }}
                   />
                 </div>
               );
