@@ -9,6 +9,13 @@ interface StatsChartProps {
 
 type Range = '1 day' | '1 week' | '1 month' | '1 year' | 'All';
 
+const toYYYYMMDD = (date: Date) => {
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
   const [selectedRange, setSelectedRange] = useState<Range>('1 week');
   const [hoveredBar, setHoveredBar] = useState<number | null>(null);
@@ -20,7 +27,7 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
 
     switch (selectedRange) {
       case '1 day': {
-        const dateStr = today.toISOString().split('T')[0];
+        const dateStr = toYYYYMMDD(today);
         const log = logs.find(l => l.date === dateStr);
         const total = log ? log.entries.reduce((sum, entry) => sum + entry.amount, 0) : 0;
         data = [{ label: 'Today', value: total }];
@@ -31,7 +38,7 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
         data = Array.from({ length: 7 }, (_, i) => {
           const d = new Date(today);
           d.setDate(today.getDate() - (6 - i));
-          const dateStr = d.toISOString().split('T')[0];
+          const dateStr = toYYYYMMDD(d);
           const log = logs.find(l => l.date === dateStr);
           const total = log ? log.entries.reduce((sum, entry) => sum + entry.amount, 0) : 0;
           return {
@@ -45,7 +52,7 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
         data = Array.from({ length: 30 }, (_, i) => {
             const d = new Date(today);
             d.setDate(today.getDate() - (29 - i));
-            const dateStr = d.toISOString().split('T')[0];
+            const dateStr = toYYYYMMDD(d);
             const log = logs.find(l => l.date === dateStr);
             const total = log ? log.entries.reduce((sum, entry) => sum + entry.amount, 0) : 0;
             return {
@@ -59,14 +66,15 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         data = Array.from({ length: 12 }, (_, i) => {
             const monthDate = new Date(today.getFullYear(), today.getMonth() - (11 - i), 1);
-            const month = monthDate.getMonth();
-            const year = monthDate.getFullYear();
+            const targetMonth = monthDate.getMonth();
+            const targetYear = monthDate.getFullYear();
             const total = logs.filter(log => {
-                const logDate = new Date(log.date);
-                return logDate.getMonth() === month && logDate.getFullYear() === year;
+                const logYear = parseInt(log.date.substring(0, 4), 10);
+                const logMonth = parseInt(log.date.substring(5, 7), 10) - 1;
+                return logMonth === targetMonth && logYear === targetYear;
             }).reduce((sum, log) => sum + log.entries.reduce((entrySum, entry) => entrySum + entry.amount, 0), 0);
             return {
-                label: months[month],
+                label: months[targetMonth],
                 value: total,
             };
         });
@@ -75,7 +83,7 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
       case 'All': {
         const yearlyData: { [year: string]: number } = {};
         logs.forEach(log => {
-            const year = new Date(log.date).getFullYear().toString();
+            const year = log.date.substring(0, 4);
             const total = log.entries.reduce((sum, entry) => sum + entry.amount, 0);
             if (!yearlyData[year]) {
                 yearlyData[year] = 0;
