@@ -9,7 +9,7 @@ interface StatsChartProps {
 
 type Range = '1 day' | '1 week' | '1 month' | '1 year' | 'All';
 
-const StatsChart: React.FC<StatsChartProps> = ({ logs }) => {
+const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
   const [selectedRange, setSelectedRange] = useState<Range>('1 week');
   const [hoveredBar, setHoveredBar] = useState<number | null>(null);
 
@@ -93,22 +93,25 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs }) => {
   }, [logs, selectedRange]);
 
   const maxValue = useMemo(() => {
-    if (chartData.length === 0) return 1000;
     const values = chartData.map(d => d.value);
-    const maxVal = Math.max(...values);
+    const maxVal = Math.max(...values, dailyGoal);
     return Math.ceil(maxVal / 500) * 500 || 1000;
-  }, [chartData]);
+  }, [chartData, dailyGoal]);
 
   const yAxisLabels = useMemo(() => {
+    if (maxValue === 0) {
+        return [dailyGoal, Math.round(dailyGoal / 2), 0];
+    }
     const labels = [];
-    for (let i = maxValue; i >= 0; i -= Math.round(maxValue / 5)) {
-        if(i < 0) continue;
+    const step = Math.round(maxValue / 5);
+    if (step === 0) return [maxValue, 0]
+
+    for (let i = maxValue; i >= 0; i -= step) {
         labels.push(i);
     }
-    if (labels.length === 0) return [1000, 800, 600, 400, 200, 0];
     if (labels.length < 2) return [labels[0], 0];
     return labels;
-  }, [maxValue]);
+  }, [maxValue, dailyGoal]);
 
   const gridTemplateColumns = {
     gridTemplateColumns: `repeat(${chartData.length}, minmax(0, 1fr))`
@@ -170,7 +173,7 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs }) => {
                   )}
                   <div
                     className="w-full rounded-lg transition-colors"
-                    style={{ height: barHeight, backgroundColor: isHovered ? 'var(--color-success)' : 'var(--color-bg-tertiary)' }}
+                    style={{ height: barHeight, backgroundColor: isHovered ? 'var(--color-success)' : 'var(--color-text-secondary)' }}
                   />
                 </div>
               );
@@ -178,10 +181,15 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs }) => {
           </div>
         </div>
 
-        <div className="flex justify-around pl-8 pr-1 mt-2">
-          {chartData.map((data, index) => (
-            <div key={index} className="text-xs text-text-secondary w-full text-center">{data.label}</div>
-          ))}
+        <div className="grid gap-3 pl-8 pr-1 mt-2" style={gridTemplateColumns}>
+          {chartData.map((data, index) => {
+            if (selectedRange === '1 month' && index % 5 !== 0) {
+                return <div key={index} />
+            }
+            return (
+                <div key={index} className="text-xs text-text-secondary text-center">{data.label}</div>
+            )
+          })}
         </div>
       </div>
     </Card>
