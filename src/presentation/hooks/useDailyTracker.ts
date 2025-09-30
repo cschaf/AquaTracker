@@ -52,27 +52,36 @@ export const useDailyTracker = () => {
   }, [loadData]);
 
   const handleAddEntry = useCallback(async (amount: number) => {
-    await addWaterIntake.execute(amount);
-    const newlyUnlocked = await recalculateAchievements.execute();
-    if (newlyUnlocked.length > 0) {
-      eventBus.emit('achievementUnlocked', newlyUnlocked);
+    try {
+      await addWaterIntake.execute(amount);
+      const newlyUnlocked = await recalculateAchievements.execute();
+      if (newlyUnlocked.length > 0) {
+        eventBus.emit('achievementUnlocked', newlyUnlocked);
+      }
+    } finally {
+      eventBus.emit('intakeDataChanged', undefined);
     }
-    eventBus.emit('intakeDataChanged', undefined);
   }, [addWaterIntake, recalculateAchievements]);
 
   const handleDeleteEntry = useCallback(async (entryId: string) => {
-    await deleteWaterIntake.execute(entryId);
-    await recalculateAchievements.execute();
-    eventBus.emit('intakeDataChanged', undefined);
+    try {
+      await deleteWaterIntake.execute(entryId);
+      await recalculateAchievements.execute();
+    } finally {
+      eventBus.emit('intakeDataChanged', undefined);
+    }
   }, [deleteWaterIntake, recalculateAchievements]);
 
   const handleUpdateEntry = useCallback(async (entryId: string, amount: number) => {
-    await updateWaterIntake.execute(entryId, amount);
-    const newlyUnlocked = await recalculateAchievements.execute();
-    if (newlyUnlocked.length > 0) {
-      eventBus.emit('achievementUnlocked', newlyUnlocked);
+    try {
+      await updateWaterIntake.execute(entryId, amount);
+      const newlyUnlocked = await recalculateAchievements.execute();
+      if (newlyUnlocked.length > 0) {
+        eventBus.emit('achievementUnlocked', newlyUnlocked);
+      }
+    } finally {
+      eventBus.emit('intakeDataChanged', undefined);
     }
-    eventBus.emit('intakeDataChanged', undefined);
   }, [updateWaterIntake, recalculateAchievements]);
 
   const handleSetGoal = useCallback(async (newGoal: number): Promise<boolean> => {

@@ -1,19 +1,19 @@
 import React from 'react';
 import DailyIntakeCard from './DailyIntakeCard';
 import TodaysEntriesCard from './TodaysEntriesCard';
-import { useDailyTracker } from '../../hooks/useDailyTracker';
+import type { useDailyTracker } from '../../hooks/useDailyTracker';
 
-const DailyTracker: React.FC = () => {
-  const {
-    summary,
-    goal,
-    setGoal,
-    addEntry,
-    deleteEntry,
-    updateEntry,
-    isLoading,
-  } = useDailyTracker();
+type DailyTrackerProps = ReturnType<typeof useDailyTracker>;
 
+const DailyTracker: React.FC<DailyTrackerProps> = ({
+  summary,
+  goal,
+  setGoal,
+  addEntry,
+  deleteEntry,
+  updateEntry,
+  isLoading,
+}) => {
   // A simple loading state
   if (isLoading) {
     return (
