@@ -144,15 +144,22 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
           </div>
 
           <div className="flex-1 grid gap-3 items-end relative" style={gridTemplateColumns}>
-            <div className="absolute top-0 left-0 right-0 h-full">
-              {yAxisLabels.map((_, index) => (
-                <div
-                  key={index}
-                  className="h-px bg-gray-200 border-t border-dashed"
-                  style={{ top: `${(index / (yAxisLabels.length - 1)) * 100}%` }}
-                ></div>
-              ))}
-            </div>
+            {dailyGoal > 0 && maxValue > 0 && dailyGoal < maxValue && (
+              <div
+                className="absolute left-0 right-0 h-px"
+                style={{
+                  bottom: `${(dailyGoal / maxValue) * 100}%`,
+                  backgroundColor: 'var(--color-accent-primary)',
+                }}
+              >
+                <span
+                  className="absolute -right-12 -translate-y-1/2 text-xs font-semibold"
+                  style={{ color: 'var(--color-accent-primary)' }}
+                >
+                  Goal
+                </span>
+              </div>
+            )}
 
             {chartData.map((data, index) => {
               const percentage = maxValue > 0 ? (data.value / maxValue) * 100 : 0;
