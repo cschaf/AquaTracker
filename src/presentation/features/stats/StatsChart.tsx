@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import type { Log } from '../../../domain/entities';
 import { Card } from '../../components/Card';
 
@@ -114,6 +114,14 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
     }
     return data;
   }, [logs, selectedRange]);
+
+  useEffect(() => {
+    if (chartData.length > 0) {
+      setSelectedBar(chartData.length - 1);
+    } else {
+      setSelectedBar(null);
+    }
+  }, [chartData]);
 
   const maxValue = useMemo(() => {
     const values = chartData.map(d => d.value);
