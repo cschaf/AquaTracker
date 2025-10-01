@@ -19,6 +19,7 @@ const toYYYYMMDD = (date: Date) => {
 const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
   const [selectedRange, setSelectedRange] = useState<Range>('1 week');
   const [hoveredBar, setHoveredBar] = useState<number | null>(null);
+  const [selectedBar, setSelectedBar] = useState<number | null>(null);
 
   const chartData = useMemo(() => {
     const today = new Date();
@@ -139,7 +140,10 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
           {(['1 day', '1 week', '1 month', '1 year', 'All'] as Range[]).map(range => (
             <button
               key={range}
-              onClick={() => setSelectedRange(range)}
+              onClick={() => {
+                setSelectedRange(range);
+                setSelectedBar(null);
+              }}
               className={`px-4 py-1.5 text-sm font-medium rounded-full transition-colors ${
                 selectedRange === range
                   ? 'bg-gray-200 text-gray-800'
@@ -152,7 +156,7 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
         </div>
 
         <div className="flex">
-          <div className="flex flex-col justify-between h-64 pr-2 text-xs text-text-secondary text-right">
+          <div className="flex flex-col justify-between h-64 pr-4 text-xs text-text-secondary text-right">
             {yAxisLabels.map(label => (
               <div key={label}>{label}</div>
             ))}
@@ -185,22 +189,30 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
                   const percentage = maxValue > 0 ? (data.value / maxValue) * 100 : 0;
                   const barHeight = `${percentage}%`;
                   const isHovered = hoveredBar === index;
+                  const isSelected = selectedBar === index;
+
+                  const getBarColor = () => {
+                    if (isHovered) return 'var(--color-success)';
+                    if (isSelected) return 'var(--color-accent-primary)';
+                    return 'var(--color-text-secondary)';
+                  };
 
                   return (
                     <div
                       key={index}
-                      className="relative flex flex-col items-center justify-end h-full z-10"
+                      className="relative flex flex-col items-center justify-end h-full z-10 cursor-pointer"
                       onMouseEnter={() => setHoveredBar(index)}
                       onMouseLeave={() => setHoveredBar(null)}
+                      onClick={() => setSelectedBar(isSelected ? null : index)}
                     >
-                      {isHovered && (
+                      {(isHovered || isSelected) && (
                         <div className="absolute -top-10 bg-success text-white text-xs font-bold px-2 py-1 rounded-md shadow-lg z-30">
                           {data.value}
                         </div>
                       )}
                       <div
                         className="w-full rounded-lg transition-colors"
-                        style={{ height: barHeight, backgroundColor: isHovered ? 'var(--color-success)' : 'var(--color-text-secondary)' }}
+                        style={{ height: barHeight, backgroundColor: getBarColor() }}
                       />
                     </div>
                   );
