@@ -27,10 +27,20 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
 
     switch (selectedRange) {
       case '1 day': {
-        const dateStr = toYYYYMMDD(today);
-        const log = logs.find(l => l.date === dateStr);
-        const total = log ? log.entries.reduce((sum, entry) => sum + entry.amount, 0) : 0;
-        data = [{ label: 'Today', value: total }];
+        const todayStr = toYYYYMMDD(today);
+        const todayLog = logs.find(l => l.date === todayStr);
+        const hourlyTotals: { [hour: number]: number } = {};
+
+        if (todayLog) {
+          todayLog.entries.forEach(entry => {
+            const hour = new Date(entry.timestamp).getHours();
+            hourlyTotals[hour] = (hourlyTotals[hour] || 0) + entry.amount;
+          });
+        }
+        data = Array.from({ length: 24 }, (_, i) => ({
+          label: `${i}`,
+          value: hourlyTotals[i] || 0,
+        }));
         break;
       }
       case '1 week': {
@@ -85,10 +95,7 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
         logs.forEach(log => {
             const year = log.date.substring(0, 4);
             const total = log.entries.reduce((sum, entry) => sum + entry.amount, 0);
-            if (!yearlyData[year]) {
-                yearlyData[year] = 0;
-            }
-            yearlyData[year] += total;
+            yearlyData[year] = (yearlyData[year] || 0) + total;
         });
         data = Object.entries(yearlyData).map(([year, total]) => ({
             label: year,
@@ -108,11 +115,11 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
 
   const yAxisLabels = useMemo(() => {
     if (maxValue === 0) {
-        return [dailyGoal, Math.round(dailyGoal / 2), 0];
+        return [dailyGoal, Math.round(dailyGoal / 2), 0].filter((v, i, a) => a.indexOf(v) === i);
     }
     const labels = [];
     const step = Math.round(maxValue / 5);
-    if (step === 0) return [maxValue, 0]
+    if (step === 0) return [maxValue, 0].filter((v, i, a) => a.indexOf(v) === i);
 
     for (let i = maxValue; i >= 0; i -= step) {
         labels.push(i);
@@ -154,15 +161,18 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
           <div className="flex-1 grid gap-3 items-end relative" style={gridTemplateColumns}>
             {dailyGoal > 0 && maxValue > 0 && dailyGoal < maxValue && (
               <div
-                className="absolute left-0 right-0 h-px"
+                className="absolute left-0 right-0 h-px z-20"
                 style={{
                   bottom: `${(dailyGoal / maxValue) * 100}%`,
                   backgroundColor: 'var(--color-accent-primary)',
                 }}
               >
                 <span
-                  className="absolute -right-12 -translate-y-1/2 text-xs font-semibold"
-                  style={{ color: 'var(--color-accent-primary)' }}
+                  className="absolute -translate-y-1/2 text-xs font-semibold"
+                  style={{
+                    color: 'var(--color-accent-primary)',
+                    left: '-2.5rem',
+                  }}
                 >
                   Goal
                 </span>
@@ -177,12 +187,12 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
               return (
                 <div
                   key={index}
-                  className="relative flex flex-col items-center justify-end h-full"
+                  className="relative flex flex-col items-center justify-end h-full z-10"
                   onMouseEnter={() => setHoveredBar(index)}
                   onMouseLeave={() => setHoveredBar(null)}
                 >
                   {isHovered && (
-                    <div className="absolute -top-10 bg-success text-white text-xs font-bold px-2 py-1 rounded-md shadow-lg">
+                    <div className="absolute -top-10 bg-success text-white text-xs font-bold px-2 py-1 rounded-md shadow-lg z-30">
                       {data.value}
                     </div>
                   )}
@@ -198,7 +208,13 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
 
         <div className="grid gap-3 pl-8 pr-1 mt-2" style={gridTemplateColumns}>
           {chartData.map((data, index) => {
-            if (selectedRange === '1 month' && index % 5 !== 0) {
+            const showLabel = (range: Range) => {
+                if (range === '1 day' && index % 6 !== 0 && index !== 0) return false;
+                if (range === '1 month' && index % 5 !== 0) return false;
+                return true;
+            }
+
+            if (!showLabel(selectedRange)) {
                 return <div key={index} />
             }
             return (

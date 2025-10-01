@@ -2,11 +2,11 @@ import React from 'react';
 import StatsChart from '../features/stats/StatsChart';
 import StatsOverview from '../features/stats/StatsOverview';
 import DailyLogList from '../features/stats/DailyLogList';
-import { useStats } from '../hooks/useStats';
+import type { useStats } from '../hooks/useStats';
 
-const StatsPage: React.FC = () => {
-  const { logs, dailyGoal, isLoading } = useStats();
+type StatsPageProps = ReturnType<typeof useStats>;
 
+const StatsPage: React.FC<StatsPageProps> = ({ logs, dailyGoal, isLoading }) => {
   if (isLoading) {
     return <div className="text-center p-8">Loading stats...</div>;
   }
