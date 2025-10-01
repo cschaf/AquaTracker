@@ -75,7 +75,7 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
       case '1 year': {
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         data = Array.from({ length: 12 }, (_, i) => {
-            const monthDate = new Date(today.getFullYear(), today.getMonth() - (11 - i), 1);
+            const monthDate = new Date(today.getFullYear(), i, 1);
             const targetMonth = monthDate.getMonth();
             const targetYear = monthDate.getFullYear();
             const total = logs.filter(log => {
@@ -134,7 +134,7 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
 
   return (
     <Card>
-      <div className="p-4">
+      <div className="p-4 overflow-hidden">
         <div className="flex justify-center mb-4">
           {(['1 day', '1 week', '1 month', '1 year', 'All'] as Range[]).map(range => (
             <button
@@ -151,76 +151,79 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
           ))}
         </div>
 
-        <div className="flex h-64">
-          <div className="flex flex-col justify-between h-full pr-2 text-xs text-text-secondary text-right">
+        <div className="flex">
+          <div className="flex flex-col justify-between h-64 pr-2 text-xs text-text-secondary text-right">
             {yAxisLabels.map(label => (
               <div key={label}>{label}</div>
             ))}
           </div>
 
-          <div className="flex-1 grid gap-3 items-end relative" style={gridTemplateColumns}>
-            {dailyGoal > 0 && maxValue > 0 && dailyGoal < maxValue && (
-              <div
-                className="absolute left-0 right-0 h-px z-20"
-                style={{
-                  bottom: `${(dailyGoal / maxValue) * 100}%`,
-                  backgroundColor: 'var(--color-accent-primary)',
-                }}
-              >
-                <span
-                  className="absolute -translate-y-1/2 text-xs font-semibold"
-                  style={{
-                    color: 'var(--color-accent-primary)',
-                    left: '-2.5rem',
-                  }}
-                >
-                  Goal
-                </span>
-              </div>
-            )}
-
-            {chartData.map((data, index) => {
-              const percentage = maxValue > 0 ? (data.value / maxValue) * 100 : 0;
-              const barHeight = `${percentage}%`;
-              const isHovered = hoveredBar === index;
-
-              return (
-                <div
-                  key={index}
-                  className="relative flex flex-col items-center justify-end h-full z-10"
-                  onMouseEnter={() => setHoveredBar(index)}
-                  onMouseLeave={() => setHoveredBar(null)}
-                >
-                  {isHovered && (
-                    <div className="absolute -top-10 bg-success text-white text-xs font-bold px-2 py-1 rounded-md shadow-lg z-30">
-                      {data.value}
-                    </div>
-                  )}
+          <div className="flex-1 overflow-x-auto">
+            <div style={{ minWidth: `${chartData.length * 2.5}rem` }}>
+              <div className="h-64 grid gap-3 items-end relative" style={gridTemplateColumns}>
+                {dailyGoal > 0 && maxValue > 0 && dailyGoal < maxValue && (
                   <div
-                    className="w-full rounded-lg transition-colors"
-                    style={{ height: barHeight, backgroundColor: isHovered ? 'var(--color-success)' : 'var(--color-text-secondary)' }}
-                  />
-                </div>
-              );
-            })}
+                    className="absolute left-0 right-0 h-px z-20"
+                    style={{
+                      bottom: `${(dailyGoal / maxValue) * 100}%`,
+                      backgroundColor: 'var(--color-accent-primary)',
+                    }}
+                  >
+                    <span
+                      className="absolute -translate-y-1/2 text-xs font-semibold"
+                      style={{
+                        color: 'var(--color-accent-primary)',
+                        left: '-2.5rem',
+                      }}
+                    >
+                      Goal
+                    </span>
+                  </div>
+                )}
+
+                {chartData.map((data, index) => {
+                  const percentage = maxValue > 0 ? (data.value / maxValue) * 100 : 0;
+                  const barHeight = `${percentage}%`;
+                  const isHovered = hoveredBar === index;
+
+                  return (
+                    <div
+                      key={index}
+                      className="relative flex flex-col items-center justify-end h-full z-10"
+                      onMouseEnter={() => setHoveredBar(index)}
+                      onMouseLeave={() => setHoveredBar(null)}
+                    >
+                      {isHovered && (
+                        <div className="absolute -top-10 bg-success text-white text-xs font-bold px-2 py-1 rounded-md shadow-lg z-30">
+                          {data.value}
+                        </div>
+                      )}
+                      <div
+                        className="w-full rounded-lg transition-colors"
+                        style={{ height: barHeight, backgroundColor: isHovered ? 'var(--color-success)' : 'var(--color-text-secondary)' }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="grid gap-3 mt-2" style={gridTemplateColumns}>
+                {chartData.map((data, index) => {
+                  const showLabel = (range: Range) => {
+                      if (range === '1 day' && index % 6 !== 0 && index !== 0) return false;
+                      if (range === '1 month' && index % 5 !== 0) return false;
+                      return true;
+                  }
+
+                  if (!showLabel(selectedRange)) {
+                      return <div key={index} />
+                  }
+                  return (
+                      <div key={index} className="text-xs text-text-secondary text-center">{data.label}</div>
+                  )
+                })}
+              </div>
+            </div>
           </div>
-        </div>
-
-        <div className="grid gap-3 pl-8 pr-1 mt-2" style={gridTemplateColumns}>
-          {chartData.map((data, index) => {
-            const showLabel = (range: Range) => {
-                if (range === '1 day' && index % 6 !== 0 && index !== 0) return false;
-                if (range === '1 month' && index % 5 !== 0) return false;
-                return true;
-            }
-
-            if (!showLabel(selectedRange)) {
-                return <div key={index} />
-            }
-            return (
-                <div key={index} className="text-xs text-text-secondary text-center">{data.label}</div>
-            )
-          })}
         </div>
       </div>
     </Card>
