@@ -56,6 +56,17 @@ You are a senior Software Engineer and TDD (Test-Driven Development) specialist.
     3.  **`application`**: `addWaterReading.ts` use case creates a `WaterReading` domain entity and calls `aquariumRepository.save(reading)`.
     4.  **`infrastructure`**: `AquariumApiRepository.ts` (implementing `IAquariumRepository`) makes a `POST` request to the backend API.
 
+- **Stats Chart Implementation**
+    - **Overview:** The statistics page features a comprehensive and interactive bar chart for visualizing water intake data.
+    - **Component:** `StatsChart.tsx` is the primary presentation component responsible for rendering the chart's UI, including the bars, axes, and labels.
+    - **Data Logic:** The data processing and calculation logic is encapsulated in the `useChartData.ts` custom hook. This hook takes the raw log data and the selected time range as input and returns the data formatted for display.
+    - **Features:**
+        - **Time Ranges:** The chart supports "1 day," "1 week," "1 month," "1 year," and "All" views.
+        - **Interactivity:** Users can tap or click on a bar to select it and view its value.
+        - **Default Selection:** The chart automatically selects the most recent bar with data.
+        - **Responsiveness:** The chart is horizontally scrollable on mobile devices to ensure all data is accessible.
+        - **Goal Line:** A solid line indicates the user's daily goal, which is visible on relevant time ranges.
+
 - **Service Worker and Background Notifications**
     - **Overview:** The application uses a service worker (`src/sw.ts`) to manage background notifications for reminders. This allows notifications to be delivered even when the app is closed or the device is offline.
     - **Technology:** The implementation relies on the **Periodic Background Sync API**.

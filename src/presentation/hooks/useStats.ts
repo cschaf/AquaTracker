@@ -43,7 +43,9 @@ export const useStats = () => {
 
   useEffect(() => {
     loadData(); // initial load
-    const handleDataChanged = () => loadData();
+    const handleDataChanged = () => {
+      loadData();
+    };
     eventBus.on('intakeDataChanged', handleDataChanged);
     eventBus.on('dataSync', handleDataChanged);
 
