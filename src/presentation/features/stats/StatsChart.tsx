@@ -210,25 +210,28 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
           <div className="flex-1 overflow-x-auto">
             <div style={{ minWidth: `${chartData.length * 2.5}rem` }}>
               <div className="h-64 grid gap-3 items-end relative" style={gridTemplateColumns}>
-                {dailyGoal > 0 && maxValue > 0 && dailyGoal < maxValue && (
-                  <div
-                    className="absolute left-0 right-0 h-px z-20"
-                    style={{
-                      bottom: `${(dailyGoal / maxValue) * 100}%`,
-                      backgroundColor: 'var(--color-accent-primary)',
-                    }}
-                  >
-                    <span
-                      className="absolute -translate-y-1/2 text-xs font-semibold"
+                {dailyGoal > 0 &&
+                  (selectedRange === '1 day' ||
+                    selectedRange === '1 week' ||
+                    selectedRange === '1 month') && (
+                    <div
+                      className="absolute left-0 right-0 h-px z-20"
                       style={{
-                        color: 'var(--color-accent-primary)',
-                        left: '-2.5rem',
+                        bottom: `${(dailyGoal / maxValue) * 100}%`,
+                        backgroundColor: 'var(--color-accent-primary)',
                       }}
                     >
-                      Goal
-                    </span>
-                  </div>
-                )}
+                      <span
+                        className="absolute -translate-y-1/2 text-xs font-semibold"
+                        style={{
+                          color: 'var(--color-accent-primary)',
+                          left: '-2.5rem',
+                        }}
+                      >
+                        Goal
+                      </span>
+                    </div>
+                  )}
 
                 {chartData.map((data, index) => {
                   const percentage = maxValue > 0 ? (data.value / maxValue) * 100 : 0;
