@@ -2,6 +2,8 @@ import React from 'react';
 import { Card } from '../../components/Card.tsx';
 import { ThemeSwitcher } from '../../components/ThemeSwitcher.tsx';
 import { useTheme } from '../../hooks/useTheme.ts';
+import { Button } from '../../components/Button.tsx';
+import { showSuccess, showError } from '../../services/toast.service.ts';
 
 interface SettingsRowProps {
   title: string;
@@ -20,12 +22,30 @@ const SettingsRow: React.FC<SettingsRowProps> = ({ title, children }) => {
 const GeneralSettings: React.FC = () => {
   const { toggleTheme } = useTheme();
 
+  const handlePermissionRequest = async () => {
+    if ('Notification' in window) {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        showSuccess('Notification permissions have been granted.');
+      } else {
+        showError('Notification permissions have been denied.');
+      }
+    } else {
+      showError('This browser does not support notifications.');
+    }
+  };
+
   return (
     <Card>
       <h2 className="text-xl font-bold mb-4 text-text-primary">General Settings</h2>
       <div>
         <SettingsRow title="Theme">
           <ThemeSwitcher onChange={toggleTheme} />
+        </SettingsRow>
+        <SettingsRow title="Reminder Notifications">
+          <Button onClick={handlePermissionRequest} className="text-sm">
+            Grant Permission
+          </Button>
         </SettingsRow>
       </div>
     </Card>
