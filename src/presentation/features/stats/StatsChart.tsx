@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, createRef } from 'react';
 import type { Log } from '../../../domain/entities';
 import { Card } from '../../components/Card';
-import { useChartData, Range } from './useChartData';
+import { useChartData, type Range } from './useChartData';
 
 interface StatsChartProps {
   logs: Log[];
