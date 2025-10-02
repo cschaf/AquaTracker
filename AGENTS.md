@@ -69,12 +69,12 @@ You are a senior Software Engineer and TDD (Test-Driven Development) specialist.
 
 - **Service Worker and Background Notifications**
     - **Overview:** The application uses a service worker (`src/sw.ts`) to manage background notifications for reminders. This allows notifications to be delivered even when the app is closed or the device is offline.
-    - **Technology:** The implementation relies on the **Periodic Background Sync API**.
+    - **Technology:** The implementation relies on the **Periodic Background Sync API** for reliable background execution.
     - **Logic:**
-        1.  The `service-worker-registration.ts` file registers for a periodic sync event (`UPDATE_REMINDERS`) that runs approximately every 12 hours.
-        2.  The `scheduleNotifications` function in the service worker is the core of the logic. It fetches all active reminders from `IndexedDB`.
-        3.  For each reminder, it checks the `lastNotified` timestamp to see if a notification was missed. If so, it fires the notification immediately.
-        4.  It then calculates the next notification time and uses `setTimeout` to schedule it.
+        1.  The `service-worker-registration.ts` file registers for a periodic sync event (`UPDATE_REMINDERS`) with a requested interval of approximately one hour. The browser ultimately controls the frequency to optimize battery life.
+        2.  The `checkReminders` function in the service worker (`sw.ts`) is the core of the logic. It is triggered by the `periodicsync` event, the `activate` event (when the service worker starts), and by a `postMessage` call from the app when reminders are updated.
+        3.  This function fetches all active reminders from `IndexedDB` and checks if a notification is due by comparing the reminder's scheduled time with the current time.
+        4.  To prevent spam, it only shows a notification if one has not been shown for the same reminder in the last 23 hours.
     - **Data Persistence:** The `lastNotified` date is added to the `Reminder` entity and stored in `IndexedDB` via the `IdbReminderRepository`. This state is crucial for the service worker to function correctly across sessions.
 
 ## Code Style & Conventions

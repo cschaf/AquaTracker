@@ -6,7 +6,7 @@ AquaTracker is a web-based application designed to help you monitor and log your
 
 ## Features
 
-*   **Offline-First Reminders System:** Set daily, persistent reminders to drink water. Notifications are handled by a service worker, ensuring they are delivered reliably even when the app is closed or the device is offline. This feature works entirely on your device without needing an internet connection.
+*   **Reliable Background Reminders:** Set daily reminders to drink water. Our notification system uses the **Periodic Background Sync API** to deliver reminders reliably, even when the app is in the background or your device's screen is off. This modern browser feature allows the app to periodically wake up and check for due reminders, ensuring you stay on track with your hydration goals without draining your battery.
 *   **Daily Goal Setting:** Set a personal daily water intake goal to stay motivated.
 *   **Quick and Custom Logging:** Log your water intake with predefined quick-add buttons (250ml, 500ml, 1L) or enter a custom amount.
 *   **Real-time Progress Tracking:** Visualize your daily progress with an animated water level and percentage display.
