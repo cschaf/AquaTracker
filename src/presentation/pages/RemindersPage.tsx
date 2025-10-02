@@ -54,6 +54,11 @@ export const RemindersPage: React.FC = () => {
     <div className="container px-4 py-8 mx-auto">
       <div className="max-w-md mx-auto space-y-6">
         <Card>
+          <p className="text-sm text-center text-gray-500">
+            Please note: Reminders work best when the app is open. Due to browser and OS limitations, background notifications may be delayed.
+          </p>
+        </Card>
+        <Card>
           <Button onClick={() => setCreateModalOpen(true)} className="w-full">
             New Reminder
           </Button>

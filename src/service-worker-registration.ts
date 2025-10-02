@@ -49,7 +49,7 @@ async function setupPeriodicSync(registration: ServiceWorkerRegistration) {
     if (status.state === 'granted') {
       try {
         await swRegistration.periodicSync.register('UPDATE_REMINDERS', {
-          minInterval: 12 * 60 * 60 * 1000, // 12 hours
+          minInterval: 60 * 60 * 1000, // 1 hour
         });
         console.log('Periodic background sync registered for reminders.');
       } catch (error) {

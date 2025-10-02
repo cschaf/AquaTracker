@@ -33,14 +33,25 @@ declare const __APP_URL__: string;
 // This uses the exact same repository class as the main application.
 const reminderRepository = new IdbReminderRepository();
 
-// Keep track of active notification timers.
-let activeTimers: number[] = [];
-
 /**
- * Shows a notification and updates the reminder's lastNotified timestamp.
+ * Shows a notification if it hasn't been shown recently and updates the
+ * reminder's lastNotified timestamp.
  * @param reminder - The reminder to notify for.
  */
 const showNotification = async (reminder: import('./domain/entities/reminder.entity').Reminder) => {
+  const now = new Date();
+  // To avoid spamming the user, check if a notification has been shown in the
+  // last 23 hours. This prevents re-showing a notification if the periodic
+  // sync fires multiple times in a short period.
+  if (reminder.lastNotified) {
+    const lastNotified = new Date(reminder.lastNotified);
+    const twentyThreeHours = 23 * 60 * 60 * 1000;
+    if (now.getTime() - lastNotified.getTime() < twentyThreeHours) {
+      console.log(`Service Worker: Notification for "${reminder.title}" was already shown recently.`);
+      return;
+    }
+  }
+
   await self.registration.showNotification('AquaTracker Reminder', {
     body: reminder.title,
     icon: '/icons/icon-192-192.png',
@@ -49,27 +60,25 @@ const showNotification = async (reminder: import('./domain/entities/reminder.ent
       url: __APP_URL__,
     },
   });
-  reminder.setLastNotified(new Date());
+  reminder.setLastNotified(now);
   await reminderRepository.save(reminder);
+  console.log(`Service Worker: Notification shown for "${reminder.title}".`);
 };
 
 /**
- * Schedules notifications for all active reminders.
- * This function clears any existing timers and creates new ones based on the
- * current reminder data in IndexedDB. It also handles missed notifications
- * that should have been shown while the service worker was inactive.
+ * Checks all active reminders from IndexedDB to see if a notification is due.
+ * This function is the core of the new notification logic, designed to be
+ * called by service worker events like 'periodicsync' or 'activate'.
  */
-const scheduleNotifications = async () => {
-  console.log('Service Worker: Scheduling notifications...');
-  activeTimers.forEach(clearTimeout);
-  activeTimers = [];
+const checkReminders = async () => {
+  console.log('Service Worker: Checking for due reminders...');
 
   try {
     const reminders = await reminderRepository.findAll();
     const activeReminders = reminders.filter((r) => r.isActive);
 
     if (activeReminders.length === 0) {
-      console.log('Service Worker: No active reminders to schedule.');
+      console.log('Service Worker: No active reminders.');
       return;
     }
 
@@ -77,49 +86,16 @@ const scheduleNotifications = async () => {
       const now = new Date();
       const [hours, minutes] = reminder.time.split(':').map(Number);
 
-      let nextNotificationTime = new Date();
-      nextNotificationTime.setHours(hours, minutes, 0, 0);
+      const reminderTimeToday = new Date();
+      reminderTimeToday.setHours(hours, minutes, 0, 0);
 
-      // If the notification time for today has already passed, schedule it for tomorrow.
-      if (nextNotificationTime.getTime() < now.getTime()) {
-        nextNotificationTime.setDate(nextNotificationTime.getDate() + 1);
-      }
-
-      // Check if a notification was missed.
-      // A notification is considered missed if the last notification was more than 24 hours ago
-      // and the scheduled time is in the past.
-      if (reminder.lastNotified) {
-        const lastNotified = new Date(reminder.lastNotified);
-        const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-        if (lastNotified < twentyFourHoursAgo && nextNotificationTime < now) {
-          console.log(`Service Worker: Missed notification for "${reminder.title}". Showing now.`);
-          await showNotification(reminder);
-          // Recalculate next notification time for the following day
-          nextNotificationTime.setDate(nextNotificationTime.getDate() + 1);
-        }
-      } else if (nextNotificationTime < now) {
-        // If there's no lastNotified date and the time is in the past,
-        // it means the user just created a reminder for a time that already passed today.
-        // We should notify them for the first time.
-        console.log(`Service Worker: First notification for "${reminder.title}" is in the past. Showing now.`);
+      // If the reminder time for today has passed, we should check if a notification is due.
+      if (reminderTimeToday.getTime() < now.getTime()) {
         await showNotification(reminder);
-        nextNotificationTime.setDate(nextNotificationTime.getDate() + 1);
-      }
-
-
-      const timeDifference = nextNotificationTime.getTime() - now.getTime();
-      const twentyFourHours = 24 * 60 * 60 * 1000;
-
-      if (timeDifference > 0 && timeDifference < twentyFourHours) {
-        console.log(`Service Worker: Scheduling notification for "${reminder.title}" in ${timeDifference / 1000 / 60} minutes.`);
-        const timerId = self.setTimeout(() => {
-          showNotification(reminder);
-        }, timeDifference);
-        activeTimers.push(timerId);
       }
     }
   } catch (error) {
-    console.error('Service Worker: Error scheduling notifications:', error);
+    console.error('Service Worker: Error checking reminders:', error);
   }
 };
 
@@ -127,20 +103,19 @@ const scheduleNotifications = async () => {
 
 /**
  * The 'activate' event is fired when the service worker is activated.
- * We schedule notifications here to ensure they are set up when the SW starts.
+ * We check reminders here to handle any missed notifications when the SW starts.
  */
 self.addEventListener('activate', (event) => {
-  event.waitUntil(scheduleNotifications());
+  event.waitUntil(checkReminders());
 });
 
 /**
  * The 'message' event listens for messages from the main application.
- * This is used to trigger a re-scheduling of notifications when reminders are
- * created, updated, or deleted in the app.
+ * This is used to trigger a check of reminders when they are updated in the app.
  */
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'UPDATE_REMINDERS') {
-    scheduleNotifications();
+    checkReminders();
   }
 });
 
@@ -148,10 +123,14 @@ interface PeriodicSyncEvent extends ExtendableEvent {
   tag: string;
 }
 
+/**
+ * The 'periodicsync' event is the primary mechanism for triggering background
+ * notifications. It runs periodically as determined by the browser.
+ */
 self.addEventListener('periodicsync', (event) => {
   const periodicSyncEvent = event as PeriodicSyncEvent;
   if (periodicSyncEvent.tag === 'UPDATE_REMINDERS') {
-    periodicSyncEvent.waitUntil(scheduleNotifications());
+    periodicSyncEvent.waitUntil(checkReminders());
   }
 });
 
