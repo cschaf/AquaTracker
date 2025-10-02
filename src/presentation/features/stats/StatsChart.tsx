@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, createRef } from 'react';
 import type { Log } from '../../../domain/entities';
 import { Card } from '../../components/Card';
 
@@ -115,6 +115,8 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
     return data;
   }, [logs, selectedRange]);
 
+  const barRefs = useMemo(() => Array.from({ length: chartData.length }, () => createRef<HTMLDivElement>()), [chartData.length]);
+
   useEffect(() => {
     let lastIndexWithValue = -1;
     for (let i = chartData.length - 1; i >= 0; i--) {
@@ -126,12 +128,22 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
 
     if (lastIndexWithValue !== -1) {
       setSelectedBar(lastIndexWithValue);
-    } else if (chartData.length === 1) {
-      setSelectedBar(0);
+    } else if (chartData.length > 0) {
+      setSelectedBar(chartData.length -1);
     } else {
       setSelectedBar(null);
     }
   }, [chartData]);
+
+  useEffect(() => {
+    if (selectedBar !== null && barRefs[selectedBar]?.current) {
+      barRefs[selectedBar].current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center',
+      });
+    }
+  }, [selectedBar, barRefs]);
 
   const maxValue = useMemo(() => {
     const values = chartData.map(d => d.value);
@@ -227,6 +239,7 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
                   return (
                     <div
                       key={index}
+                      ref={barRefs[index]}
                       className="relative flex flex-col items-center justify-end h-full z-10 cursor-pointer"
                       onClick={() => setSelectedBar(isSelected ? null : index)}
                     >
