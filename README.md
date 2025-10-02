@@ -12,7 +12,7 @@ AquaTracker is a web-based application designed to help you monitor and log your
 *   **Real-time Progress Tracking:** Visualize your daily progress with an animated water level and percentage display.
 *   **Today's Entries:** View a detailed list of your water intake entries for the day, including timestamps.
 *   **Edit and Delete Entries:** Easily correct mistakes by editing or deleting individual entries.
-*   **Weekly Consumption Chart:** Get an overview of your water intake for the past week with a bar chart.
+*   **Interactive Stats Chart:** Visualize your water intake with a detailed and interactive bar chart. View your data by day, week, month, year, or see your entire history. Tap on bars to see specific values and track your progress against your goal.
 *   **Key Statistics:** Track important stats like your weekly total, best streak, and current streak of meeting your goal.
 *   **Achievements System:** Unlock a variety of achievements for reaching milestones and maintaining consistency.
 *   **Data Import/Export:** Backup your data by exporting it to a JSON file, and restore it later using the import feature.
