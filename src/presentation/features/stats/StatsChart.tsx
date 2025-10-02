@@ -116,8 +116,18 @@ const StatsChart: React.FC<StatsChartProps> = ({ logs, dailyGoal }) => {
   }, [logs, selectedRange]);
 
   useEffect(() => {
-    if (chartData.length > 0) {
-      setSelectedBar(chartData.length - 1);
+    let lastIndexWithValue = -1;
+    for (let i = chartData.length - 1; i >= 0; i--) {
+      if (chartData[i].value > 0) {
+        lastIndexWithValue = i;
+        break;
+      }
+    }
+
+    if (lastIndexWithValue !== -1) {
+      setSelectedBar(lastIndexWithValue);
+    } else if (chartData.length === 1) {
+      setSelectedBar(0);
     } else {
       setSelectedBar(null);
     }
