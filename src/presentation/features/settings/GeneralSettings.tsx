@@ -40,7 +40,7 @@ const GeneralSettings: React.FC = () => {
           showSuccess('Background sync for reminders is enabled.');
         } else {
           showInfo(
-            'Background sync permission was not granted. You may need to enable it in your browser settings for reliable reminders.',
+            'For the most reliable reminders, install the app to your home screen. This allows background sync to work correctly.',
           );
         }
       }
