@@ -3,7 +3,8 @@ import { Card } from '../../components/Card.tsx';
 import { ThemeSwitcher } from '../../components/ThemeSwitcher.tsx';
 import { useTheme } from '../../hooks/useTheme.ts';
 import { Button } from '../../components/Button.tsx';
-import { showSuccess, showError } from '../../services/toast.service.ts';
+import { showSuccess, showError, showInfo } from '../../services/toast.service.ts';
+import { setupPeriodicSync } from '../../../service-worker-registration.ts';
 
 interface SettingsRowProps {
   title: string;
@@ -23,15 +24,28 @@ const GeneralSettings: React.FC = () => {
   const { toggleTheme } = useTheme();
 
   const handlePermissionRequest = async () => {
-    if ('Notification' in window) {
-      const permission = await Notification.requestPermission();
-      if (permission === 'granted') {
-        showSuccess('Notification permissions have been granted.');
-      } else {
-        showError('Notification permissions have been denied.');
+    if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+      showError('This browser does not support notifications or service workers.');
+      return;
+    }
+
+    const permission = await Notification.requestPermission();
+    if (permission === 'granted') {
+      showSuccess('Notification permissions have been granted.');
+
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (registration) {
+        const syncEnabled = await setupPeriodicSync(registration);
+        if (syncEnabled) {
+          showSuccess('Background sync for reminders is enabled.');
+        } else {
+          showInfo(
+            'Background sync permission was not granted. You may need to enable it in your browser settings for reliable reminders.',
+          );
+        }
       }
     } else {
-      showError('This browser does not support notifications.');
+      showError('Notification permissions have been denied.');
     }
   };
 

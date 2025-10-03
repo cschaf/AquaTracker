@@ -39,26 +39,30 @@ interface ServiceWorkerRegistrationWithPeriodicSync extends ServiceWorkerRegistr
   readonly periodicSync: PeriodicSyncManager;
 }
 
-async function setupPeriodicSync(registration: ServiceWorkerRegistration) {
+export async function setupPeriodicSync(registration: ServiceWorkerRegistration): Promise<boolean> {
   const swRegistration = registration as ServiceWorkerRegistrationWithPeriodicSync;
-  if ('periodicSync' in swRegistration) {
-    const status = await navigator.permissions.query({
-      name: 'periodic-background-sync' as any,
-    });
-
-    if (status.state === 'granted') {
-      try {
-        await swRegistration.periodicSync.register('UPDATE_REMINDERS', {
-          minInterval: 60 * 60 * 1000, // 1 hour
-        });
-        console.log('Periodic background sync registered for reminders.');
-      } catch (error) {
-        console.error('Failed to register periodic background sync:', error);
-      }
-    } else {
-      console.log('Periodic background sync permission not granted.');
-    }
-  } else {
+  if (!('periodicSync' in swRegistration)) {
     console.log('Periodic background sync is not supported.');
+    return false;
+  }
+
+  const status = await navigator.permissions.query({
+    name: 'periodic-background-sync' as any,
+  });
+
+  if (status.state !== 'granted') {
+    console.log('Periodic background sync permission not granted.');
+    return false;
+  }
+
+  try {
+    await swRegistration.periodicSync.register('UPDATE_REMINDERS', {
+      minInterval: 60 * 60 * 1000, // 1 hour
+    });
+    console.log('Periodic background sync registered for reminders.');
+    return true;
+  } catch (error) {
+    console.error('Failed to register periodic background sync:', error);
+    return false;
   }
 }
