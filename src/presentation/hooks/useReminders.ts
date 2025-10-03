@@ -2,12 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useUseCases } from '../../di';
 import type { ReminderDto, CreateReminderDto, UpdateReminderDto } from '../../domain/dtos';
 import { showSuccess, showError } from '../services/toast.service';
-
-const notifyServiceWorker = () => {
-  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-    navigator.serviceWorker.controller.postMessage({ type: 'UPDATE_REMINDERS' });
-  }
-};
+import { getStoredFCMToken, subscribeToWorker } from '../../infrastructure/services/firebase.service';
 
 export const useReminders = () => {
   const {
@@ -22,6 +17,18 @@ export const useReminders = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  const syncRemindersWithWorker = useCallback(async (remindersToSync: ReminderDto[]) => {
+    const token = await getStoredFCMToken();
+    if (token) {
+      console.log('FCM token found, syncing reminders with worker...');
+      // This is a background task, so we don't need to block the UI by awaiting it.
+      // Errors will be logged to the console from the service.
+      subscribeToWorker(token, remindersToSync);
+    } else {
+      console.log('No FCM token found, skipping reminder sync.');
+    }
+  }, []);
+
   const refreshReminders = useCallback(async () => {
     try {
       setLoading(true);
@@ -30,6 +37,8 @@ export const useReminders = () => {
       fetchedReminders.sort((a, b) => a.time.localeCompare(b.time));
       setReminders(fetchedReminders);
       setError(null);
+      // After fetching the latest reminders, sync them with the worker.
+      await syncRemindersWithWorker(fetchedReminders);
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
       setError(errorMessage);
@@ -37,7 +46,7 @@ export const useReminders = () => {
     } finally {
       setLoading(false);
     }
-  }, [getAllReminders]);
+  }, [getAllReminders, syncRemindersWithWorker]);
 
   useEffect(() => {
     refreshReminders();
@@ -49,7 +58,6 @@ export const useReminders = () => {
       await createReminder.execute(dto);
       showSuccess('Reminder created successfully!');
       await refreshReminders();
-      notifyServiceWorker();
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : 'Failed to create reminder.';
       showError(errorMessage);
@@ -65,7 +73,6 @@ export const useReminders = () => {
       await deleteReminder.execute(id);
       showSuccess('Reminder deleted.');
       await refreshReminders();
-      notifyServiceWorker();
     } catch (e) {
        const errorMessage = e instanceof Error ? e.message : 'Failed to delete reminder.';
        showError(errorMessage);
@@ -81,7 +88,6 @@ export const useReminders = () => {
       await toggleReminderStatus.execute(id);
       await refreshReminders();
       showSuccess('Reminder status updated.');
-      notifyServiceWorker();
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : 'Failed to update reminder status.';
       showError(errorMessage);
@@ -95,7 +101,6 @@ export const useReminders = () => {
       await updateReminder.execute(dto);
       showSuccess('Reminder updated successfully!');
       await refreshReminders();
-      notifyServiceWorker();
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : 'Failed to update reminder.';
       showError(errorMessage);

@@ -4,7 +4,7 @@ import { ThemeSwitcher } from '../../components/ThemeSwitcher.tsx';
 import { useTheme } from '../../hooks/useTheme.ts';
 import { Button } from '../../components/Button.tsx';
 import { showSuccess, showError, showInfo } from '../../services/toast.service.ts';
-import { setupPeriodicSync } from '../../../service-worker-registration.ts';
+import { getFCMToken } from '../../../infrastructure/services/firebase.service.ts';
 
 interface SettingsRowProps {
   title: string;
@@ -23,29 +23,26 @@ const SettingsRow: React.FC<SettingsRowProps> = ({ title, children }) => {
 const GeneralSettings: React.FC = () => {
   const { toggleTheme } = useTheme();
 
-  const handlePermissionRequest = async () => {
+  const handleEnableNotifications = async () => {
     if (!('Notification' in window) || !('serviceWorker' in navigator)) {
-      showError('This browser does not support notifications or service workers.');
+      showError('Push notifications are not supported in this browser.');
       return;
     }
 
     const permission = await Notification.requestPermission();
-    if (permission === 'granted') {
-      showSuccess('Notification permissions have been granted.');
+    if (permission !== 'granted') {
+      showError('Notification permission was denied. Please enable it in your browser settings.');
+      return;
+    }
 
-      const registration = await navigator.serviceWorker.getRegistration();
-      if (registration) {
-        const syncEnabled = await setupPeriodicSync(registration);
-        if (syncEnabled) {
-          showSuccess('Background sync for reminders is enabled.');
-        } else {
-          showInfo(
-            'For the most reliable reminders, install the app to your home screen. This allows background sync to work correctly.',
-          );
-        }
-      }
+    showInfo('Permission granted. Enabling push notifications...');
+
+    const token = await getFCMToken();
+
+    if (token) {
+      showSuccess('Successfully enabled push notifications! Your reminders will now be synced.');
     } else {
-      showError('Notification permissions have been denied.');
+      showError('Failed to enable push notifications. Please try again.');
     }
   };
 
@@ -57,8 +54,8 @@ const GeneralSettings: React.FC = () => {
           <ThemeSwitcher onChange={toggleTheme} />
         </SettingsRow>
         <SettingsRow title="Reminder Notifications">
-          <Button onClick={handlePermissionRequest} className="text-sm">
-            Grant Permission
+          <Button onClick={handleEnableNotifications} className="text-sm">
+            Enable Notifications
           </Button>
         </SettingsRow>
       </div>

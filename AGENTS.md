@@ -67,15 +67,19 @@ You are a senior Software Engineer and TDD (Test-Driven Development) specialist.
         - **Responsiveness:** The chart is horizontally scrollable on mobile devices to ensure all data is accessible.
         - **Goal Line:** A solid line indicates the user's daily goal, which is visible on relevant time ranges.
 
-- **Service Worker and Background Notifications**
-    - **Overview:** The application uses a service worker (`src/sw.ts`) to manage background notifications for reminders. This allows notifications to be delivered even when the app is closed or the device is offline.
-    - **Technology:** The implementation relies on the **Periodic Background Sync API** for reliable background execution.
-    - **Logic:**
-        1.  The `service-worker-registration.ts` file registers for a periodic sync event (`UPDATE_REMINDERS`) with a requested interval of approximately one hour. The browser ultimately controls the frequency to optimize battery life.
-        2.  The `checkReminders` function in the service worker (`sw.ts`) is the core of the logic. It is triggered by the `periodicsync` event, the `activate` event (when the service worker starts), and by a `postMessage` call from the app when reminders are updated.
-        3.  This function fetches all active reminders from `IndexedDB` and checks if a notification is due by comparing the reminder's scheduled time with the current time.
-        4.  To prevent spam, it only shows a notification if one has not been shown for the same reminder in the last 23 hours.
-    - **Data Persistence:** The `lastNotified` date is added to the `Reminder` entity and stored in `IndexedDB` via the `IdbReminderRepository`. This state is crucial for the service worker to function correctly across sessions.
+- **Service Worker and Push Notifications**
+    - **Overview:** The application uses a serverless backend to deliver reliable push notifications for reminders. This ensures notifications are delivered even when the app is closed or the device is offline.
+    - **Technology Stack:**
+        - **Firebase Cloud Messaging (FCM):** Used to deliver push messages to the client's service worker.
+        - **Cloudflare Workers:** Provides the serverless backend logic. It has a cron job that runs every minute to check for due reminders.
+        - **Cloudflare KV:** A key-value store used by the worker to persist user FCM tokens and their reminder data.
+    - **Logic Flow:**
+        1.  **Permission and Tokenization (`GeneralSettings.tsx`):** The user clicks "Enable Notifications". The app requests permission and then uses the Firebase SDK to get an FCM registration token. This token is stored locally in IndexedDB using `idb-keyval`.
+        2.  **Subscription (`useReminders.ts`):** Whenever the user's reminders are added, updated, or deleted, the `useReminders` hook calls the `subscribeToWorker` function. This function retrieves the stored FCM token and sends it along with the full, updated list of reminders to the Cloudflare Worker's `/api/subscribe` endpoint.
+        3.  **Data Storage (Cloudflare Worker):** The worker receives the subscription request and stores the user's reminders in a KV namespace, using the FCM token as the key.
+        4.  **Scheduled Check (Cloudflare Worker):** A cron job (`* * * * *`) triggers the worker's `scheduled` handler every minute. This handler iterates through all keys (FCM tokens) in the KV store.
+        5.  **Sending Notifications (Cloudflare Worker):** For each user, the worker checks their list of reminders. If a reminder is due at the current minute, it sends a push notification to that user's FCM token via the FCM API.
+        6.  **Receiving Notifications (`sw.ts`):** The client's service worker listens for incoming messages from FCM using `onBackgroundMessage`. When a message arrives, it displays the notification to the user.
 
 ## Code Style & Conventions
 

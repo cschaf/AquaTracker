@@ -6,7 +6,7 @@ AquaTracker is a web-based application designed to help you monitor and log your
 
 ## Features
 
-*   **Reliable Background Reminders:** Set daily reminders to drink water. Our notification system uses the **Periodic Background Sync API** to deliver reminders reliably, even when the app is in the background or your device's screen is off. This modern browser feature allows the app to periodically wake up and check for due reminders, ensuring you stay on track with your hydration goals without draining your battery.
+*   **Push Notification Reminders:** Set daily reminders to drink water. This app uses a robust, serverless backend built with **Cloudflare Workers** and **Firebase Cloud Messaging (FCM)** to deliver push notifications. This ensures your reminders are delivered reliably and on time, even when the app is closed or your device's screen is off.
 *   **Daily Goal Setting:** Set a personal daily water intake goal to stay motivated.
 *   **Quick and Custom Logging:** Log your water intake with predefined quick-add buttons (250ml, 500ml, 1L) or enter a custom amount.
 *   **Real-time Progress Tracking:** Visualize your daily progress with an animated water level and percentage display.
@@ -40,6 +40,8 @@ AquaTracker is a web-based application designed to help you monitor and log your
 *   **Font Awesome:** For icons used throughout the application.
 *   **React Hot Toast:** For displaying modern, non-intrusive toast notifications.
 *   **Browser `localStorage` & `IndexedDB`:** For storing user data and reminders persistently in the browser.
+*   **Firebase Cloud Messaging (FCM):** For handling push notifications.
+*   **Cloudflare Workers:** For the serverless backend that schedules and sends reminders.
 
 ## Project Structure
 

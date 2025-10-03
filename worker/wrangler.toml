@@ -1,0 +1,21 @@
+name = "aquatracker-reminders"
+main = "src/index.ts"
+compatibility_date = "2024-05-30"
+
+# Cron trigger to run the worker periodically to check for due reminders.
+# This will run every minute.
+[triggers]
+crons = ["* * * * *"]
+
+# Binding for KV storage, where we will store user tokens and reminders.
+# You will need to create a KV namespace in your Cloudflare dashboard
+# and replace the placeholder values below.
+[[kv_namespaces]]
+binding = "REMINDERS_STORE"
+id = "YOUR_KV_NAMESPACE_ID_PLACEHOLDER"
+preview_id = "YOUR_KV_NAMESPACE_PREVIEW_ID_PLACEHOLDER"
+
+# Environment variables for your secrets.
+# You will need to create these secrets in your Cloudflare dashboard.
+[vars]
+FCM_SERVER_KEY = "YOUR_FCM_SERVER_KEY_PLACEHOLDER"
