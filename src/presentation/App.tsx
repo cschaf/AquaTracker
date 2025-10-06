@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { setupServiceWorker } from '../service-worker-registration';
+import { useFcmInitialization } from './hooks/useFcmInitialization';
 import { ThemeProvider } from './theme/theme-provider';
 import { eventBus } from './lib/event-bus/event-bus';
 import type { Achievement, Page } from '../domain/entities';
@@ -22,6 +23,9 @@ import { RemindersPage } from './pages/RemindersPage';
 function App() {
   const [activePage, setActivePage] = useState<Page>('main');
   const isInitialMount = useRef(true);
+
+  // Initialize Firebase Cloud Messaging
+  useFcmInitialization();
 
   useEffect(() => {
     setupServiceWorker();
